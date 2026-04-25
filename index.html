@@ -7715,92 +7715,61 @@ function slideMove(id, dir) {
 
 // ── 커뮤니티 ──
 let currentCommTab = 'all';
-// ── 메뉴 이미지 고정 매핑 ──
-const MENU_IMAGES = {
-  '된장찌개':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
-  '김치찌개':'https://cdn.pixabay.com/photo/2021/01/20/12/50/kimchi-jjigae-5934570_640.jpg',
-  '비빔밥':'https://cdn.pixabay.com/photo/2020/05/05/04/17/bibimbap-5132027_640.jpg',
-  '삼겹살':'https://cdn.pixabay.com/photo/2016/09/22/05/57/samgyeopsal-1686023_640.jpg',
-  '떡볶이':'https://cdn.pixabay.com/photo/2022/05/30/03/51/tteokbokki-7230133_640.jpg',
-  '라면':'https://cdn.pixabay.com/photo/2017/09/16/19/21/ramen-2756541_640.jpg',
-  '김밥':'https://cdn.pixabay.com/photo/2019/09/19/14/41/kimbap-4489505_640.jpg',
-  '치킨':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
-  '후라이드 치킨':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
-  '양념치킨':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
-  '간장치킨':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
-  '파닭':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
-  '짜장면':'https://cdn.pixabay.com/photo/2021/10/28/11/00/jajangmyeon-6749846_640.jpg',
-  '짬뽕':'https://cdn.pixabay.com/photo/2022/03/08/02/00/jjamppong-7054145_640.jpg',
-  '순두부찌개':'https://cdn.pixabay.com/photo/2020/12/15/20/00/sundubu-jjigae-5834145_640.jpg',
-  '제육볶음':'https://cdn.pixabay.com/photo/2021/08/04/12/57/jeyuk-bokkeum-6521016_640.jpg',
-  '스테이크':'https://cdn.pixabay.com/photo/2016/01/22/02/01/steak-1155899_640.jpg',
-  '피자':'https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_640.jpg',
-  '페퍼로니 피자':'https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_640.jpg',
-  '불고기 피자':'https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_640.jpg',
-  '고구마피자':'https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_640.jpg',
-  '파스타':'https://cdn.pixabay.com/photo/2018/07/18/19/12/pasta-3547078_640.jpg',
-  '까르보나라':'https://cdn.pixabay.com/photo/2018/07/18/19/12/pasta-3547078_640.jpg',
-  '알리오올리오':'https://cdn.pixabay.com/photo/2018/07/18/19/12/pasta-3547078_640.jpg',
-  '아라비아타':'https://cdn.pixabay.com/photo/2018/07/18/19/12/pasta-3547078_640.jpg',
-  '리조또':'https://cdn.pixabay.com/photo/2021/01/16/10/51/risotto-5921491_640.jpg',
-  '불고기버거':'https://cdn.pixabay.com/photo/2016/03/05/19/02/hamburger-1238246_640.jpg',
-  '치킨버거':'https://cdn.pixabay.com/photo/2016/03/05/19/02/hamburger-1238246_640.jpg',
-  '치즈버거':'https://cdn.pixabay.com/photo/2016/03/05/19/02/hamburger-1238246_640.jpg',
-  '초밥 세트':'https://cdn.pixabay.com/photo/2016/11/12/15/28/restaurant-1819024_640.jpg',
-  '쌀국수':'https://cdn.pixabay.com/photo/2019/03/20/07/26/pho-4067313_640.jpg',
-  '마라탕':'https://cdn.pixabay.com/photo/2022/07/19/13/04/mala-hot-pot-7331548_640.jpg',
-  '훠궈':'https://cdn.pixabay.com/photo/2022/07/19/13/04/mala-hot-pot-7331548_640.jpg',
-  '닭갈비':'https://cdn.pixabay.com/photo/2021/10/28/05/08/dak-galbi-6749525_640.jpg',
-  '족발':'https://cdn.pixabay.com/photo/2022/02/10/06/18/jokbal-7004793_640.jpg',
-  '보쌈':'https://cdn.pixabay.com/photo/2022/02/10/06/18/jokbal-7004793_640.jpg',
-  '오므라이스':'https://cdn.pixabay.com/photo/2019/01/31/16/52/omurice-3967683_640.jpg',
-  '카레라이스':'https://cdn.pixabay.com/photo/2020/10/05/10/51/curry-5629647_640.jpg',
-  '계란볶음밥':'https://cdn.pixabay.com/photo/2017/06/29/20/09/fried-rice-2456981_640.jpg',
-  '김치볶음밥':'https://cdn.pixabay.com/photo/2017/06/29/20/09/fried-rice-2456981_640.jpg',
-  '새우볶음밥':'https://cdn.pixabay.com/photo/2017/06/29/20/09/fried-rice-2456981_640.jpg',
-  '채소볶음밥':'https://cdn.pixabay.com/photo/2017/06/29/20/09/fried-rice-2456981_640.jpg',
-  '갈비탕':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
-  '곰탕':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
-  '물냉면':'https://cdn.pixabay.com/photo/2021/07/12/07/07/naengmyeon-6406819_640.jpg',
-  '비빔냉면':'https://cdn.pixabay.com/photo/2021/07/12/07/07/naengmyeon-6406819_640.jpg',
-  '잔치국수':'https://cdn.pixabay.com/photo/2017/09/16/19/21/ramen-2756541_640.jpg',
-  '군만두':'https://cdn.pixabay.com/photo/2020/09/30/09/20/mandu-5614931_640.jpg',
-  '만두국':'https://cdn.pixabay.com/photo/2020/09/30/09/20/mandu-5614931_640.jpg',
-  '시저샐러드':'https://cdn.pixabay.com/photo/2017/05/07/08/56/salad-2292932_640.jpg',
-  '닭가슴살 샐러드':'https://cdn.pixabay.com/photo/2017/05/07/08/56/salad-2292932_640.jpg',
-  '아보카도 토스트':'https://cdn.pixabay.com/photo/2020/04/28/08/22/avocado-toast-5103506_640.jpg',
-  '팬케이크':'https://cdn.pixabay.com/photo/2016/11/22/18/52/pancakes-1850012_640.jpg',
-  '오믈렛':'https://cdn.pixabay.com/photo/2014/09/17/20/26/omelette-449258_640.jpg',
-  '돈코츠라멘':'https://cdn.pixabay.com/photo/2017/09/16/19/21/ramen-2756541_640.jpg',
-  '미소라멘':'https://cdn.pixabay.com/photo/2017/09/16/19/21/ramen-2756541_640.jpg',
-  '일식돈까스':'https://cdn.pixabay.com/photo/2020/04/13/16/41/tonkatsu-5039272_640.jpg',
-  '경양식돈까스':'https://cdn.pixabay.com/photo/2020/04/13/16/41/tonkatsu-5039272_640.jpg',
-  '잡채':'https://cdn.pixabay.com/photo/2021/09/16/09/50/japchae-6629849_640.jpg',
-  '탕수육':'https://cdn.pixabay.com/photo/2019/09/02/10/02/tang-su-yuk-4447372_640.jpg',
-  '낙지볶음':'https://cdn.pixabay.com/photo/2021/08/04/12/57/jeyuk-bokkeum-6521016_640.jpg',
-  '소고기등심':'https://cdn.pixabay.com/photo/2016/01/22/02/01/steak-1155899_640.jpg',
-  '소갈비':'https://cdn.pixabay.com/photo/2016/09/22/05/57/samgyeopsal-1686023_640.jpg',
-  '목살':'https://cdn.pixabay.com/photo/2016/09/22/05/57/samgyeopsal-1686023_640.jpg',
-  '닭강정':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
-  '전복죽':'https://cdn.pixabay.com/photo/2020/01/31/07/10/congee-4806892_640.jpg',
-  '닭죽':'https://cdn.pixabay.com/photo/2020/01/31/07/10/congee-4806892_640.jpg',
-  '돼지국밥':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
-  '순대국밥':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
-  '연어덮밥(사케동)':'https://cdn.pixabay.com/photo/2016/11/12/15/28/restaurant-1819024_640.jpg',
-  '회덮밥':'https://cdn.pixabay.com/photo/2016/11/12/15/28/restaurant-1819024_640.jpg',
-  '월남쌈':'https://cdn.pixabay.com/photo/2018/03/31/19/29/spring-rolls-3279066_640.jpg',
-  '분짜':'https://cdn.pixabay.com/photo/2019/03/20/07/26/pho-4067313_640.jpg',
-  '피시앤칩스':'https://cdn.pixabay.com/photo/2017/09/15/16/18/fish-2751682_640.jpg',
-};
-
+// ── 메뉴 이미지 (Wikipedia API) ──
 const imgCache = JSON.parse(localStorage.getItem('wmjImgCache') || '{}');
 
-function getMenuImg(name) {
-  return MENU_IMAGES[name] || imgCache[name] || null;
-}
+const MENU_WIKI = {
+  '된장찌개':'된장찌개','김치찌개':'김치찌개','순두부찌개':'순두부찌개',
+  '비빔밥':'비빔밥','삼겹살':'삼겹살','떡볶이':'떡볶이','라면':'라면',
+  '김밥':'김밥','후라이드 치킨':'프라이드_치킨','양념치킨':'양념치킨',
+  '짜장면':'짜장면','짬뽕':'짬뽕','탕수육':'탕수육','순대':'순대',
+  '제육볶음':'제육볶음','잡채':'잡채','갈비찜':'갈비찜','닭볶음탕':'닭볶음탕',
+  '족발':'족발','보쌈':'보쌈','콩나물국밥':'콩나물국밥','미역국':'미역국',
+  '갈비탕':'갈비탕','곰탕':'곰탕','물냉면':'냉면','비빔냉면':'비빔냉면',
+  '만두국':'만두국','군만두':'군만두','잔치국수':'잔치국수','콩국수':'콩국수',
+  '오므라이스':'오므라이스','카레라이스':'카레라이스','계란볶음밥':'볶음밥',
+  '김치볶음밥':'김치볶음밥','닭갈비':'닭갈비','마라탕':'마라탕',
+  '훠궈':'훠궈','낙지볶음':'낙지볶음','전복죽':'전복죽','닭죽':'닭죽',
+  '스테이크':'스테이크','까르보나라':'카르보나라','리조또':'리조토',
+  '피자':'피자','초밥 세트':'초밥','시저샐러드':'시저_샐러드',
+  '팬케이크':'팬케이크','오믈렛':'오믈렛','돈코츠라멘':'돈코쓰_라멘',
+  '일식돈까스':'돈가스','탕수육':'탕수육','소불고기':'불고기',
+  '회덮밥':'회덮밥','연어덮밥(사케동)':'연어','닭고기덮밥(오야코동)':'오야코동',
+  '돼지국밥':'돼지국밥','순대국밥':'순대국밥','월남쌈':'월남쌈',
+  '쌀국수':'쌀국수','불고기버거':'햄버거','치킨버거':'햄버거','치즈버거':'햄버거',
+  '아보카도 토스트':'아보카도_토스트',
+};
 
 async function fetchMenuImg(name) {
-  return getMenuImg(name);
+  if (imgCache[name]) return imgCache[name];
+  const title = MENU_WIKI[name] || name;
+  try {
+    const res = await fetch(
+      `https://ko.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=400&origin=*`
+    );
+    const data = await res.json();
+    const page = Object.values(data.query.pages)[0];
+    if (page.thumbnail?.source) {
+      imgCache[name] = page.thumbnail.source;
+      localStorage.setItem('wmjImgCache', JSON.stringify(imgCache));
+      return page.thumbnail.source;
+    }
+    const enRes = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name)}&prop=pageimages&format=json&pithumbsize=400&origin=*`
+    );
+    const enData = await enRes.json();
+    const enPage = Object.values(enData.query.pages)[0];
+    if (enPage.thumbnail?.source) {
+      imgCache[name] = enPage.thumbnail.source;
+      localStorage.setItem('wmjImgCache', JSON.stringify(imgCache));
+      return enPage.thumbnail.source;
+    }
+  } catch(e) {}
+  return null;
+}
+
+function getMenuImg(name) {
+  return imgCache[name] || null;
 }
 (function() {
   const PW = '1123';
