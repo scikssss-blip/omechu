@@ -12,8 +12,8 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
 .safe-badge { display:inline-block; background:rgba(6,214,160,0.15); border:1px solid #06d6a0; border-radius:20px; padding:3px 10px; font-size:11px; color:#06d6a0; margin-bottom:12px; }
 .stats { font-size:12px; color:#ff4757; font-weight:700; margin-bottom:12px; }
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
-.card { background:#1e1e1e; border-radius:12px; overflow:hidden; border:2px solid #333; transition:all 0.15s; cursor:pointer; }
-.card:hover { border-color:#666; }
+.card { background:#1e1e1e; border-radius:12px; overflow:hidden; border:2px solid #333; cursor:pointer; transition:all 0.15s; }
+.card:hover { border-color:#666; transform:translateY(-1px); }
 .card.has-img { border-color:#06d6a0; }
 .card img { width:100%; height:110px; object-fit:cover; display:block; }
 .card .no-img { width:100%; height:110px; background:#2a2a2a; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; }
@@ -26,8 +26,6 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
 .bottom-bar { position:fixed; bottom:0; left:0; right:0; background:#1a1a1a; border-top:1px solid #333; padding:10px 16px; display:flex; gap:8px; align-items:center; }
 .bottom-bar button { background:#ff4757; border:none; border-radius:8px; color:white; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
 .bottom-bar .count { font-size:12px; color:#888; flex:1; }
-
-/* 이미지 선택 모달 */
 .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:200; flex-direction:column; }
 .modal-bg.open { display:flex; }
 .modal-header { background:#1e1e1e; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #333; flex-shrink:0; }
@@ -37,26 +35,23 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
 .search-bar input { flex:1; background:#2a2a2a; border:1.5px solid #444; border-radius:10px; padding:9px 14px; font-size:13px; color:#f0f0f0; outline:none; }
 .search-bar input:focus { border-color:#ff4757; }
 .search-bar button { background:#ff4757; border:none; border-radius:10px; color:white; padding:9px 16px; font-size:13px; cursor:pointer; white-space:nowrap; }
-.img-grid { flex:1; overflow-y:auto; padding:12px; display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; }
-.img-item { border-radius:10px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all 0.15s; aspect-ratio:4/3; }
+.img-grid { flex:1; overflow-y:auto; padding:12px; display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; align-content:start; }
+.img-item { border-radius:10px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all 0.15s; aspect-ratio:4/3; background:#2a2a2a; }
 .img-item:hover { border-color:#ff4757; transform:scale(1.02); }
 .img-item img { width:100%; height:100%; object-fit:cover; display:block; }
-.loading { text-align:center; padding:40px; color:#666; font-size:14px; }
-.no-result { text-align:center; padding:40px; color:#666; font-size:13px; line-height:1.8; }
-
-/* 완료 모달 */
+.loading { grid-column:1/-1; text-align:center; padding:40px; color:#666; font-size:14px; }
 .done-modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:300; align-items:flex-end; justify-content:center; }
 .done-modal-bg.open { display:flex; }
 .done-modal { background:#1e1e1e; border-radius:20px 20px 0 0; padding:20px; width:100%; max-width:480px; }
 .done-modal h3 { font-size:15px; margin-bottom:8px; color:#06d6a0; }
 .done-modal textarea { width:100%; height:180px; background:#111; border:1px solid #444; border-radius:8px; padding:10px; font-size:11px; color:#ccc; font-family:monospace; resize:none; margin-bottom:8px; }
 .done-modal .btn-row { display:flex; gap:8px; }
-.done-modal .btn-row button { flex:1; padding:12px; border-radius:10px; border:none; font-size:13px; font-weight:700; cursor:pointer; font-family:'Apple SD Gothic Neo',sans-serif; }
+.done-modal .btn-row button { flex:1; padding:12px; border-radius:10px; border:none; font-size:13px; font-weight:700; cursor:pointer; }
 </style>
 </head>
 <body>
 <h1>🍽️ 오메추 이미지 설정</h1>
-<div class="desc">카드 클릭 → Pexels에서 자동 검색 → 마음에 드는 이미지 클릭 → 저장!</div>
+<div class="desc">카드 클릭 → Pexels 이미지 자동 검색 → 마음에 드는 거 클릭 → 저장!</div>
 <div class="safe-badge">✅ Pexels — 상업적 무료 사용 가능</div>
 <div class="stats" id="stats">설정된 이미지: 0 / 250개</div>
 <div class="grid" id="grid"></div>
@@ -67,14 +62,13 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
   <button onclick="clearAll()" style="background:#333;color:#aaa;">초기화</button>
 </div>
 
-<!-- Pexels 이미지 선택 모달 -->
 <div class="modal-bg" id="modal">
   <div class="modal-header">
     <h3 id="modal-title">이미지 선택</h3>
-    <button class="close-btn" onclick="closeModal()">닫기</button>
+    <button class="close-btn" onclick="closeModal()">✕ 닫기</button>
   </div>
   <div class="search-bar">
-    <input type="text" id="search-input" placeholder="검색어" onkeydown="if(event.key==='Enter')doSearch()">
+    <input type="text" id="search-input" placeholder="검색어 수정 가능" onkeydown="if(event.key==='Enter')doSearch()">
     <button onclick="doSearch()">검색</button>
   </div>
   <div class="img-grid" id="img-grid">
@@ -82,7 +76,6 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
   </div>
 </div>
 
-<!-- 코드 내보내기 모달 -->
 <div class="done-modal-bg" id="done-modal" onclick="if(event.target===this)closeDone()">
   <div class="done-modal">
     <h3>✅ 저에게 이걸 붙여넣어주세요!</h3>
@@ -95,11 +88,9 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
 </div>
 
 <script>
-const PEXELS_KEY = 'YFgee7RgZYmjnYKlQsVpa7AeE0QWO2o4rNcS1qXJQ0TjmrfAM14GtY3s';
-
 const MENUS = ["가자미구이","가자미찜","간장게장","갈릭버터파스타","갈매기살","갈치구이","갈치찌개","감바스","감자국","감자된장국","감자소고기찌개","감자스프","게살죽","경양식돈까스","계란국","계란볶음밥","고구마맛탕","고구마밥","고구마튀김","고구마피자","고기뷔페","고등어구이","고등어찌개","고등어찜","고추잡채","곤드레나물밥","골뱅이소면","곰탕","곱창","곱창전골","군만두","굴밥","굴비구이","굴죽","그릭요거트볼","그린커리","기스면","김말이튀김","김치돼지볶음","김치순두부","김치전","김치전골","깐쇼새우","깐풍새우","꼬리곰탕","꼬막찜","꽁치구이","꽁치찌개","꽃게된장국","꽃게찜","꽃게탕","꽃등심","꿔바로우","나가사키짬뽕","나베","나시고렝","나폴리탄스파게티","낙곱새","낙지삼겹살볶음","낙지전골","낙지찜","내장전골","냉파스타","뇨끼","단백질쉐이크","달걀찜","닭가슴살 샐러드","닭가슴살도시락","닭가슴살볶음","닭계장","닭날개구이","닭다리구이","닭똥집튀김","닭발","닭볶음","대구매운탕","대구탕","대창","대창덮밥(호르몬동)","대합죽","도토리묵밥","돈가스김밥","돈코츠라멘","동태매운탕","동태찌개","돼지갈비","돼지갈비전골","돼지국밥","돼지껍데기","돼지찌개","된장국","두루치기","두부샐러드","두부스테이크","두부청국장찌개","들깨죽","딤섬","떡만두국","라면","로제파스타","리조또","리코타치즈샐러드","마라롱샤","마라샹궈","막국수","만두국","매운족발","매운치킨","메밀소바","메추리알꼬치","명란파스타","모듬회","모츠나베","목살","문어숙회","미소라멘","미소시루","미트볼스파게티","반미","버터치킨커리","복지리탕","봉골레파스타","북경오리","북어국","분짜","불낙덮밥","비빔국수","비빔냉면","삼겹살","삼치구이","새우볶음밥","새우장덮밥","새우찜","샤오롱바오","샥슈카","선지해장국","소갈비","소고기감자죽","소고기구이","소고기국밥","소고기등심","소고기뭇국","소불고기","소불고기덮밥(규동)","소시지야채볶음","솥밥","수육","순대국밥","순대볶음","순두부찌개","스테이크덮밥","시래기된장국","시저샐러드","쌀국수","쌈밥","아귀찜","아라비아타","아보카도 토스트","아보카도샐러드","알리오올리오","알탕","야키토리","양념치킨","어묵탕","에그베네딕트","연어덮밥(사케동)","연어샐러드","연어스테이크","열무김치국수","열무냉면","오겹살","오뎅볶음","오리구이","오리죽","오마카세","오므라이스","오삼불고기","오이냉국","완탕면","우거지갈비탕","우동볶음","우럭매운탕","월남쌈","유린기","인도카레","잔치국수","잡곡밥","장어덮밥","쟁반막국수","전복버터구이","전어구이","제육덮밥","조개구이","조개탕","족발","중식볶음밥","짬뽕밥","쭈꾸미볶음","차돌박이샤브샤브","차슈덮밥","참치마요덮밥","참치샐러드","참치죽","채소볶음밥","채소죽","청국장","초밥 세트","치즈닭갈비","치즈스틱","치킨마요덮밥","치킨스테이크","치킨윙봉","치킨카레","치킨파히타","케밥","콩국수","콩나물불고기","콩비지찌개","퀘사디아","크로크무슈","크림떡볶이","크림수프","클럽샌드위치","타코야키","탄두리치킨","텐동","토마토파스타","토스트","톰얌꿍","튀김우동","팟타이","포케","프렌치토스트","피시앤칩스","하이라이스","함박스테이크","핫도그","항정살","해물볶음밥","해물순두부","해물파스타","해물파전","현미밥+된장국","홍합탕","황태해장국","회덮밥","후라이드 치킨","훈제연어샐러드","훠궈","히츠마부시"];
 
-const EN_KW = {"가자미구이":"grilled flatfish","가자미찜":"steamed flatfish","간장게장":"soy sauce marinated crab","갈릭버터파스타":"garlic butter pasta","갈매기살":"grilled pork","갈치구이":"grilled cutlassfish","갈치찌개":"cutlassfish stew","감바스":"gambas al ajillo shrimp","감자국":"potato soup","감자된장국":"doenjang soup","감자소고기찌개":"beef potato stew","감자스프":"cream potato soup","게살죽":"crab congee","경양식돈까스":"tonkatsu pork cutlet","계란국":"egg soup","계란볶음밥":"egg fried rice","고구마맛탕":"candied sweet potato","고구마밥":"sweet potato rice","고구마튀김":"fried sweet potato","고구마피자":"sweet potato pizza","고기뷔페":"korean bbq buffet","고등어구이":"grilled mackerel","고등어찌개":"mackerel stew","고등어찜":"steamed mackerel","고추잡채":"green pepper beef stir fry","곤드레나물밥":"korean herb rice","골뱅이소면":"whelk noodles","곰탕":"korean ox bone soup","곱창":"beef intestine grilled","곱창전골":"beef tripe hotpot","군만두":"pan fried dumplings","굴밥":"oyster rice","굴비구이":"grilled dried fish","굴죽":"oyster porridge","그릭요거트볼":"greek yogurt bowl","그린커리":"thai green curry","기스면":"chinese noodle soup","김말이튀김":"fried seaweed roll","김치돼지볶음":"kimchi pork stir fry","김치순두부":"kimchi soft tofu stew","김치전":"kimchi pancake","김치전골":"kimchi hot pot","깐쇼새우":"szechuan shrimp","깐풍새우":"kung pao shrimp","꼬리곰탕":"oxtail soup","꼬막찜":"steamed cockles","꽁치구이":"grilled pacific saury","꽁치찌개":"pacific saury stew","꽃게된장국":"crab soybean soup","꽃게찜":"steamed blue crab","꽃게탕":"spicy crab stew","꽃등심":"ribeye steak","꿔바로우":"chinese sweet sour pork","나가사키짬뽕":"nagasaki champon noodles","나베":"japanese hot pot","나시고렝":"nasi goreng fried rice","나폴리탄스파게티":"napolitan spaghetti ketchup","낙곱새":"octopus tripe stew","낙지삼겹살볶음":"octopus pork belly stir fry","낙지전골":"octopus hot pot","낙지찜":"steamed spicy octopus","내장전골":"beef offal hot pot","냉파스타":"cold pasta","뇨끼":"gnocchi","단백질쉐이크":"protein shake","달걀찜":"korean steamed egg custard","닭가슴살 샐러드":"chicken breast salad","닭가슴살도시락":"chicken breast meal prep","닭가슴살볶음":"chicken breast stir fry","닭계장":"spicy chicken soup korean","닭날개구이":"grilled chicken wings","닭다리구이":"grilled chicken drumstick","닭똥집튀김":"fried chicken gizzard","닭발":"spicy chicken feet korean","닭볶음":"braised chicken","대구매운탕":"spicy cod fish soup","대구탕":"cod fish soup","대창":"beef large intestine korean","대창덮밥(호르몬동)":"beef intestine rice bowl","대합죽":"clam porridge","도토리묵밥":"acorn jelly rice bowl","돈가스김밥":"tonkatsu kimbap roll","돈코츠라멘":"tonkotsu ramen pork bone","동태매운탕":"spicy pollock soup","동태찌개":"pollock stew","돼지갈비":"korean pork ribs bbq","돼지갈비전골":"pork rib hot pot","돼지국밥":"pork rice soup","돼지껍데기":"pork skin crispy","돼지찌개":"pork stew","된장국":"korean soybean paste soup","두루치기":"pork kimchi stir fry","두부샐러드":"tofu salad","두부스테이크":"pan fried tofu steak","두부청국장찌개":"fermented soybean stew","들깨죽","딤섬":"dim sum dumplings","떡만두국":"rice cake dumpling soup","라면":"korean ramen instant noodles","로제파스타":"rose cream pasta","리조또":"risotto creamy","리코타치즈샐러드":"ricotta cheese salad","마라롱샤":"mala spicy crayfish","마라샹궈":"mala dry pot chinese","막국수":"buckwheat noodles cold","만두국":"korean dumpling soup","매운족발":"spicy braised pork feet","매운치킨":"spicy fried chicken","메밀소바":"soba buckwheat noodles","메추리알꼬치":"quail egg skewer","명란파스타":"mentaiko pasta","모듬회":"assorted sashimi platter","모츠나베":"japanese offal hot pot","목살":"pork neck steak grilled","문어숙회":"sliced octopus","미소라멘":"miso ramen noodles","미소시루":"japanese miso soup","미트볼스파게티":"spaghetti meatballs","반미":"banh mi vietnamese sandwich","버터치킨커리":"butter chicken curry indian","복지리탕":"blowfish soup korean","봉골레파스타":"spaghetti alle vongole clam","북경오리":"peking duck chinese","북어국":"dried pollack soup","분짜":"bun cha vietnamese noodles","불낙덮밥":"beef octopus rice bowl","비빔국수":"spicy mixed noodles korean","비빔냉면":"spicy cold noodles korean","삼겹살":"samgyeopsal grilled pork belly","삼치구이":"grilled spanish mackerel","새우볶음밥":"shrimp fried rice","새우장덮밥":"soy marinated shrimp rice","새우찜":"steamed shrimp","샤오롱바오":"xiaolongbao soup dumpling","샥슈카":"shakshuka eggs tomato","선지해장국":"blood sausage soup hangover","소갈비":"korean beef short ribs","소고기감자죽":"beef potato porridge","소고기구이":"grilled beef korean bbq","소고기국밥":"beef rice soup","소고기등심":"sirloin steak beef","소고기뭇국":"beef radish soup","소불고기":"bulgogi korean beef","소불고기덮밥(규동)":"gyudon beef rice bowl","소시지야채볶음":"sausage vegetable stir fry","솥밥":"korean stone pot rice","수육":"boiled pork slices","순대국밥":"blood sausage soup rice","순대볶음":"stir fried blood sausage","순두부찌개":"soft tofu stew korean","스테이크덮밥":"steak rice bowl","시래기된장국":"dried radish leaf soup","시저샐러드":"caesar salad","쌀국수":"pho vietnamese rice noodles","쌈밥":"korean lettuce wrap rice","아귀찜":"spicy monkfish stew","아라비아타":"arrabbiata spicy tomato pasta","아보카도 토스트":"avocado toast","아보카도샐러드":"avocado salad","알리오올리오":"aglio olio garlic pasta","알탕":"spicy fish roe soup","야키토리":"yakitori chicken skewer","양념치킨":"korean sweet spicy chicken","어묵탕":"fish cake soup korean","에그베네딕트":"eggs benedict brunch","연어덮밥(사케동)":"salmon donburi rice bowl","연어샐러드":"salmon salad","연어스테이크":"salmon steak grilled","열무김치국수":"radish kimchi noodles","열무냉면":"radish cold noodles","오겹살":"pork belly grilled","오뎅볶음":"fish cake stir fry","오리구이":"roasted duck","오리죽":"duck porridge","오마카세":"omakase sushi japanese","오므라이스":"omurice japanese","오삼불고기":"squid pork stir fry spicy","오이냉국","완탕면":"wonton noodle soup","우거지갈비탕":"cabbage rib soup korean","우동볶음":"stir fried udon noodles","우럭매운탕":"spicy rockfish soup","월남쌈":"vietnamese fresh spring rolls","유린기":"chinese crispy chicken","인도카레":"indian curry","잔치국수":"korean warm noodle soup","잡곡밥":"mixed grain rice bowl","장어덮밥":"eel rice bowl unaju","쟁반막국수":"large bowl buckwheat noodles","전복버터구이":"butter grilled abalone","전어구이":"grilled gizzard shad","제육덮밥":"spicy pork rice bowl","조개구이":"grilled clams","조개탕":"clam soup","족발":"braised pork feet korean","중식볶음밥":"chinese fried rice","짬뽕밥":"spicy seafood rice","쭈꾸미볶음":"spicy octopus stir fry","차돌박이샤브샤브":"brisket shabu shabu","차슈덮밥":"chashu pork rice bowl","참치마요덮밥":"tuna mayo rice bowl","참치샐러드":"tuna salad","참치죽":"tuna rice porridge","채소볶음밥":"vegetable fried rice","채소죽":"vegetable porridge","청국장":"cheonggukjang fermented soybean","초밥 세트":"sushi set platter","치즈닭갈비":"cheese dak galbi korean","치즈스틱":"mozzarella cheese sticks","치킨마요덮밥":"chicken mayo rice bowl","치킨스테이크":"chicken steak grilled","치킨윙봉":"buffalo chicken wings","치킨카레":"chicken curry","치킨파히타":"chicken fajita","케밥":"kebab grilled meat","콩국수":"cold soy milk noodles","콩나물불고기":"bean sprout bulgogi","콩비지찌개":"soybean pulp stew","퀘사디아":"quesadilla cheese","크로크무슈":"croque monsieur sandwich","크림떡볶이":"cream sauce tteokbokki","크림수프":"cream soup","클럽샌드위치":"club sandwich","타코야키":"takoyaki octopus balls","탄두리치킨":"tandoori chicken","텐동":"tempura rice bowl tendon","토마토파스타":"tomato pasta","토스트":"toast breakfast","톰얌꿍":"tom yum soup thai","튀김우동":"tempura udon noodles","팟타이":"pad thai noodles","포케":"poke bowl hawaii","프렌치토스트":"french toast breakfast","피시앤칩스":"fish and chips","하이라이스":"hayashi rice stew","함박스테이크":"hamburg steak","핫도그":"hot dog","항정살":"pork jowl grilled","해물볶음밥":"seafood fried rice","해물순두부":"seafood soft tofu","해물파스타":"seafood pasta","해물파전":"seafood green onion pancake","현미밥+된장국":"brown rice miso soup","홍합탕":"mussel soup","황태해장국":"dried pollack hangover soup","회덮밥":"raw fish rice bowl korean","후라이드 치킨":"fried chicken crispy","훈제연어샐러드":"smoked salmon salad","훠궈":"chinese hot pot","히츠마부시":"hitsumabushi eel rice"};
+const EN_KW = {"가자미구이":"grilled flatfish","가자미찜":"steamed flatfish","간장게장":"soy sauce marinated crab","갈릭버터파스타":"garlic butter pasta","갈매기살":"grilled pork","갈치구이":"grilled cutlassfish","갈치찌개":"fish stew korean","감바스":"gambas al ajillo shrimp","감자국":"potato soup","감자된장국":"korean soybean paste soup","감자소고기찌개":"beef potato stew","감자스프":"cream potato soup","게살죽":"crab congee porridge","경양식돈까스":"tonkatsu pork cutlet","계란국":"egg drop soup","계란볶음밥":"egg fried rice","고구마맛탕":"candied sweet potato","고구마밥":"sweet potato rice","고구마튀김":"fried sweet potato","고구마피자":"sweet potato pizza","고기뷔페":"korean bbq buffet","고등어구이":"grilled mackerel","고등어찌개":"mackerel stew","고등어찜":"steamed mackerel","고추잡채":"pepper beef stir fry","곤드레나물밥":"korean herb rice bowl","골뱅이소면":"whelk noodles","곰탕":"korean ox bone soup","곱창":"beef intestine grilled korean","곱창전골":"beef tripe hot pot","군만두":"pan fried dumplings","굴밥":"oyster rice","굴비구이":"grilled dried fish","굴죽":"oyster porridge","그릭요거트볼":"greek yogurt bowl fruit","그린커리":"thai green curry","기스면":"chinese noodle soup","김말이튀김":"fried seaweed roll","김치돼지볶음":"kimchi pork stir fry","김치순두부":"kimchi soft tofu stew","김치전":"kimchi pancake","김치전골":"kimchi hot pot","깐쇼새우":"szechuan shrimp","깐풍새우":"kung pao shrimp","꼬리곰탕":"oxtail soup korean","꼬막찜":"steamed cockles shellfish","꽁치구이":"grilled pacific saury fish","꽁치찌개":"fish stew korean","꽃게된장국":"crab soybean soup","꽃게찜":"steamed blue crab","꽃게탕":"spicy crab stew","꽃등심":"ribeye steak","꿔바로우":"sweet sour pork chinese","나가사키짬뽕":"champon noodles japanese","나베":"japanese hot pot nabemono","나시고렝":"nasi goreng fried rice","나폴리탄스파게티":"ketchup spaghetti","낙곱새":"spicy korean stew seafood","낙지삼겹살볶음":"octopus pork stir fry","낙지전골":"octopus hot pot","낙지찜":"steamed spicy octopus","내장전골":"beef offal hot pot","냉파스타":"cold pasta salad","뇨끼":"gnocchi","단백질쉐이크":"protein shake smoothie","달걀찜":"korean steamed egg custard","닭가슴살 샐러드":"chicken breast salad healthy","닭가슴살도시락":"chicken breast meal prep","닭가슴살볶음":"chicken breast stir fry","닭계장":"spicy chicken soup korean","닭날개구이":"grilled chicken wings","닭다리구이":"grilled chicken drumstick","닭똥집튀김":"fried chicken gizzard","닭발":"spicy chicken feet korean","닭볶음":"braised chicken stew","대구매운탕":"spicy cod fish soup","대구탕":"cod fish soup korean","대창":"beef intestine korean grilled","대창덮밥(호르몬동)":"beef intestine rice bowl","대합죽":"clam porridge","도토리묵밥":"acorn jelly rice bowl","돈가스김밥":"tonkatsu kimbap roll","돈코츠라멘":"tonkotsu ramen pork bone soup","동태매운탕":"spicy pollock soup korean","동태찌개":"pollock stew korean","돼지갈비":"korean pork ribs bbq grilled","돼지갈비전골":"pork rib hot pot","돼지국밥":"pork rice soup korean","돼지껍데기":"crispy pork skin","돼지찌개":"pork stew korean","된장국":"korean soybean paste soup","두루치기":"pork kimchi stir fry","두부샐러드":"tofu salad fresh","두부스테이크":"pan fried tofu steak","두부청국장찌개":"fermented soybean stew tofu","들깨죽":"perilla seed porridge","딤섬":"dim sum dumplings chinese","떡만두국":"rice cake dumpling soup korean","라면":"korean ramen noodles soup","로제파스타":"rose cream pasta pink","리조또":"creamy risotto italian","리코타치즈샐러드":"ricotta cheese salad","마라롱샤":"mala spicy crayfish chinese","마라샹궈":"mala dry pot spicy chinese","막국수":"korean buckwheat cold noodles","만두국":"korean dumpling soup","매운족발":"spicy braised pork feet","매운치킨":"spicy fried chicken","메밀소바":"soba buckwheat noodles cold","메추리알꼬치":"quail egg skewer street food","명란파스타":"mentaiko roe pasta","모듬회":"assorted sashimi platter","모츠나베":"japanese offal hot pot","목살":"grilled pork neck steak","문어숙회":"blanched octopus sliced","미소라멘":"miso ramen japanese noodles","미소시루":"japanese miso soup","미트볼스파게티":"spaghetti meatballs tomato","반미":"banh mi vietnamese sandwich","버터치킨커리":"butter chicken curry indian","복지리탕":"blowfish soup korean","봉골레파스타":"spaghetti vongole clam pasta","북경오리":"peking duck chinese roasted","북어국":"dried pollack soup korean","분짜":"bun cha vietnamese noodles","불낙덮밥":"beef octopus rice bowl spicy","비빔국수":"spicy mixed noodles korean","비빔냉면":"spicy cold noodles korean","삼겹살":"samgyeopsal grilled pork belly","삼치구이":"grilled spanish mackerel","새우볶음밥":"shrimp fried rice","새우장덮밥":"soy marinated shrimp rice bowl","새우찜":"steamed shrimp seafood","샤오롱바오":"xiaolongbao soup dumpling","샥슈카":"shakshuka eggs tomato","선지해장국":"blood sausage hangover soup","소갈비":"korean beef short ribs grilled","소고기감자죽":"beef potato porridge congee","소고기구이":"grilled beef korean bbq","소고기국밥":"beef rice soup korean","소고기등심":"sirloin steak grilled","소고기뭇국":"beef radish soup","소불고기":"bulgogi korean beef grilled","소불고기덮밥(규동)":"gyudon beef rice bowl japanese","소시지야채볶음":"sausage vegetable stir fry","솥밥":"korean stone pot rice dolsot","수육":"boiled pork belly slices","순대국밥":"blood sausage soup rice korean","순대볶음":"stir fried blood sausage korean","순두부찌개":"soft tofu stew korean spicy","스테이크덮밥":"steak rice bowl","시래기된장국":"dried radish leaf soybean soup","시저샐러드":"caesar salad crispy","쌀국수":"pho vietnamese rice noodle soup","쌈밥":"korean lettuce wrap rice ssam","아귀찜":"spicy monkfish stew korean","아라비아타":"arrabbiata spicy tomato pasta","아보카도 토스트":"avocado toast brunch","아보카도샐러드":"avocado salad healthy","알리오올리오":"aglio olio garlic pasta olive oil","알탕":"spicy fish roe soup korean","야키토리":"yakitori chicken skewer japanese","양념치킨":"korean sweet spicy chicken yangnyeom","어묵탕":"fish cake soup korean oden","에그베네딕트":"eggs benedict hollandaise","연어덮밥(사케동)":"salmon donburi rice bowl","연어샐러드":"salmon salad fresh","연어스테이크":"salmon steak grilled","열무김치국수":"radish kimchi noodles","열무냉면":"radish cold noodles korean","오겹살":"grilled pork belly korean","오뎅볶음":"fish cake stir fry korean","오리구이":"roasted duck crispy","오리죽":"duck porridge congee","오마카세":"omakase sushi japanese","오므라이스":"omurice japanese rice omelette","오삼불고기":"squid pork stir fry spicy","오이냉국":"cold cucumber soup refreshing","완탕면":"wonton noodle soup chinese","우거지갈비탕":"cabbage beef rib soup korean","우동볶음":"stir fried udon noodles","우럭매운탕":"spicy rockfish soup korean","월남쌈":"vietnamese fresh spring rolls","유린기":"chinese crispy chicken sauce","인도카레":"indian curry spices","잔치국수":"korean warm noodle soup janchi","잡곡밥":"mixed grain rice healthy","장어덮밥":"eel rice bowl unaju japanese","쟁반막국수":"large bowl buckwheat noodles","전복버터구이":"butter grilled abalone","전어구이":"grilled gizzard shad fish","제육덮밥":"spicy pork rice bowl korean","조개구이":"grilled clams shellfish","조개탕":"clam soup korean","족발":"braised pork feet korean jokbal","중식볶음밥":"chinese fried rice wok","짬뽕밥":"spicy seafood noodle rice","쭈꾸미볶음":"spicy octopus stir fry korean","차돌박이샤브샤브":"brisket shabu shabu hotpot","차슈덮밥":"chashu pork rice bowl ramen","참치마요덮밥":"tuna mayo rice bowl","참치샐러드":"tuna salad","참치죽":"tuna rice congee porridge","채소볶음밥":"vegetable fried rice","채소죽":"vegetable porridge healthy","청국장":"cheonggukjang fermented soybean stew","초밥 세트":"sushi set platter japanese","치즈닭갈비":"cheese dak galbi korean","치즈스틱":"mozzarella cheese sticks fried","치킨마요덮밥":"chicken mayo rice bowl","치킨스테이크":"chicken steak grilled","치킨윙봉":"buffalo chicken wings","치킨카레":"chicken curry rice","치킨파히타":"chicken fajita mexican","케밥":"kebab grilled meat skewer","콩국수":"cold soy milk noodles korean","콩나물불고기":"bean sprout bulgogi korean","콩비지찌개":"soybean pulp stew korean","퀘사디아":"quesadilla cheese mexican","크로크무슈":"croque monsieur french sandwich","크림떡볶이":"cream sauce tteokbokki korean","크림수프":"cream soup velvety","클럽샌드위치":"club sandwich layers","타코야키":"takoyaki octopus balls japanese","탄두리치킨":"tandoori chicken indian","텐동":"tempura rice bowl tendon japanese","토마토파스타":"tomato pasta italian","토스트":"toast breakfast egg","톰얌꿍":"tom yum soup thai shrimp","튀김우동":"tempura udon noodles","팟타이":"pad thai noodles thai","포케":"poke bowl hawaii","프렌치토스트":"french toast breakfast syrup","피시앤칩스":"fish and chips british","하이라이스":"hayashi rice japanese stew","함박스테이크":"hamburg steak demi glace","핫도그":"hot dog sausage","항정살":"grilled pork jowl korean","해물볶음밥":"seafood fried rice","해물순두부":"seafood soft tofu stew","해물파스타":"seafood pasta","해물파전":"seafood pancake korean pajeon","현미밥+된장국":"brown rice miso soup","홍합탕":"mussel soup broth","황태해장국":"dried pollack hangover soup","회덮밥":"raw fish rice bowl korean","후라이드 치킨":"crispy fried chicken","훈제연어샐러드":"smoked salmon salad","훠궈":"chinese hot pot steamboat","히츠마부시":"hitsumabushi eel rice japanese"};
 
 let imgMap = JSON.parse(localStorage.getItem('omechuImgMap') || '{}');
 let currentMenu = null;
@@ -117,10 +108,9 @@ function renderCard(name, i) {
   card.id = `card-${i}`;
   card.onclick = () => openModal(name);
   const imgHtml = url
-    ? `<img src="${url}" alt="${name}">`
+    ? `<img src="${url}" alt="${name}" onerror="this.style.display='none'">`
     : `<div class="no-img"><span class="emoji">🍽️</span><span class="label">클릭해서 선택</span></div>`;
-  card.innerHTML = `
-    ${imgHtml}
+  card.innerHTML = `${imgHtml}
     <div class="info">
       <div class="name">${name}</div>
       ${url ? `<button class="del-btn" onclick="event.stopPropagation();deleteImg('${name.replace(/'/g,"\\'")}',${i})">✕ 삭제</button>` : ''}
@@ -136,11 +126,11 @@ function init() {
 
 async function openModal(name) {
   currentMenu = name;
-  document.getElementById('modal-title').textContent = `🖼️ ${name} 이미지 선택`;
+  document.getElementById('modal-title').textContent = `🖼️ ${name}`;
   const kw = EN_KW[name] || name;
   document.getElementById('search-input').value = kw;
   document.getElementById('modal').classList.add('open');
-  await searchPexels(kw);
+  await searchImages(kw);
 }
 
 function closeModal() {
@@ -150,32 +140,30 @@ function closeModal() {
 
 async function doSearch() {
   const q = document.getElementById('search-input').value.trim();
-  if (q) await searchPexels(q);
+  if (q) await searchImages(q);
 }
 
-async function searchPexels(query) {
+async function searchImages(query) {
   const grid = document.getElementById('img-grid');
   grid.innerHTML = '<div class="loading">🔍 검색 중...</div>';
   try {
-    const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=20&orientation=landscape`,
-      { headers: { Authorization: PEXELS_KEY } }
-    );
+    // Vercel 프록시를 통해 Pexels API 호출
+    const res = await fetch(`/api/pexels?query=${encodeURIComponent(query)}`);
     const data = await res.json();
     if (!data.photos || data.photos.length === 0) {
-      grid.innerHTML = `<div class="no-result">이미지를 찾지 못했어요 😢<br>검색어를 바꿔보세요</div>`;
+      grid.innerHTML = `<div class="loading">이미지를 찾지 못했어요 😢<br>검색어를 바꿔보세요</div>`;
       return;
     }
     grid.innerHTML = '';
     data.photos.forEach(photo => {
       const div = document.createElement('div');
       div.className = 'img-item';
-      div.innerHTML = `<img src="${photo.src.medium}" alt="${photo.alt}" loading="lazy">`;
+      div.innerHTML = `<img src="${photo.src.medium}" loading="lazy">`;
       div.onclick = () => selectImg(photo.src.large);
       grid.appendChild(div);
     });
   } catch(e) {
-    grid.innerHTML = `<div class="no-result">오류가 발생했어요 😢<br>${e.message}</div>`;
+    grid.innerHTML = `<div class="loading">오류가 발생했어요 😢</div>`;
   }
 }
 
