@@ -39,7 +39,11 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
 .img-item { border-radius:10px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all 0.15s; aspect-ratio:4/3; background:#2a2a2a; }
 .img-item:hover { border-color:#ff4757; transform:scale(1.02); }
 .img-item img { width:100%; height:100%; object-fit:cover; display:block; }
-.loading { grid-column:1/-1; text-align:center; padding:40px; color:#666; font-size:14px; }
+.site-tab { background:#2a2a2a; border:1.5px solid #444; border-bottom:none; border-radius:8px 8px 0 0; color:#888; font-size:12px; padding:7px 14px; cursor:pointer; font-family:'Apple SD Gothic Neo',sans-serif; transition:all 0.15s; }
+.site-tab.active { background:#1e1e1e; border-color:#ff4757; color:#ff4757; }
+.ext-grid { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+.ext-open-btn { width:100%; max-width:360px; padding:14px; border-radius:14px; border:2px solid; font-size:14px; font-weight:700; cursor:pointer; font-family:'Apple SD Gothic Neo',sans-serif; transition:all 0.2s; }
+.ext-hint { font-size:12px; color:#666; text-align:center; line-height:1.8; max-width:320px; }
 .done-modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:300; align-items:flex-end; justify-content:center; }
 .done-modal-bg.open { display:flex; }
 .done-modal { background:#1e1e1e; border-radius:20px 20px 0 0; padding:20px; width:100%; max-width:480px; }
@@ -67,9 +71,21 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
     <h3 id="modal-title">이미지 선택</h3>
     <button class="close-btn" onclick="closeModal()">✕ 닫기</button>
   </div>
+  <div style="background:#161616;padding:8px 16px 0;border-bottom:1px solid #222;flex-shrink:0;display:flex;gap:6px">
+    <button id="tab-pexels" class="site-tab active" onclick="switchTab('pexels')">🟢 Pexels</button>
+    <button id="tab-unsplash" class="site-tab" onclick="switchTab('unsplash')">⚪ Unsplash</button>
+    <button id="tab-pixabay" class="site-tab" onclick="switchTab('pixabay')">🟡 Pixabay</button>
+  </div>
   <div class="search-bar">
     <input type="text" id="search-input" placeholder="검색어 수정 가능" onkeydown="if(event.key==='Enter')doSearch()">
     <button onclick="doSearch()">검색</button>
+  </div>
+  <div style="background:#1a1a1a;padding:8px 16px;border-bottom:1px solid #222;display:flex;gap:8px;align-items:center;flex-shrink:0">
+    <input type="text" id="direct-url" placeholder="또는 이미지 URL 직접 붙여넣기" 
+      style="flex:1;background:#2a2a2a;border:1.5px solid #555;border-radius:8px;padding:7px 12px;font-size:12px;color:#f0f0f0;outline:none"
+      onkeydown="if(event.key==='Enter')saveDirectUrl()"
+      onfocus="this.style.borderColor='#ff4757'" onblur="this.style.borderColor='#555'">
+    <button onclick="saveDirectUrl()" style="background:#ff4757;border:none;border-radius:8px;color:white;padding:7px 14px;font-size:12px;cursor:pointer;white-space:nowrap">URL저장</button>
   </div>
   <div class="img-grid" id="img-grid">
     <div class="loading">카드를 클릭하면 이미지가 표시돼요</div>
@@ -124,11 +140,65 @@ function init() {
   updateStats();
 }
 
+let currentTab = 'pexels';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.site-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  const kw = document.getElementById('search-input').value.trim();
+  if (tab === 'pexels') {
+    document.getElementById('img-grid').style.display = 'grid';
+    searchImages(kw);
+  } else {
+    showExternal(tab, kw);
+  }
+}
+
+function showExternal(site, kw) {
+  const grid = document.getElementById('img-grid');
+  grid.style.display = 'flex';
+  grid.style.flexDirection = 'column';
+  grid.style.alignItems = 'center';
+  grid.style.gap = '12px';
+  grid.style.padding = '24px 16px';
+
+  const configs = {
+    unsplash: {
+      color: '#222', borderColor: '#fff', textColor: '#fff',
+      label: '⚪ Unsplash에서 검색하기',
+      url: `https://unsplash.com/s/photos/${encodeURIComponent(kw)}`,
+      hint: '1. 위 버튼으로 Unsplash 열기\n2. 마음에 드는 이미지 클릭\n3. 오른쪽 하단 ⬇ 다운로드 버튼 옆 화살표 클릭\n4. "Copy image address" 또는 이미지 우클릭 → 이미지 주소 복사\n5. 아래 URL 입력란에 붙여넣기'
+    },
+    pixabay: {
+      color: '#2ec66e', borderColor: '#2ec66e', textColor: '#fff',
+      label: '🟡 Pixabay에서 검색하기',
+      url: `https://pixabay.com/images/search/${encodeURIComponent(kw)}/`,
+      hint: '1. 위 버튼으로 Pixabay 열기\n2. 마음에 드는 이미지 클릭\n3. 이미지 우클릭 → 이미지 주소 복사\n4. 아래 URL 입력란에 붙여넣기'
+    }
+  };
+
+  const c = configs[site];
+  grid.innerHTML = `
+    <button class="ext-open-btn" 
+      style="background:${c.color};border-color:${c.borderColor};color:${c.textColor}"
+      onclick="window.open('${c.url}','_blank')">${c.label} ↗</button>
+    <div class="ext-hint" style="white-space:pre-line">${c.hint}</div>`;
+}
+
 async function openModal(name) {
   currentMenu = name;
+  currentTab = 'pexels';
+  document.querySelectorAll('.site-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-pexels').classList.add('active');
   document.getElementById('modal-title').textContent = `🖼️ ${name}`;
   const kw = EN_KW[name] || name;
   document.getElementById('search-input').value = kw;
+  document.getElementById('direct-url').value = '';
+  const grid = document.getElementById('img-grid');
+  grid.style.display = 'grid';
+  grid.style.flexDirection = '';
+  grid.style.alignItems = '';
   document.getElementById('modal').classList.add('open');
   await searchImages(kw);
 }
@@ -140,7 +210,16 @@ function closeModal() {
 
 async function doSearch() {
   const q = document.getElementById('search-input').value.trim();
-  if (q) await searchImages(q);
+  if (!q) return;
+  if (currentTab === 'pexels') {
+    const grid = document.getElementById('img-grid');
+    grid.style.display = 'grid';
+    grid.style.flexDirection = '';
+    grid.style.alignItems = '';
+    await searchImages(q);
+  } else {
+    showExternal(currentTab, q);
+  }
 }
 
 async function searchImages(query) {
@@ -165,6 +244,14 @@ async function searchImages(query) {
   } catch(e) {
     grid.innerHTML = `<div class="loading">오류가 발생했어요 😢</div>`;
   }
+}
+
+function saveDirectUrl() {
+  const url = document.getElementById('direct-url').value.trim();
+  if (!url || !url.startsWith('http')) { alert('올바른 URL을 입력해주세요'); return; }
+  if (!currentMenu) return;
+  selectImg(url);
+  document.getElementById('direct-url').value = '';
 }
 
 function selectImg(url) {
