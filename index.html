@@ -7715,7 +7715,93 @@ function slideMove(id, dir) {
 
 // ── 커뮤니티 ──
 let currentCommTab = 'all';
-// ── 비밀번호 보호 ──
+// ── 메뉴 이미지 고정 매핑 ──
+const MENU_IMAGES = {
+  '된장찌개':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
+  '김치찌개':'https://cdn.pixabay.com/photo/2021/01/20/12/50/kimchi-jjigae-5934570_640.jpg',
+  '비빔밥':'https://cdn.pixabay.com/photo/2020/05/05/04/17/bibimbap-5132027_640.jpg',
+  '삼겹살':'https://cdn.pixabay.com/photo/2016/09/22/05/57/samgyeopsal-1686023_640.jpg',
+  '떡볶이':'https://cdn.pixabay.com/photo/2022/05/30/03/51/tteokbokki-7230133_640.jpg',
+  '라면':'https://cdn.pixabay.com/photo/2017/09/16/19/21/ramen-2756541_640.jpg',
+  '김밥':'https://cdn.pixabay.com/photo/2019/09/19/14/41/kimbap-4489505_640.jpg',
+  '치킨':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
+  '후라이드 치킨':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
+  '양념치킨':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
+  '간장치킨':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
+  '파닭':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
+  '짜장면':'https://cdn.pixabay.com/photo/2021/10/28/11/00/jajangmyeon-6749846_640.jpg',
+  '짬뽕':'https://cdn.pixabay.com/photo/2022/03/08/02/00/jjamppong-7054145_640.jpg',
+  '순두부찌개':'https://cdn.pixabay.com/photo/2020/12/15/20/00/sundubu-jjigae-5834145_640.jpg',
+  '제육볶음':'https://cdn.pixabay.com/photo/2021/08/04/12/57/jeyuk-bokkeum-6521016_640.jpg',
+  '스테이크':'https://cdn.pixabay.com/photo/2016/01/22/02/01/steak-1155899_640.jpg',
+  '피자':'https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_640.jpg',
+  '페퍼로니 피자':'https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_640.jpg',
+  '불고기 피자':'https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_640.jpg',
+  '고구마피자':'https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_640.jpg',
+  '파스타':'https://cdn.pixabay.com/photo/2018/07/18/19/12/pasta-3547078_640.jpg',
+  '까르보나라':'https://cdn.pixabay.com/photo/2018/07/18/19/12/pasta-3547078_640.jpg',
+  '알리오올리오':'https://cdn.pixabay.com/photo/2018/07/18/19/12/pasta-3547078_640.jpg',
+  '아라비아타':'https://cdn.pixabay.com/photo/2018/07/18/19/12/pasta-3547078_640.jpg',
+  '리조또':'https://cdn.pixabay.com/photo/2021/01/16/10/51/risotto-5921491_640.jpg',
+  '불고기버거':'https://cdn.pixabay.com/photo/2016/03/05/19/02/hamburger-1238246_640.jpg',
+  '치킨버거':'https://cdn.pixabay.com/photo/2016/03/05/19/02/hamburger-1238246_640.jpg',
+  '치즈버거':'https://cdn.pixabay.com/photo/2016/03/05/19/02/hamburger-1238246_640.jpg',
+  '초밥 세트':'https://cdn.pixabay.com/photo/2016/11/12/15/28/restaurant-1819024_640.jpg',
+  '쌀국수':'https://cdn.pixabay.com/photo/2019/03/20/07/26/pho-4067313_640.jpg',
+  '마라탕':'https://cdn.pixabay.com/photo/2022/07/19/13/04/mala-hot-pot-7331548_640.jpg',
+  '훠궈':'https://cdn.pixabay.com/photo/2022/07/19/13/04/mala-hot-pot-7331548_640.jpg',
+  '닭갈비':'https://cdn.pixabay.com/photo/2021/10/28/05/08/dak-galbi-6749525_640.jpg',
+  '족발':'https://cdn.pixabay.com/photo/2022/02/10/06/18/jokbal-7004793_640.jpg',
+  '보쌈':'https://cdn.pixabay.com/photo/2022/02/10/06/18/jokbal-7004793_640.jpg',
+  '오므라이스':'https://cdn.pixabay.com/photo/2019/01/31/16/52/omurice-3967683_640.jpg',
+  '카레라이스':'https://cdn.pixabay.com/photo/2020/10/05/10/51/curry-5629647_640.jpg',
+  '계란볶음밥':'https://cdn.pixabay.com/photo/2017/06/29/20/09/fried-rice-2456981_640.jpg',
+  '김치볶음밥':'https://cdn.pixabay.com/photo/2017/06/29/20/09/fried-rice-2456981_640.jpg',
+  '새우볶음밥':'https://cdn.pixabay.com/photo/2017/06/29/20/09/fried-rice-2456981_640.jpg',
+  '채소볶음밥':'https://cdn.pixabay.com/photo/2017/06/29/20/09/fried-rice-2456981_640.jpg',
+  '갈비탕':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
+  '곰탕':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
+  '물냉면':'https://cdn.pixabay.com/photo/2021/07/12/07/07/naengmyeon-6406819_640.jpg',
+  '비빔냉면':'https://cdn.pixabay.com/photo/2021/07/12/07/07/naengmyeon-6406819_640.jpg',
+  '잔치국수':'https://cdn.pixabay.com/photo/2017/09/16/19/21/ramen-2756541_640.jpg',
+  '군만두':'https://cdn.pixabay.com/photo/2020/09/30/09/20/mandu-5614931_640.jpg',
+  '만두국':'https://cdn.pixabay.com/photo/2020/09/30/09/20/mandu-5614931_640.jpg',
+  '시저샐러드':'https://cdn.pixabay.com/photo/2017/05/07/08/56/salad-2292932_640.jpg',
+  '닭가슴살 샐러드':'https://cdn.pixabay.com/photo/2017/05/07/08/56/salad-2292932_640.jpg',
+  '아보카도 토스트':'https://cdn.pixabay.com/photo/2020/04/28/08/22/avocado-toast-5103506_640.jpg',
+  '팬케이크':'https://cdn.pixabay.com/photo/2016/11/22/18/52/pancakes-1850012_640.jpg',
+  '오믈렛':'https://cdn.pixabay.com/photo/2014/09/17/20/26/omelette-449258_640.jpg',
+  '돈코츠라멘':'https://cdn.pixabay.com/photo/2017/09/16/19/21/ramen-2756541_640.jpg',
+  '미소라멘':'https://cdn.pixabay.com/photo/2017/09/16/19/21/ramen-2756541_640.jpg',
+  '일식돈까스':'https://cdn.pixabay.com/photo/2020/04/13/16/41/tonkatsu-5039272_640.jpg',
+  '경양식돈까스':'https://cdn.pixabay.com/photo/2020/04/13/16/41/tonkatsu-5039272_640.jpg',
+  '잡채':'https://cdn.pixabay.com/photo/2021/09/16/09/50/japchae-6629849_640.jpg',
+  '탕수육':'https://cdn.pixabay.com/photo/2019/09/02/10/02/tang-su-yuk-4447372_640.jpg',
+  '낙지볶음':'https://cdn.pixabay.com/photo/2021/08/04/12/57/jeyuk-bokkeum-6521016_640.jpg',
+  '소고기등심':'https://cdn.pixabay.com/photo/2016/01/22/02/01/steak-1155899_640.jpg',
+  '소갈비':'https://cdn.pixabay.com/photo/2016/09/22/05/57/samgyeopsal-1686023_640.jpg',
+  '목살':'https://cdn.pixabay.com/photo/2016/09/22/05/57/samgyeopsal-1686023_640.jpg',
+  '닭강정':'https://cdn.pixabay.com/photo/2020/10/26/11/37/chicken-5687580_640.jpg',
+  '전복죽':'https://cdn.pixabay.com/photo/2020/01/31/07/10/congee-4806892_640.jpg',
+  '닭죽':'https://cdn.pixabay.com/photo/2020/01/31/07/10/congee-4806892_640.jpg',
+  '돼지국밥':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
+  '순대국밥':'https://cdn.pixabay.com/photo/2016/09/21/05/12/doenjang-jjigae-1683946_640.jpg',
+  '연어덮밥(사케동)':'https://cdn.pixabay.com/photo/2016/11/12/15/28/restaurant-1819024_640.jpg',
+  '회덮밥':'https://cdn.pixabay.com/photo/2016/11/12/15/28/restaurant-1819024_640.jpg',
+  '월남쌈':'https://cdn.pixabay.com/photo/2018/03/31/19/29/spring-rolls-3279066_640.jpg',
+  '분짜':'https://cdn.pixabay.com/photo/2019/03/20/07/26/pho-4067313_640.jpg',
+  '피시앤칩스':'https://cdn.pixabay.com/photo/2017/09/15/16/18/fish-2751682_640.jpg',
+};
+
+const imgCache = JSON.parse(localStorage.getItem('wmjImgCache') || '{}');
+
+function getMenuImg(name) {
+  return MENU_IMAGES[name] || imgCache[name] || null;
+}
+
+async function fetchMenuImg(name) {
+  return getMenuImg(name);
+}
 (function() {
   const PW = '1123';
   const KEY = 'omechuAuth';
@@ -7736,58 +7822,6 @@ let currentCommTab = 'all';
   };
 })();
 
-// ── 메뉴 이미지 (Unsplash API) ──
-const UNSPLASH_KEY = 'U-qCCdy0U4XaobKWxKWWa8x4N2x_Km6UM4jn3T932_k';
-const imgCache = JSON.parse(localStorage.getItem('wmjImgCache') || '{}');
-
-const MENU_KW = {
-  '된장찌개':'korean doenjang jjigae soup','김치찌개':'kimchi jjigae stew','순두부찌개':'korean soft tofu stew',
-  '제육볶음':'korean spicy pork stir fry','소불고기':'korean bulgogi beef','계란볶음밥':'egg fried rice',
-  '김치볶음밥':'kimchi fried rice','비빔밥':'korean bibimbap bowl','갈비찜':'korean braised short ribs',
-  '닭볶음탕':'korean spicy braised chicken','잡채':'korean japchae glass noodles','콩나물국밥':'korean bean sprout rice soup',
-  '미역국':'korean seaweed soup','라면':'korean ramen noodles','토스트':'toast bread breakfast',
-  '오믈렛':'omelette egg breakfast','까르보나라':'carbonara pasta cream','알리오올리오':'aglio olio pasta',
-  '아라비아타':'arrabbiata pasta tomato','리조또':'risotto italian','스테이크':'beef steak grilled',
-  '시저샐러드':'caesar salad','아보카도 토스트':'avocado toast','닭고기덮밥(오야코동)':'oyakodon japanese rice bowl',
-  '연어덮밥(사케동)':'salmon donburi rice bowl','마파두부':'mapo tofu chinese','후라이드 치킨':'fried chicken crispy',
-  '양념치킨':'korean yangnyeom chicken','간장치킨':'korean soy sauce chicken','페퍼로니 피자':'pepperoni pizza',
-  '짜장면':'jjajangmyeon black bean noodles','짬뽕':'jjamppong spicy seafood noodles','탕수육':'sweet sour pork chinese',
-  '떡볶이':'tteokbokki spicy rice cake','순대':'korean sundae blood sausage','김밥':'korean kimbap rice roll',
-  '족발':'korean braised pork feet','보쌈':'korean bossam pork wrap','마라탕':'mala spicy hotpot chinese',
-  '쌀국수':'pho vietnamese noodle soup','닭갈비':'dak galbi spicy chicken','삼겹살':'samgyeopsal grilled pork belly',
-  '목살':'grilled pork neck korean bbq','소고기등심':'beef sirloin grilled','소갈비':'beef short ribs korean bbq',
-  '초밥 세트':'sushi set japanese','회덮밥':'korean raw fish rice bowl','오마카세':'omakase japanese sushi',
-  '돈코츠라멘':'tonkotsu ramen japanese','일식돈까스':'japanese tonkatsu pork cutlet','순대국밥':'korean sundae soup rice',
-  '꽃게탕':'korean spicy crab soup','낙지볶음':'korean spicy octopus stir fry','오삼불고기':'korean pork squid stir fry',
-  '비빔국수':'korean spicy noodles bibim','해물순두부':'seafood soft tofu jjigae','훠궈':'chinese hotpot',
-  '마라롱샤':'mala spicy crayfish','분짜':'bun cha vietnamese','오코노미야키':'okonomiyaki japanese pancake',
-  '피시앤칩스':'fish and chips british','팬케이크':'pancake breakfast stack','프렌치토스트':'french toast breakfast',
-  '연어스테이크':'salmon steak grilled','오므라이스':'omurice japanese omelette rice','카레라이스':'japanese curry rice',
-  '새우볶음밥':'shrimp fried rice','물냉면':'korean cold noodles','비빔냉면':'korean spicy cold noodles',
-  '잔치국수':'korean warm noodle soup','콩국수':'korean cold soy milk noodles','만두국':'korean dumpling soup',
-  '군만두':'korean pan fried dumplings','돼지국밥':'korean pork soup rice','갈비탕':'korean beef rib soup',
-  '곰탕':'korean bone broth soup','닭죽':'korean chicken porridge','전복죽':'korean abalone porridge',
-  '삼겹살':'samgyeopsal korean pork bbq','닭강정':'korean crispy glazed chicken','꽃게찜':'steamed crab korean',
-};
-
-async function fetchMenuImg(name) {
-  if (imgCache[name]) return imgCache[name];
-  const kw = MENU_KW[name] || name + ' korean food';
-  try {
-    const res = await fetch(`https://api.unsplash.com/photos/random?query=${encodeURIComponent(kw)}&orientation=landscape&client_id=${UNSPLASH_KEY}`);
-    const data = await res.json();
-    if (data.urls?.small) {
-      imgCache[name] = data.urls.small;
-      localStorage.setItem('wmjImgCache', JSON.stringify(imgCache));
-      return data.urls.small;
-    }
-  } catch(e) {}
-  return null;
-}
-
-function getMenuImg(name) {
-  return imgCache[name] || null;
-}
 const SUPABASE_URL = 'https://arodifxcwdehcezybhrh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_fHCAe5O2yY_EPtZhdGPyJg_cHPkjgiB';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
