@@ -72,9 +72,9 @@ h1 { font-size:18px; margin-bottom:4px; color:#ff4757; }
     <button class="close-btn" onclick="closeModal()">✕ 닫기</button>
   </div>
   <div style="background:#161616;padding:8px 16px 0;border-bottom:1px solid #222;flex-shrink:0;display:flex;gap:6px">
-    <button id="tab-pexels" class="site-tab active" onclick="switchTab('pexels')">🟢 Pexels</button>
-    <button id="tab-unsplash" class="site-tab" onclick="switchTab('unsplash')">⚪ Unsplash</button>
-    <button id="tab-pixabay" class="site-tab" onclick="switchTab('pixabay')">🟡 Pixabay</button>
+    <button id="tab-pexels" class="site-tab active" onclick="switchTab('pexels')">Pexels</button>
+    <button id="tab-unsplash" class="site-tab" onclick="switchTab('unsplash')">Unsplash</button>
+    <button id="tab-pixabay" class="site-tab" onclick="switchTab('pixabay')">Pixabay</button>
   </div>
   <div class="search-bar">
     <input type="text" id="search-input" placeholder="검색어 수정 가능" onkeydown="if(event.key==='Enter')doSearch()">
@@ -146,44 +146,10 @@ function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.site-tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
-  const kw = document.getElementById('search-input').value.trim();
-  if (tab === 'pexels') {
-    document.getElementById('img-grid').style.display = 'grid';
-    searchImages(kw);
-  } else {
-    showExternal(tab, kw);
-  }
-}
-
-function showExternal(site, kw) {
   const grid = document.getElementById('img-grid');
-  grid.style.display = 'flex';
-  grid.style.flexDirection = 'column';
-  grid.style.alignItems = 'center';
-  grid.style.gap = '12px';
-  grid.style.padding = '24px 16px';
-
-  const configs = {
-    unsplash: {
-      color: '#222', borderColor: '#fff', textColor: '#fff',
-      label: '⚪ Unsplash에서 검색하기',
-      url: `https://unsplash.com/s/photos/${encodeURIComponent(kw)}`,
-      hint: '1. 위 버튼으로 Unsplash 열기\n2. 마음에 드는 이미지 클릭\n3. 오른쪽 하단 ⬇ 다운로드 버튼 옆 화살표 클릭\n4. "Copy image address" 또는 이미지 우클릭 → 이미지 주소 복사\n5. 아래 URL 입력란에 붙여넣기'
-    },
-    pixabay: {
-      color: '#2ec66e', borderColor: '#2ec66e', textColor: '#fff',
-      label: '🟡 Pixabay에서 검색하기',
-      url: `https://pixabay.com/images/search/${encodeURIComponent(kw)}/`,
-      hint: '1. 위 버튼으로 Pixabay 열기\n2. 마음에 드는 이미지 클릭\n3. 이미지 우클릭 → 이미지 주소 복사\n4. 아래 URL 입력란에 붙여넣기'
-    }
-  };
-
-  const c = configs[site];
-  grid.innerHTML = `
-    <button class="ext-open-btn" 
-      style="background:${c.color};border-color:${c.borderColor};color:${c.textColor}"
-      onclick="window.open('${c.url}','_blank')">${c.label} ↗</button>
-    <div class="ext-hint" style="white-space:pre-line">${c.hint}</div>`;
+  grid.style.cssText = 'display:grid;flex-direction:initial;align-items:initial;padding:12px;gap:8px;';
+  const kw = document.getElementById('search-input').value.trim();
+  searchImages(kw, tab);
 }
 
 async function openModal(name) {
@@ -195,12 +161,9 @@ async function openModal(name) {
   const kw = EN_KW[name] || name;
   document.getElementById('search-input').value = kw;
   document.getElementById('direct-url').value = '';
-  const grid = document.getElementById('img-grid');
-  grid.style.display = 'grid';
-  grid.style.flexDirection = '';
-  grid.style.alignItems = '';
+  document.getElementById('img-grid').style.cssText = 'display:grid;padding:12px;gap:8px;';
   document.getElementById('modal').classList.add('open');
-  await searchImages(kw);
+  await searchImages(kw, 'pexels');
 }
 
 function closeModal() {
@@ -211,23 +174,14 @@ function closeModal() {
 async function doSearch() {
   const q = document.getElementById('search-input').value.trim();
   if (!q) return;
-  if (currentTab === 'pexels') {
-    const grid = document.getElementById('img-grid');
-    grid.style.display = 'grid';
-    grid.style.flexDirection = '';
-    grid.style.alignItems = '';
-    await searchImages(q);
-  } else {
-    showExternal(currentTab, q);
-  }
+  await searchImages(q, currentTab);
 }
 
-async function searchImages(query) {
+async function searchImages(query, site = 'pexels') {
   const grid = document.getElementById('img-grid');
   grid.innerHTML = '<div class="loading">🔍 검색 중...</div>';
   try {
-    // Vercel 프록시를 통해 Pexels API 호출
-    const res = await fetch(`/api/pexels?query=${encodeURIComponent(query)}`);
+    const res = await fetch(`/api/pexels?query=${encodeURIComponent(query)}&site=${site}`);
     const data = await res.json();
     if (!data.photos || data.photos.length === 0) {
       grid.innerHTML = `<div class="loading">이미지를 찾지 못했어요 😢<br>검색어를 바꿔보세요</div>`;
