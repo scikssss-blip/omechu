@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       `https://pixabay.com/api/?key=55591606-554d57e4cfb9d6d994e87a6ba&q=${encodeURIComponent(query)}&per_page=20&image_type=photo&orientation=horizontal`
     );
     const d = await r.json();
-    result = { photos: (d.hits || []).map(p => ({ src: { medium: p.webformatURL, large: p.largeImageURL }, alt: p.tags })) };
+    result = { photos: (d.hits || []).map(p => ({ src: { medium: p.webformatURL, large: p.webformatURL }, alt: p.tags })) };
 
   } else if (site === 'wikipedia') {
     // 한국어 Wikipedia 먼저, 없으면 영어
