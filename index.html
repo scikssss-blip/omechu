@@ -902,7 +902,6 @@
   <div class="logo">오<span>메</span>추</div>
   <div style="display:flex;align-items:center;gap:10px">
     <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="다크/라이트 모드">🌙</button>
-    <div class="header-badge">BETA v0.3</div>
   </div>
 </header>
 
@@ -2021,14 +2020,14 @@
 </div>
 
 <div id="onboarding-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center">
-  <div style="width:100%;max-width:380px;margin:0 20px;position:relative">
+  <div style="width:100%;max-width:380px;margin:0 20px;position:relative;background:var(--card);border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
 
     <!-- 슬라이드 래퍼 -->
-    <div style="overflow:hidden;border-radius:24px">
+    <div style="overflow:hidden">
       <div id="onboarding-track" style="display:flex;transition:transform 0.35s ease">
 
         <!-- 슬라이드 1 -->
-        <div style="min-width:100%;background:var(--card);border-radius:24px;padding:40px 28px 32px;text-align:center">
+        <div style="min-width:100%;padding:40px 28px 20px;text-align:center">
           <div style="font-size:64px;margin-bottom:16px">🍽️</div>
           <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">오늘 <em style="color:var(--orange);font-style:normal">뭐 먹지?</em></div>
           <div style="font-size:13px;color:var(--muted);line-height:1.8">직접요리 · 배달 · 외식 중 고르고<br>조건 태그 선택하면<br><strong style="color:var(--text)">딱 맞는 메뉴 3개</strong>를 추천해드려요</div>
@@ -2039,7 +2038,7 @@
         </div>
 
         <!-- 슬라이드 2 -->
-        <div style="min-width:100%;background:var(--card);border-radius:24px;padding:40px 28px 32px;text-align:center">
+        <div style="min-width:100%;padding:40px 28px 20px;text-align:center">
           <div style="font-size:64px;margin-bottom:16px">💬</div>
           <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">같이 <em style="color:var(--orange);font-style:normal">고민해요</em></div>
           <div style="font-size:13px;color:var(--muted);line-height:1.8">오메추 투표로 뭐 먹을지 물어보고<br>오늘 먹은 것도 인증해봐요<br><strong style="color:var(--text)">커뮤니티</strong>에서 같이 고민해요</div>
@@ -2051,7 +2050,7 @@
         </div>
 
         <!-- 슬라이드 3 -->
-        <div style="min-width:100%;background:var(--card);border-radius:24px;padding:40px 28px 32px;text-align:center">
+        <div style="min-width:100%;padding:40px 28px 20px;text-align:center">
           <div style="font-size:64px;margin-bottom:16px">📅</div>
           <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">먹은 거 <em style="color:var(--orange);font-style:normal">기록해요</em></div>
           <div style="font-size:13px;color:var(--muted);line-height:1.8">오늘 식단을 올리면<br><strong style="color:var(--text)">먹방 달력</strong>에 자동으로 쌓여요<br>🔥 연속 기록 스트릭도 도전해봐요!</div>
@@ -2065,7 +2064,7 @@
     </div>
 
     <!-- 하단 컨트롤 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding:0 4px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 24px 24px">
       <!-- 닷 인디케이터 -->
       <div style="display:flex;gap:6px">
         <div class="ob-dot active" id="ob-dot-0"></div>
@@ -2349,7 +2348,7 @@
     </div>
     <div style="font-size:11px;color:var(--muted);background:var(--surface);border-radius:8px;padding:4px 8px">바로가기 →</div>
   </div>
-  <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:16px">* 쿠팡 파트너스 제휴 링크</div>
+  <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:16px;line-height:1.4">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>
 
   <!-- 장보기 목록 -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -2373,7 +2372,7 @@
       <div class="my-avatar">😋</div>
       <div class="my-profile-info">
         <div class="my-nickname" id="my-profile-nick">로딩중...</div>
-        <div class="my-join">BETA 테스터 · 오메추</div>
+        <div class="my-join">오메추 회원</div>
         <div id="diet-streak-badge" style="display:none;margin-top:5px"></div>
       </div>
       <button class="my-edit-btn" onclick="openNicknameModal()">편집</button>
@@ -2477,8 +2476,8 @@
 
   <!-- 앱 정보 -->
   <div style="text-align:center;padding:20px 0 10px;color:var(--muted);font-size:11px">
-    오메추 BETA v0.3<br>
-    <span style="font-size:10px">Made with ❤️ · 광고 없는 앱을 지향합니다</span>
+    오메추 v0.4<br>
+    <span style="font-size:10px">Made with ❤️</span>
   </div>
 </div>
 <div class="recipe-modal-backdrop" id="recipe-modal" onclick="closeRecipe()">
@@ -2570,6 +2569,7 @@ function toggleAccordion(id) {
 // ── 싫어요 프리셋 ──
 // ── 즐겨찾기 태그 시스템 ──
 let favTags = JSON.parse(localStorage.getItem('wmjFavTags') || '[]');
+const QUICK_TAGS = ['🌶️ 매운/얼큰한맛','🍲 국물/찌개','🍚 밥','🍜 면','🥩 고기','💧 담백한맛','🌙 야식','🤢 해장'];
 
 function initFavStars() {
   document.querySelectorAll('.tag').forEach(tag => {
@@ -2629,22 +2629,26 @@ function renderFavSection() {
   const wrap = document.getElementById('fav-chips-wrap');
   if (!section || !wrap) return;
 
-  if (favTags.length === 0) {
-    section.style.display = 'none';
-    return;
-  }
+  const titleEl = section.querySelector('.fav-section-title');
+  const hintEl = section.querySelector('.fav-section-header span:last-child');
+  const useQuick = favTags.length === 0;
+  // 즐겨찾기가 없으면 '이런 느낌 땡겨'에서만 많이 찾는 조건을 바로 보여줌
+  if (useQuick && currentMode === 'hate') { section.style.display = 'none'; return; }
   section.style.display = 'block';
+  if (titleEl) titleEl.textContent = useQuick ? '🔥 많이 찾는 조건' : '⭐ 즐겨찾는 태그';
+  if (hintEl) hintEl.textContent = useQuick ? '태그 옆 ☆ 누르면 내 조건으로 저장' : '태그 옆 ☆ 눌러서 추가';
+  const chipTags = useQuick ? QUICK_TAGS : favTags;
 
   // 현재 활성화된 태그 목록
   const activeTags = [...document.querySelectorAll('.tag.active')]
     .map(t => t.dataset.tagText || t.textContent.replace(/[★☆]/g,'').trim());
 
-  wrap.innerHTML = '<div class="fav-chips-row">' + favTags.map(tag => {
+  wrap.innerHTML = '<div class="fav-chips-row">' + chipTags.map(tag => {
     const isActive = activeTags.includes(tag);
     const pureTagText = tag.replace(/\s/g,'').length <= 4 ? true : false;
     return `<span class="fav-chip ${isActive ? 'active' : ''}" onclick="applyFavTag('${tag.replace(/'/g,"\\'")}')">
       <span>${tag}</span>
-      <button class="fav-chip-star ${pureTagText ? 'wide' : ''}" onclick="event.stopPropagation();toggleFavTag('${tag.replace(/'/g,"\\'")}', null)" title="즐겨찾기 해제">★</button>
+      ${useQuick ? '' : `<button class="fav-chip-star ${pureTagText ? 'wide' : ''}" onclick="event.stopPropagation();toggleFavTag('${tag.replace(/'/g,"\\'")}', null)" title="즐겨찾기 해제">★</button>`}
     </span>`;
   }).join('') + '</div>';
 }
@@ -2813,7 +2817,7 @@ function updateCandidateCount() {
     btn.style.cursor = 'pointer';
     btn.style.transform = '';
     if (countEl) { countEl.textContent = ''; countEl.style.display = 'none'; }
-    if (labelEl) labelEl.textContent = '🎲 전체 ' + totalCount + '개 랜덤 추천받기';
+    if (labelEl) labelEl.textContent = '🎲 ' + totalCount + '개 중 랜덤 추천';
   } else {
     // 태그 선택 → N개 발견 모드
     btn.disabled = false;
@@ -2902,18 +2906,18 @@ const menuDB = [
   {id:3, name:'순두부찌개', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🫘 두부/콩류','⚡ 10분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','🌶️ 매운/얼큰한맛','📉 혈당 조절(저당)','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식']},
   {id:4, name:'제육볶음', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🥑 저지방','🍺 술안주','🌶️ 매운 음식']},
   {id:5, name:'소불고기', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🔥 구이/에어프라이어','🍱 한식','🧂 짭짤한맛','🥂 데이트','🎉 홈파티/집들이','🍟 기름진 음식']},
-  {id:6, name:'계란볶음밥', emoji:'🥚', cat:['cook','delivery','dine'], tags:['🍚 밥','🥚 계란','⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍱 한식','🧂 짭짤한맛','🥑 저지방','🌙 야식']},
+  {id:6, name:'계란볶음밥', emoji:'🥚', cat:['cook','delivery'], tags:['🍚 밥','🥚 계란','⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍱 한식','🧂 짭짤한맛','🥑 저지방','🌙 야식']},
   {id:7, name:'김치볶음밥', emoji:'🍳', cat:['cook','delivery','dine'], tags:['🍚 밥','🥗 채소','⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🌙 야식','🌶️ 매운 음식']},
   {id:8, name:'비빔밥', emoji:'🥗', cat:['cook','delivery','dine'], tags:['🍚 밥','🥗 채소','🕒 30분 이내','👶 초보도 가능','🥗 무침/생식','🍱 한식','🌶️ 매운/얼큰한맛','🌶️ 매운 음식']},
   {id:9, name:'갈비찜', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🕐 1시간 이내','♨️ 찜/조림','🍱 한식','🧂 짭짤한맛','🥂 데이트','🎉 홈파티/집들이','🥶 추운 날','🦴 뼈 있는 음식','✋ 손 써야하는 음식']},
   {id:10, name:'닭볶음탕', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🕐 1시간 이내','👶 초보도 가능','🍲 국물/찌개','♨️ 찜/조림','🍱 한식','🌶️ 매운/얼큰한맛','🎉 홈파티/집들이','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','🦴 뼈 있는 음식']},
   {id:11, name:'잡채', emoji:'🍜', cat:['cook','delivery','dine'], tags:['🍜 면','🥩 고기','🥗 채소','🕐 1시간 이내','🍳 볶음','🍱 한식','🧂 짭짤한맛','🥑 저지방','🎉 홈파티/집들이']},
   {id:12, name:'콩나물국밥', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🍚 밥','🥗 채소','🫘 두부/콩류','⚡ 10분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
-  {id:13, name:'미역국', emoji:'🍲', cat:['cook','dine'], tags:['🦐 해산물','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
-  {id:17, name:'닭가슴살 샐러드', emoji:'🥗', cat:['cook','delivery','dine'], tags:['🥩 고기','🥗 채소','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','💧 담백한맛','🥗 다이어트식','📉 혈당 조절(저당)','💪 고단백','🥑 저지방','🥂 데이트','☀️ 더운 날']},
-  {id:18, name:'라면', emoji:'🍜', cat:['cook','delivery','dine'], tags:['🍜 면','⚡ 10분 이내','👶 초보도 가능','⚡ 간편조리','🍱 한식','🌶️ 매운/얼큰한맛','🌙 야식','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','🗑️ 쓰레기 많은 것']},
-  {id:19, name:'토스트', emoji:'🍞', cat:['cook','dine'], tags:['🍞 빵/샌드위치','🥫 가공식품(햄/참치)','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','⚡ 간편조리','🍝 양식','📉 혈당 조절(저당)','🌙 야식']},
-  {id:20, name:'오믈렛', emoji:'🥚', cat:['cook','dine'], tags:['🥚 계란','⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍝 양식','💧 담백한맛','🧈 느끼한맛','🌙 야식','🍟 기름진 음식']},
+  {id:13, name:'미역국', emoji:'🍲', cat:['cook'], tags:['🦐 해산물','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
+  {id:17, name:'닭가슴살 샐러드', emoji:'🥗', cat:['cook','delivery'], tags:['🥩 고기','🥗 채소','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','💧 담백한맛','🥗 다이어트식','📉 혈당 조절(저당)','💪 고단백','🥑 저지방','🥂 데이트','☀️ 더운 날']},
+  {id:18, name:'라면', emoji:'🍜', cat:['cook','delivery'], tags:['🍜 면','⚡ 10분 이내','👶 초보도 가능','⚡ 간편조리','🍱 한식','🌶️ 매운/얼큰한맛','🌙 야식','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','🗑️ 쓰레기 많은 것']},
+  {id:19, name:'토스트', emoji:'🍞', cat:['cook'], tags:['🍞 빵/샌드위치','🥫 가공식품(햄/참치)','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','⚡ 간편조리','🍝 양식','📉 혈당 조절(저당)','🌙 야식']},
+  {id:20, name:'오믈렛', emoji:'🥚', cat:['cook'], tags:['🥚 계란','⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍝 양식','💧 담백한맛','🧈 느끼한맛','🌙 야식','🍟 기름진 음식']},
   {id:21, name:'까르보나라', emoji:'🍝', cat:['cook','delivery','dine'], tags:['🍜 면','🥚 계란','🕒 30분 이내','🍳 볶음','🍝 양식','🧈 느끼한맛','🥂 데이트','🍟 기름진 음식']},
   {id:22, name:'알리오올리오', emoji:'🍝', cat:['cook','delivery','dine'], tags:['🍜 면','🕒 30분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍝 양식','💧 담백한맛','🥂 데이트']},
   {id:23, name:'아라비아타', emoji:'🍝', cat:['cook','delivery','dine'], tags:['🍜 면','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍝 양식','🌶️ 매운/얼큰한맛','🌶️ 매운 음식']},
@@ -2958,10 +2962,10 @@ const menuDB = [
   {id:76, name:'해장국', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','🧂 짭짤한맛','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:77, name:'설렁탕', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🦴 뼈 있는 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:78, name:'육개장', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🥩 고기','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','🌶️ 매운/얼큰한맛','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
-  {id:83, name:'참치마요덮밥', emoji:'🍚', cat:['cook','dine'], tags:['🍚 밥','⚡ 10분 이내','👶 초보도 가능','🥗 무침/생식','🍱 한식','🧂 짭짤한맛','🌙 야식']},
+  {id:83, name:'참치마요덮밥', emoji:'🍚', cat:['cook'], tags:['🍚 밥','⚡ 10분 이내','👶 초보도 가능','🥗 무침/생식','🍱 한식','🧂 짭짤한맛','🌙 야식']},
   {id:85, name:'수육', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🕐 1시간 이내','♨️ 찜/조림','🍱 한식','💧 담백한맛','🍺 술안주','🎉 홈파티/집들이','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:87, name:'소불고기덮밥(규동)', emoji:'🍚', cat:['cook','delivery','dine'], tags:['🍚 밥','🥩 고기','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍱 한식','🍯 달달한맛','🧂 짭짤한맛','🌙 야식']},
-  {id:89, name:'미소시루', emoji:'🍲', cat:['cook','dine'], tags:['🫘 두부/콩류','⚡ 10분 이내','👶 초보도 가능','🍲 국물/찌개','🍣 일식','💧 담백한맛','📉 혈당 조절(저당)','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
+  {id:89, name:'미소시루', emoji:'🍲', cat:['cook'], tags:['🫘 두부/콩류','⚡ 10분 이내','👶 초보도 가능','🍲 국물/찌개','🍣 일식','💧 담백한맛','📉 혈당 조절(저당)','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
   {id:90, name:'칼국수', emoji:'🍜', cat:['cook','delivery','dine'], tags:['🍜 면','🕒 30분 이내','👶 초보도 가능','🍜 면 요리','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🌾 밀(글루텐)']},
   {id:91, name:'삼계탕', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🥩 고기','🕐 1시간 이내','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🦴 뼈 있는 음식']},
   {id:93, name:'추어탕', emoji:'🍲', cat:['delivery','dine'], tags:['🐟 생선','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','💨 냄새 심한 음식','💨 냄새배는 음식']},
@@ -2980,7 +2984,7 @@ const menuDB = [
   {id:108, name:'규카츠', emoji:'🥩', cat:['delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🫕 튀김','🍣 일식','🧂 짭짤한맛','🥂 데이트','🎉 홈파티/집들이','🌾 밀(글루텐)','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
   {id:109, name:'텐동', emoji:'🦐', cat:['delivery','dine'], tags:['🍚 밥','🦐 해산물','🕒 30분 이내','👶 초보도 가능','🫕 튀김','🍣 일식','🧂 짭짤한맛','🧈 느끼한맛','🥂 데이트','🌾 밀(글루텐)','🦀 갑각류','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
   {id:110, name:'가라아게', emoji:'🍗', cat:['delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🫕 튀김','🍣 일식','🧂 짭짤한맛','🌙 야식','🍺 술안주','🌾 밀(글루텐)','🍟 기름진 음식','🗑️ 쓰레기 많은 것','🫗 옷에 튀는 음식']},
-  {id:111, name:'크림수프', emoji:'🍵', cat:['cook','delivery','dine'], tags:['🥗 채소','🧀 유제품/치즈','⚡ 10분 이내','👶 초보도 가능','🍝 양식','🧈 느끼한맛','🥂 데이트','🌨️ 눈/비오는 날','🥶 추운 날','🥛 우유/유제품','🍟 기름진 음식']},
+  {id:111, name:'크림수프', emoji:'🍵', cat:['cook','delivery'], tags:['🥗 채소','🧀 유제품/치즈','⚡ 10분 이내','👶 초보도 가능','🍝 양식','🧈 느끼한맛','🥂 데이트','🌨️ 눈/비오는 날','🥶 추운 날','🥛 우유/유제품','🍟 기름진 음식']},
   {id:112, name:'봉골레파스타', emoji:'🍝', cat:['cook','delivery','dine'], tags:['🍜 면','🦐 해산물','🕒 30분 이내','🍳 볶음','🍝 양식','💧 담백한맛','🥂 데이트','🎉 홈파티/집들이','🌾 밀(글루텐)','🦀 갑각류']},
   {id:113, name:'그라탕', emoji:'🧀', cat:['cook','delivery','dine'], tags:['🥚 계란','🥗 채소','🧀 유제품/치즈','🕒 30분 이내','🍝 양식','🧈 느끼한맛','🥂 데이트','🎉 홈파티/집들이','🌨️ 눈/비오는 날','🥶 추운 날','🥛 우유/유제품','🌾 밀(글루텐)','🍟 기름진 음식']},
   {id:114, name:'뇨끼', emoji:'🍝', cat:['cook','delivery','dine'], tags:['🥗 채소','🕒 30분 이내','🍝 양식','🧈 느끼한맛','🥂 데이트','🎉 홈파티/집들이','🥛 우유/유제품','🌾 밀(글루텐)','🍟 기름진 음식']},
@@ -2997,18 +3001,18 @@ const menuDB = [
   {id:126, name:'케밥', emoji:'🥙', cat:['cook','delivery','dine'], tags:['🍞 빵/샌드위치','🥩 고기','⚡ 10분 이내','👶 초보도 가능','🌎 그 외(멕시코/인도 등)','🧂 짭짤한맛','🌙 야식','🌾 밀(글루텐)']},
   {id:127, name:'카레', emoji:'🍛', cat:['cook','delivery','dine'], tags:['🍚 밥','🥩 고기','🥗 채소','🕒 30분 이내','♨️ 찜/조림','🌎 그 외(멕시코/인도 등)','🌶️ 매운/얼큰한맛','🧈 느끼한맛','🥂 데이트','🍟 기름진 음식','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
   {id:128, name:'핫도그', emoji:'🌭', cat:['delivery','dine'], tags:['🍞 빵/샌드위치','🥩 고기','⚡ 10분 이내','👶 초보도 가능','🫕 튀김','🍱 한식','🧂 짭짤한맛','🌙 야식','🌾 밀(글루텐)','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
-  {id:130, name:'오뎅볶음', emoji:'🐟', cat:['cook','delivery','dine'], tags:['⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🥑 저지방','🌙 야식','🍺 술안주','🌶️ 매운 음식']},
-  {id:131, name:'계란탕', emoji:'🍲', cat:['cook','dine'], tags:['🥚 계란','⚡ 10분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
-  {id:132, name:'주먹밥', emoji:'🍙', cat:['cook','dine'], tags:['🍚 밥','🥫 가공식품(햄/참치)','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🍱 한식','🧂 짭짤한맛','🌙 야식']},
+  {id:130, name:'오뎅볶음', emoji:'🐟', cat:['cook','delivery'], tags:['⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🥑 저지방','🌙 야식','🍺 술안주','🌶️ 매운 음식']},
+  {id:131, name:'계란탕', emoji:'🍲', cat:['cook'], tags:['🥚 계란','⚡ 10분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
+  {id:132, name:'주먹밥', emoji:'🍙', cat:['cook'], tags:['🍚 밥','🥫 가공식품(햄/참치)','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🍱 한식','🧂 짭짤한맛','🌙 야식']},
   {id:134, name:'오겹살', emoji:'🥓', cat:['delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🔥 구이','🍱 한식','🧂 짭짤한맛','🧈 느끼한맛','🥩 저탄고지','🍺 술안주','🎉 홈파티/집들이','🍟 기름진 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:136, name:'대창', emoji:'🍖', cat:['delivery','dine'], tags:['🥩 고기','🕒 30분 이내','🔥 구이','🍱 한식','🧂 짭짤한맛','🧈 느끼한맛','🥩 저탄고지','🍺 술안주','🎉 홈파티/집들이','🍟 기름진 음식','🗑️ 쓰레기 많은 것','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:137, name:'모듬회', emoji:'🐟', cat:['delivery','dine'], tags:['🐟 생선','🕒 30분 이내','🥗 무침/생식','🍣 일식','💧 담백한맛','🥑 저지방','🍺 술안주','🥂 데이트','✋ 손 써야하는 음식']},
   {id:138, name:'해물파전', emoji:'🥞', cat:['cook','delivery','dine'], tags:['🦐 해산물','🥚 계란','🕒 30분 이내','👶 초보도 가능','🔥 구이/에어프라이어','🍱 한식','🧂 짭짤한맛','🥑 저지방','🌙 야식','🍺 술안주','🎉 홈파티/집들이','🌨️ 눈/비오는 날','🌾 밀(글루텐)','🦀 갑각류','🍟 기름진 음식','🗑️ 쓰레기 많은 것','🫗 옷에 튀는 음식']},
   {id:139, name:'골뱅이소면', emoji:'🍜', cat:['delivery','dine'], tags:['🍜 면','🦐 해산물','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🍜 면 요리','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🍋 새콤/상큼한맛','🥑 저지방','🍺 술안주','🌶️ 매운 음식']},
   {id:140, name:'닭발', emoji:'🍗', cat:['delivery','dine'], tags:['🥩 고기','⚡ 10분 이내','👶 초보도 가능','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🌙 야식','🍺 술안주','🌶️ 매운 음식','🦴 뼈 있는 음식','🗑️ 쓰레기 많은 것','💨 냄새 심한 음식','💨 냄새배는 음식','✋ 손 써야하는 음식']},
-  {id:143, name:'그릭요거트볼', emoji:'🥣', cat:['cook','dine'], tags:['🧀 유제품/치즈','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','🍯 달달한맛','💧 담백한맛','🥗 다이어트식','📉 혈당 조절(저당)','🥑 저지방','☀️ 더운 날','🥛 우유/유제품']},
+  {id:143, name:'그릭요거트볼', emoji:'🥣', cat:['cook'], tags:['🧀 유제품/치즈','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','🍯 달달한맛','💧 담백한맛','🥗 다이어트식','📉 혈당 조절(저당)','🥑 저지방','☀️ 더운 날','🥛 우유/유제품']},
   {id:148, name:'감자튀김', emoji:'🍟', cat:['delivery','dine'], tags:['🥗 채소','⚡ 10분 이내','👶 초보도 가능','🫕 튀김','🍝 양식','🧂 짭짤한맛','🌙 야식','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
-  {id:149, name:'치즈스틱', emoji:'🧀', cat:['delivery','dine'], tags:['🥚 계란','🧀 유제품/치즈','⚡ 10분 이내','👶 초보도 가능','🫕 튀김','🍝 양식','🧂 짭짤한맛','🧈 느끼한맛','🌙 야식','🍺 술안주','🥛 우유/유제품','🌾 밀(글루텐)','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
+  {id:149, name:'치즈스틱', emoji:'🧀', cat:['delivery'], tags:['🥚 계란','🧀 유제품/치즈','⚡ 10분 이내','👶 초보도 가능','🫕 튀김','🍝 양식','🧂 짭짤한맛','🧈 느끼한맛','🌙 야식','🍺 술안주','🥛 우유/유제품','🌾 밀(글루텐)','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
   {id:150, name:'차돌박이샤브샤브', emoji:'🍲', cat:['delivery','dine'], tags:['🥩 고기','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥂 데이트','🎉 홈파티/집들이','🌨️ 눈/비오는 날','🥶 추운 날','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:153, name:'꽃게탕', emoji:'🦀', cat:['delivery','dine'], tags:['🦐 해산물','🍲 국물/찌개','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🌨️ 눈/비오는 날','🥶 추운 날','🦀 갑각류','🌶️ 매운 음식','🦴 뼈 있는 음식','🗑️ 쓰레기 많은 것','✋ 손 써야하는 음식']},
   {id:154, name:'닭개장', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🥩 고기','🍲 국물/찌개','🍱 한식','🌶️ 매운/얼큰한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
@@ -3018,7 +3022,7 @@ const menuDB = [
   {id:159, name:'비빔국수', emoji:'🍜', cat:['cook','delivery','dine'], tags:['🍜 면','🥗 채소','🍜 면 요리','🍱 한식','🌶️ 매운/얼큰한맛','🍋 새콤/상큼한맛','🌙 야식','☀️ 더운 날','🌶️ 매운 음식','🫗 옷에 튀는 음식']},
   {id:160, name:'낙지볶음', emoji:'🐙', cat:['cook','delivery','dine'], tags:['🦐 해산물','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🥑 저지방','🍺 술안주','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
   {id:162, name:'곱창전골', emoji:'🍲', cat:['delivery','dine'], tags:['🥩 고기','🍲 국물/찌개','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🍺 술안주','🎉 홈파티/집들이','🥶 추운 날','🌶️ 매운 음식','🗑️ 쓰레기 많은 것','💨 냄새 심한 음식','💨 냄새배는 음식']},
-  {id:163, name:'소고기무국', emoji:'🍲', cat:['cook','dine'], tags:['🥩 고기','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
+  {id:163, name:'소고기무국', emoji:'🍲', cat:['cook'], tags:['🥩 고기','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
   {id:164, name:'우동볶음', emoji:'🍜', cat:['cook','delivery','dine'], tags:['🍜 면','🥗 채소','🍳 볶음','🍜 면 요리','🍱 한식','🍣 일식','🧂 짭짤한맛','🌙 야식','🌾 밀(글루텐)','🍟 기름진 음식']},
   {id:165, name:'제육덮밥', emoji:'🍚', cat:['cook','delivery','dine'], tags:['🍚 밥','🥩 고기','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🌙 야식','🌶️ 매운 음식']},
   {id:166, name:'훠궈', emoji:'🍲', cat:['delivery','dine'], tags:['🥩 고기','🦐 해산물','🥗 채소','🍲 국물/찌개','🥢 중식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🎉 홈파티/집들이','🥶 추운 날','🦀 갑각류','🍟 기름진 음식','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
@@ -3056,7 +3060,7 @@ const menuDB = [
   {id:208, name:'갈비탕', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🥩 고기','🍲 국물/찌개','🍱 한식','💧 담백한맛','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🦴 뼈 있는 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:211, name:'갈치찌개', emoji:'🐟', cat:['cook','delivery','dine'], tags:['🐟 생선','🥗 채소','🍲 국물/찌개','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','📉 혈당 조절(저당)','🥑 저지방','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:217, name:'갈매기살', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🔥 구이','🍱 한식','🧂 짭짤한맛','🥩 저탄고지','🍺 술안주','🎉 홈파티/집들이','🍟 기름진 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
-  {id:220, name:'고구마맛탕', emoji:'🍠', cat:['delivery','dine'], tags:['🥗 채소','🫕 튀김','🍱 한식','🍯 달달한맛','🌙 야식','🎉 홈파티/집들이','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
+  {id:220, name:'고구마맛탕', emoji:'🍠', cat:['delivery'], tags:['🥗 채소','🫕 튀김','🍱 한식','🍯 달달한맛','🌙 야식','🎉 홈파티/집들이','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
   {id:223, name:'곰탕', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','🦴 뼈 있는 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:227, name:'생선구이', emoji:'🐟', cat:['cook','delivery','dine'], tags:['🐟 생선','🕒 30분 이내','👶 초보도 가능','🔥 구이/에어프라이어','🍱 한식','🧂 짭짤한맛','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:228, name:'곱창', emoji:'🍖', cat:['delivery','dine'], tags:['🥩 고기','🔥 구이','🍱 한식','🧂 짭짤한맛','🍺 술안주','🎉 홈파티/집들이','🍟 기름진 음식','🗑️ 쓰레기 많은 것','💨 냄새 심한 음식','💨 냄새배는 음식','✋ 손 써야하는 음식']},
@@ -3080,7 +3084,7 @@ const menuDB = [
   {id:262, name:'굴국밥', emoji:'🦪', cat:['cook','delivery','dine'], tags:['🍚 밥','🦐 해산물','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:263, name:'소유라멘', emoji:'🍜', cat:['delivery','dine'], tags:['🍜 면','🥩 고기','🍜 면 요리','🍣 일식','🧂 짭짤한맛','🌨️ 눈/비오는 날','🥶 추운 날','🌾 밀(글루텐)']},
   {id:267, name:'대구탕', emoji:'🐟', cat:['cook','delivery','dine'], tags:['🐟 생선','🥗 채소','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날','💨 냄새 심한 음식','💨 냄새배는 음식']},
-  {id:271, name:'김치돼지볶음', emoji:'🥘', cat:['cook','delivery','dine'], tags:['🥩 고기','🥗 채소','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🌙 야식','🍺 술안주','🍟 기름진 음식','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
+  {id:271, name:'김치돼지볶음', emoji:'🥘', cat:['cook','delivery'], tags:['🥩 고기','🥗 채소','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🌙 야식','🍺 술안주','🍟 기름진 음식','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:273, name:'닭똥집볶음', emoji:'🍗', cat:['delivery','dine'], tags:['🥩 고기','🍳 볶음','🍱 한식','🧂 짭짤한맛','📉 혈당 조절(저당)','💪 고단백','🥑 저지방','🌙 야식','🍺 술안주']},
   {id:278, name:'가자미찜', emoji:'🐟', cat:['cook','delivery','dine'], tags:['🐟 생선','🥗 채소','♨️ 찜/조림','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🥑 저지방','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:280, name:'들깨죽', emoji:'🥣', cat:['cook','delivery','dine'], tags:['🥗 채소','♨️ 찜/조림','🍱 한식','💧 담백한맛','🌨️ 눈/비오는 날','🥶 추운 날','🌰 견과류']},
@@ -3091,7 +3095,7 @@ const menuDB = [
   {id:294, name:'닭날개구이', emoji:'🍗', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🔥 구이/에어프라이어','🍱 한식','🧂 짭짤한맛','💪 고단백','🌙 야식','🍺 술안주','🍟 기름진 음식','🦴 뼈 있는 음식','✋ 손 써야하는 음식']},
   {id:295, name:'닭다리구이', emoji:'🍗', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🔥 구이/에어프라이어','🍱 한식','🧂 짭짤한맛','🌙 야식','🍟 기름진 음식','🦴 뼈 있는 음식','✋ 손 써야하는 음식']},
   {id:296, name:'고구마튀김', emoji:'🍠', cat:['delivery','dine'], tags:['🥗 채소','🫕 튀김','🍱 한식','🍯 달달한맛','🌙 야식','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
-  {id:299, name:'달걀찜', emoji:'🥚', cat:['cook','dine'], tags:['🥚 계란','⚡ 10분 이내','👶 초보도 가능','♨️ 찜/조림','🍱 한식','💧 담백한맛']},
+  {id:299, name:'달걀찜', emoji:'🥚', cat:['cook'], tags:['🥚 계란','⚡ 10분 이내','👶 초보도 가능','♨️ 찜/조림','🍱 한식','💧 담백한맛']},
   {id:301, name:'쭈꾸미볶음', emoji:'🐙', cat:['cook','delivery','dine'], tags:['🦐 해산물','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🥑 저지방','🌙 야식','🍺 술안주','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
   {id:302, name:'오징어볶음', emoji:'🦑', cat:['cook','delivery','dine'], tags:['🦐 해산물','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🥑 저지방','🌙 야식','🍺 술안주','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
   {id:303, name:'두루치기', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🍺 술안주','🍟 기름진 음식','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
@@ -3116,15 +3120,15 @@ const menuDB = [
   {id:331, name:'모츠나베', emoji:'🍲', cat:['delivery','dine'], tags:['🥩 고기','🥗 채소','🍲 국물/찌개','🍣 일식','🌿 아시아','🧂 짭짤한맛','🍺 술안주','🎉 홈파티/집들이','🌨️ 눈/비오는 날','🥶 추운 날','🗑️ 쓰레기 많은 것','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:332, name:'샤오롱바오', emoji:'🥟', cat:['delivery','dine'], tags:['🥩 고기','♨️ 찜/조림','🥢 중식','🌿 아시아','🧂 짭짤한맛','🥂 데이트','🎉 홈파티/집들이','🌾 밀(글루텐)','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
   {id:333, name:'북경오리', emoji:'🦆', cat:['delivery','dine'], tags:['🥩 고기','🔥 구이','🥢 중식','🌿 아시아','🧂 짭짤한맛','🧈 느끼한맛','🥂 데이트','🎉 홈파티/집들이','🍟 기름진 음식','🗑️ 쓰레기 많은 것','✋ 손 써야하는 음식']},
-  {id:338, name:'닭가슴살볶음', emoji:'🍗', cat:['cook','delivery','dine'], tags:['🥩 고기','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍱 한식','🧂 짭짤한맛','🥗 다이어트식','📉 혈당 조절(저당)','💪 고단백','🥑 저지방']},
+  {id:338, name:'닭가슴살볶음', emoji:'🍗', cat:['cook','delivery'], tags:['🥩 고기','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍱 한식','🧂 짭짤한맛','🥗 다이어트식','📉 혈당 조절(저당)','💪 고단백','🥑 저지방']},
   {id:339, name:'냉우동', emoji:'🍜', cat:['delivery','dine'], tags:['🍜 면','🍜 면 요리','🍣 일식','💧 담백한맛','🍋 새콤/상큼한맛','🥑 저지방','☀️ 더운 날','🌾 밀(글루텐)']},
   {id:340, name:'냉파스타', emoji:'🍝', cat:['cook','delivery','dine'], tags:['🍜 면','🥗 채소','🕒 30분 이내','🍜 면 요리','🍝 양식','💧 담백한맛','🍋 새콤/상큼한맛','☀️ 더운 날','🌾 밀(글루텐)']},
   {id:341, name:'오리구이', emoji:'🦆', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','🔥 구이/에어프라이어','🍱 한식','🧂 짭짤한맛','🧈 느끼한맛','🍺 술안주','🎉 홈파티/집들이','🍟 기름진 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:343, name:'스테이크덮밥', emoji:'🍚', cat:['cook','delivery','dine'], tags:['🍚 밥','🥩 고기','🕒 30분 이내','🔥 구이/에어프라이어','🍝 양식','🧂 짭짤한맛','💪 고단백','🥂 데이트','🍟 기름진 음식']},
   {id:345, name:'짬뽕밥', emoji:'🍚', cat:['delivery','dine'], tags:['🍚 밥','🦐 해산물','🥗 채소','🥢 중식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🌙 야식','🤢 해장','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
-  {id:348, name:'소시지야채볶음', emoji:'🌭', cat:['cook','dine'], tags:['🥩 고기','🥗 채소','⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍱 한식','🧂 짭짤한맛','🌙 야식','🍟 기름진 음식']},
+  {id:348, name:'소시지야채볶음', emoji:'🌭', cat:['cook'], tags:['🥩 고기','🥗 채소','⚡ 10분 이내','👶 초보도 가능','🍳 원팬요리','🍳 볶음','🍱 한식','🧂 짭짤한맛','🌙 야식','🍟 기름진 음식']},
   {id:349, name:'솥밥', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🍚 밥','🥗 채소','🕒 30분 이내','♨️ 찜/조림','🍱 한식','💧 담백한맛','🥑 저지방','🥂 데이트','🎉 홈파티/집들이']},
-  {id:350, name:'시래기국', emoji:'🍲', cat:['cook','dine'], tags:['🥗 채소','⚡ 10분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
+  {id:350, name:'시래기국', emoji:'🍲', cat:['cook'], tags:['🥗 채소','⚡ 10분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
   {id:351, name:'우럭매운탕', emoji:'🐟', cat:['cook','delivery','dine'], tags:['🐟 생선','🥗 채소','🍲 국물/찌개','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🥑 저지방','🍺 술안주','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:352, name:'돼지껍데기', emoji:'🐷', cat:['delivery','dine'], tags:['🥩 고기','🔥 구이','🍱 한식','🧂 짭짤한맛','🧈 느끼한맛','🥩 저탄고지','🍺 술안주','🎉 홈파티/집들이','🍟 기름진 음식','🗑️ 쓰레기 많은 것','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:353, name:'막창', emoji:'🍖', cat:['delivery','dine'], tags:['🥩 고기','🔥 구이','🍱 한식','🧂 짭짤한맛','🧈 느끼한맛','🥩 저탄고지','🍺 술안주','🎉 홈파티/집들이','🍟 기름진 음식','🗑️ 쓰레기 많은 것','💨 냄새 심한 음식','💨 냄새배는 음식']},
@@ -3148,11 +3152,11 @@ const menuDB = [
   {id:378, name:'비지찌개', emoji:'🍲', cat:['cook','delivery','dine'], tags:['🥩 고기','🫘 두부/콩류','🍲 국물/찌개','🍱 한식','💧 담백한맛','🌨️ 눈/비오는 날','🥶 추운 날','🫘 대두/콩','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:379, name:'갈릭버터파스타', emoji:'🍝', cat:['cook','delivery','dine'], tags:['🍜 면','🥩 고기','🕒 30분 이내','🍜 면 요리','🍝 양식','🧂 짭짤한맛','🧈 느끼한맛','🌙 야식','🥂 데이트','🎉 홈파티/집들이','🌾 밀(글루텐)','🍟 기름진 음식']},
   {id:380, name:'감바스', emoji:'🦐', cat:['cook','delivery','dine'], tags:['🦐 해산물','🥗 채소','🕒 30분 이내','🍝 양식','🧂 짭짤한맛','🧈 느끼한맛','🍺 술안주','🥂 데이트','🎉 홈파티/집들이','🦀 갑각류','🍟 기름진 음식']},
-  {id:381, name:'두부샐러드', emoji:'🫘', cat:['cook','dine'], tags:['🥗 채소','🫘 두부/콩류','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','☀️ 더운 날','🫘 대두/콩']},
+  {id:381, name:'두부샐러드', emoji:'🫘', cat:['cook'], tags:['🥗 채소','🫘 두부/콩류','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍱 한식','💧 담백한맛','📉 혈당 조절(저당)','☀️ 더운 날','🫘 대두/콩']},
   {id:383, name:'아보카도샐러드', emoji:'🥑', cat:['cook','dine'], tags:['🥗 채소','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','💧 담백한맛','🍋 새콤/상큼한맛','🥗 다이어트식','🥂 데이트','☀️ 더운 날']},
   {id:384, name:'치킨파히타', emoji:'🌮', cat:['cook','delivery','dine'], tags:['🍞 빵/샌드위치','🥩 고기','🥗 채소','🕒 30분 이내','🌎 그 외(멕시코/인도 등)','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🌙 야식','🎉 홈파티/집들이','🌾 밀(글루텐)','🌶️ 매운 음식']},
   {id:385, name:'연어샐러드', emoji:'🐟', cat:['cook','delivery','dine'], tags:['🐟 생선','🥗 채소','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','💧 담백한맛','🍋 새콤/상큼한맛','🥗 다이어트식','💪 고단백','🥂 데이트','☀️ 더운 날']},
-  {id:386, name:'참치샐러드', emoji:'🐟', cat:['cook','dine'], tags:['🥗 채소','🥫 가공식품(햄/참치)','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','💧 담백한맛','🥗 다이어트식','📉 혈당 조절(저당)','💪 고단백','☀️ 더운 날']},
+  {id:386, name:'참치샐러드', emoji:'🐟', cat:['cook'], tags:['🥗 채소','🥫 가공식품(햄/참치)','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','💧 담백한맛','🥗 다이어트식','📉 혈당 조절(저당)','💪 고단백','☀️ 더운 날']},
   {id:387, name:'훈제연어샐러드', emoji:'🐟', cat:['cook','delivery','dine'], tags:['🐟 생선','🥗 채소','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🥗 무침/생식','🍝 양식','💧 담백한맛','🍋 새콤/상큼한맛','🥗 다이어트식','💪 고단백','🥂 데이트','☀️ 더운 날']},
   {id:390, name:'문어숙회', emoji:'🐙', cat:['delivery','dine'], tags:['🦐 해산물','🥗 무침/생식','🍱 한식','💧 담백한맛','💪 고단백','🥑 저지방','🍺 술안주','🥂 데이트','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:391, name:'전복버터구이', emoji:'🦪', cat:['cook','delivery','dine'], tags:['🦐 해산물','🔥 구이','🍱 한식','🧂 짭짤한맛','🧈 느끼한맛','💪 고단백','🍺 술안주','🥂 데이트','🎉 홈파티/집들이','🍟 기름진 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
@@ -3231,6 +3235,11 @@ function selectCat(cat) {
   updateFilterLayout();
   updateCandidateCount();
   refreshFavStars();
+  // 처음엔 '맛' 조건을 펼쳐서 바로 고를 수 있게
+  if (currentMode !== 'hate' && !document.querySelector('#filter-tags .accordion-body.open')) {
+    const tasteHeader = document.getElementById('acc-taste-header');
+    if (tasteHeader && tasteHeader.offsetParent !== null) toggleAccordion('acc-taste');
+  }
 }
 
 // 모드 + 카테고리 조합에 따른 필터 레이아웃 제어
@@ -3289,8 +3298,7 @@ function updateFilterLayout() {
   });
 
   // ── 즐겨찾기 섹션 표시 ──
-  const favSec = document.getElementById('fav-section');
-  if (favSec) favSec.style.display = favTags.length > 0 ? 'block' : 'none';
+  renderFavSection();
 
   // ── 카테고리별 태그 세부 제어 ──
   applyTagVisibility();
@@ -4061,6 +4069,11 @@ const recipeDB = {
     youtube: '안동찜닭 레시피',
     calories: 560, carbs: 52, protein: 40, fat: 20,
   },
+  '그라탕': {calories:480, carbs:38, protein:20, fat:27},
+  '카레': {calories:432, carbs:83, protein:12, fat:6},
+  '주먹밥': {calories:230, carbs:45, protein:5, fat:3},
+  '만두': {calories:420, carbs:48, protein:18, fat:16},
+  '간짜장': {calories:680, carbs:110, protein:22, fat:16},
 };
 
 
@@ -4223,6 +4236,8 @@ function likeMenu(name, emoji) {
 const SHOP_AFFILIATE = {
   coupang: {
     name: '쿠팡', emoji: '🛒', color: '#e62e14', enabled: true,
+    // tracked: 수수료 추적 링크(파트너스 API)로 바꾸면 true → 대가성 문구 자동 표시
+    tracked: false,
     url: (q) => `https://www.coupang.com/np/search?q=${encodeURIComponent(q)}&channel=user`
   },
   mealkit: {
@@ -4333,7 +4348,7 @@ function renderResults(rejectPattern, flipIndex) {
             <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${getLikedMenus().some(m=>m.name===item.name)?'❤️':'🤍'} 좋아요</button>
             <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">😅 안땡겨</button>
             <button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">📋 레시피</button>
-            <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">💬 후기 ${commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length}개</button>
+            <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? `💬 후기 ${rc}개` : '✍️ 첫 후기 남기기'; })()}</button>
           </div>
           <div id="similar-btn-wrap-${i}">
             <button class="similar-toggle-btn" onclick="toggleSimilar('${item.name.replace(/'/g,"\\'")}',${i})">🔍 비슷한 메뉴</button>
@@ -4371,7 +4386,7 @@ function renderResults(rejectPattern, flipIndex) {
         <span style="flex:1 0 70px;font-size:13px;min-width:70px">${m.emoji} ${m.name}</span>
         <span style="display:flex;gap:6px;flex-wrap:wrap">${shopButtons(m.name)}</span>
       </div>`).join('')}
-    <div style="font-size:9px;color:var(--muted);text-align:right;margin-top:2px">* 쿠팡 파트너스 등 제휴 링크</div>
+    ${SHOP_AFFILIATE.coupang.tracked ? '<div style="font-size:10px;color:var(--muted);text-align:right;margin-top:2px">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : ''}
   </div>` : '';
 
   document.getElementById('result-area').innerHTML = `<div class="result-grid">${cards}</div>${feedbackHtml}${rerollBtn}
@@ -4532,7 +4547,7 @@ function openRecipe(menuName, emoji) {
         <span class="cp-logo">coupang</span>
         <span class="cp-arrow">›</span>
       </a>
-      <div class="cp-disclaimer">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>
+      ${SHOP_AFFILIATE.coupang.tracked ? '<div class="cp-disclaimer">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : ''}
     </div>`;
 
   modal.classList.add('show');
@@ -5321,7 +5336,7 @@ function renderWriteTagList(q) {
       <span style="font-size:13px;color:var(--text)">${item.emoji} ${item.name}</span>
       ${item.cnt > 0
         ? `<span style="font-size:11px;color:var(--orange)">후기 ${item.cnt}개</span>`
-        : `<span style="font-size:10px;color:var(--muted)">후기 없음</span>`}
+        : `<span style="font-size:10px;color:var(--muted)">첫 후기 남기기</span>`}
     </div>`).join('');
 }
 
@@ -5870,16 +5885,11 @@ function postWeeklySummary() {
 }
 
 // ── 알림 ──
-const DUMMY_NOTIFS = [
-  { id:'n1', type:'like', read:false, avatar:'😋', nick:'배고픈짱구', text:'회원님의 글을 좋아해요', sub:'오늘 점심 김치찌개 해먹었는데...', date: Date.now()-180000 },
-  { id:'n2', type:'comment', read:false, avatar:'🍜', nick:'라면장인', text:'댓글을 남겼어요', sub:'"저도 치즈 넣어봤는데 진짜 맛있더라고요!"', date: Date.now()-600000 },
-  { id:'n3', type:'vote', read:false, avatar:'🤔', nick:'메뉴고민중', text:'회원님 투표에 참여했어요', sub:'오늘 야식 뭐 시킬까요?', date: Date.now()-1800000 },
-  { id:'n4', type:'like', read:true, avatar:'🌸', nick:'다이어터K', text:'회원님의 글을 좋아해요', sub:'제육볶음 황금 레시피 공유해요!', date: Date.now()-7200000 },
-  { id:'n5', type:'comment', read:true, avatar:'👨‍🍳', nick:'집밥마스터', text:'댓글을 남겼어요', sub:'"설탕 대신 올리고당 쓰면 더 맛있어요!"', date: Date.now()-14400000 },
-  { id:'n6', type:'vote_result', read:true, avatar:'🗳️', nick:'투표결과', text:'투표가 마감됐어요', sub:'"야식 뭐 시킬까요?" → 치킨 승리!', date: Date.now()-18000000 },
-];
-
-let notifications = JSON.parse(localStorage.getItem('wmjNotifs') || 'null') || DUMMY_NOTIFS;
+// 실제 알림만 표시 (내 글에 달린 댓글·좋아요를 Supabase에서 불러옴)
+localStorage.removeItem('wmjNotifs'); // 예전 더미 알림 정리
+let notifications = [];
+function getReadNotifIds() { try { return new Set(JSON.parse(localStorage.getItem('wmjNotifRead') || '[]')); } catch(e) { return new Set(); } }
+function saveReadNotifIds(set) { localStorage.setItem('wmjNotifRead', JSON.stringify([...set].slice(-300))); }
 
 function renderNotifyPage() {
   const list = document.getElementById('notify-list');
@@ -5918,13 +5928,14 @@ function renderNotifyPage() {
 
 function readNotif(id) {
   const n = notifications.find(x => x.id === id);
-  if (n) { n.read = true; localStorage.setItem('wmjNotifs', JSON.stringify(notifications)); }
+  if (n) { n.read = true; const r = getReadNotifIds(); r.add(id); saveReadNotifIds(r); }
   renderNotifyPage();
 }
 
 function markAllRead() {
-  notifications.forEach(n => n.read = true);
-  localStorage.setItem('wmjNotifs', JSON.stringify(notifications));
+  const r = getReadNotifIds();
+  notifications.forEach(n => { n.read = true; r.add(n.id); });
+  saveReadNotifIds(r);
   renderNotifyPage();
   showToast('모두 읽음 처리됐어요');
 }
@@ -6370,7 +6381,7 @@ function renderMenuPickList(q) {
       <span style="font-size:13px;color:var(--text)">${item.emoji} ${item.name}</span>
       ${item.cnt > 0
         ? `<span style="font-size:11px;color:var(--orange);font-weight:700">후기 ${item.cnt}개</span>`
-        : `<span style="font-size:10px;color:var(--muted)">후기 없음</span>`}
+        : `<span style="font-size:10px;color:var(--muted)">첫 후기 남기기</span>`}
     </div>`).join('');
 }
 
@@ -6851,7 +6862,7 @@ function renderDailyMeal() {
         <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
           <div style="background:var(--yellow);height:100%;border-radius:4px;width:${cnt > 0 ? pct : 0}%;transition:width 0.5s ease"></div>
         </div>
-        <div style="font-size:10px;color:var(--muted)">인증 ${cnt}명</div>
+        <div style="font-size:10px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어보세요'}</div>
       </div>
       <button onclick="certifyDailyMeal('${m.name}')"
         style="background:var(--yellow);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#1a1400;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%">
@@ -7003,7 +7014,7 @@ function renderDailyQ() {
             </div>
           </div>`;
         }).join('')}
-        <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">총 ${total}명 참여</div>
+        <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">${total > 0 ? `총 ${total}명 참여` : '첫 투표를 남겨주세요'}</div>
       ` : `
         <!-- 투표 버튼 -->
         <div style="display:flex;gap:8px">
@@ -7274,7 +7285,7 @@ function renderTournamentMatches() {
     const bBar = confirmed ? '<div style="margin-top:6px"><div style="background:var(--surface);border-radius:4px;height:5px;overflow:hidden;margin-bottom:2px"><div style="background:' + (vd.myVote==='b'?'var(--orange)':'var(--border)') + ';height:100%;border-radius:4px;width:' + bPct + '%"></div></div><div style="font-size:10px;color:' + (vd.myVote==='b'?'var(--orange)':'var(--muted)') + '">' + bPct + '%' + (vd.myVote==='b'?' ✓':'') + '</div></div>' : (temp==='b' ? '<div style="font-size:10px;color:var(--orange);margin-top:4px">선택중</div>' : '');
 
     html += '<div style="background:var(--card);border:1.5px solid ' + ((aActive||bActive)&&!confirmed?'var(--orange)':'var(--border)') + ';border-radius:14px;padding:14px;margin-bottom:10px">'
-      + '<div style="font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:10px">' + (i+1) + '매치 &nbsp;·&nbsp; <span style="color:var(--orange)">' + total + '명 참여중</span></div>'
+      + '<div style="font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:10px">' + (i+1) + '매치 &nbsp;·&nbsp; ' + (total > 0 ? '<span style="color:var(--orange)">' + total + '명 참여중</span>' : '<span style="color:var(--orange)">첫 투표를 기다려요</span>') + '</div>'
       + '<div style="display:flex;gap:10px;align-items:center">'
       + '<button onclick="voteTournament(' + i + ',\'a\')" ' + (!canVote?'disabled ':'') + 'style="flex:1;background:' + aBg + ';border:2px solid ' + aBorder + ';border-radius:12px;padding:12px 6px;text-align:center;cursor:' + cursor + ';transition:all 0.15s;font-family:\'Noto Sans KR\',sans-serif">'
       + wcFoodVisual(m.a, 62)
@@ -7520,7 +7531,7 @@ function renderFunPage() {
           <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
             <div style="background:var(--yellow);height:100%;border-radius:4px;width:${cnt>0?pct:0}%;transition:width 0.5s ease"></div>
           </div>
-          <div style="font-size:10px;color:var(--muted)">인증 ${cnt}명</div>
+          <div style="font-size:10px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어보세요'}</div>
         </div>
         <button onclick="certifyDailyMeal('${m.name}')"
           style="background:var(--yellow);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#1a1400;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%">
@@ -7563,7 +7574,7 @@ function renderFunPage() {
                   </div>
                 </div>`;
               }).join('')}
-              <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">총 ${total}명 참여</div>
+              <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">${total > 0 ? `총 ${total}명 참여` : '첫 투표를 남겨주세요'}</div>
             ` : `
               <div style="display:flex;gap:8px">
                 ${q.opts.map((opt,i)=>`
@@ -7953,7 +7964,7 @@ const EXTRA_IMAGES = {
   '일식돈까스':'https://images.pexels.com/photos/27009848/pexels-photo-27009848.png?w=400',
   '콤비네이션피자':'https://images.pexels.com/photos/31596394/pexels-photo-31596394.jpeg?w=400',
   '포테이토피자':'https://images.unsplash.com/photo-1573821663912-569905455b1c?w=400',
-  '순두부찌개':'https://omechu-rouge.vercel.app/images/순두부찌개.png',
+  '순두부찌개':'https://omechu-rouge.vercel.app/images/순두부찌개.jpg',
   '연어덮밥(사케동)':'https://images.pexels.com/photos/37058820/pexels-photo-37058820.jpeg?w=400',
   '양념치킨':'https://images.pexels.com/photos/31986858/pexels-photo-31986858.jpeg?w=400',
   '소갈비':'https://images.pexels.com/photos/27643005/pexels-photo-27643005.jpeg?w=400',
@@ -7968,7 +7979,7 @@ const EXTRA_IMAGES = {
   '꽃게탕':'https://images.pexels.com/photos/13704629/pexels-photo-13704629.jpeg?w=400',
   '오삼불고기':'https://images.pexels.com/photos/8827906/pexels-photo-8827906.jpeg?w=400',
   '비빔국수':'https://images.pexels.com/photos/8980455/pexels-photo-8980455.jpeg?w=400',
-  '소고기무국':'https://omechu-rouge.vercel.app/images/소고기뭇국.png',
+  '소고기무국':'https://omechu-rouge.vercel.app/images/소고기뭇국.jpg',
   '콩국수':'https://images.unsplash.com/photo-1750296976666-e736034e76fa?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw0fHxLb3JlYW4lMjBjb2xkJTIwc295JTIwbWlsayUyMG5vb2RsZXMlMjBrb25ndWtzdXxlbnwwfHx8fDE3Nzc3MzAxNTF8MA&ixlib=rb-4.1.0&q=85',
   '만두':'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400',
   '간짜장':'https://omechu-rouge.vercel.app/images/간짜장.jpg',
@@ -7979,7 +7990,7 @@ const EXTRA_IMAGES = {
   '고추잡채':'https://images.pexels.com/photos/724291/pexels-photo-724291.jpeg?w=400',
   '꽃게찜':'https://images.pexels.com/photos/8352013/pexels-photo-8352013.jpeg?w=400',
   '달걀찜':'https://images.pexels.com/photos/35833815/pexels-photo-35833815.jpeg?w=400',
-  '아구찜':'https://omechu-rouge.vercel.app/images/아구찜.png',
+  '아구찜':'https://omechu-rouge.vercel.app/images/아구찜.jpg',
   '간장게장':'https://images.pexels.com/photos/8980370/pexels-photo-8980370.jpeg?w=400',
   '쌈밥':'https://images.pexels.com/photos/36964141/pexels-photo-36964141.jpeg?w=400',
   '모츠나베':'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Motsunabe.jpg/400px-Motsunabe.jpg',
@@ -7999,8 +8010,8 @@ const EXTRA_IMAGES = {
   '비빔밥':'https://images.pexels.com/photos/5773960/pexels-photo-5773960.jpeg?w=400',
   '갈비찜':'https://images.pexels.com/photos/32767703/pexels-photo-32767703.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
   '잡채':'https://images.pexels.com/photos/8948967/pexels-photo-8948967.jpeg?w=400',
-  '콩나물국밥':'https://omechu-rouge.vercel.app/images/콩나물국밥.png',
-  '미역국':'https://omechu-rouge.vercel.app/images/소고기미역국.png',
+  '콩나물국밥':'https://omechu-rouge.vercel.app/images/콩나물국밥.jpg',
+  '미역국':'https://omechu-rouge.vercel.app/images/소고기미역국.jpg',
   '까르보나라':'https://images.pexels.com/photos/31779533/pexels-photo-31779533.jpeg?w=400',
   '닭고기덮밥(오야코동)':'https://images.pexels.com/photos/37297724/pexels-photo-37297724.jpeg?w=400',
   '마파두부':'https://images.pexels.com/photos/20943936/pexels-photo-20943936.jpeg?w=400',
@@ -8023,9 +8034,9 @@ const EXTRA_IMAGES = {
   '감자탕':'https://images.pexels.com/photos/8934866/pexels-photo-8934866.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
   '해장국':'https://upload.wikimedia.org/wikipedia/commons/9/9a/Korean_soup-Seonjiguk-01.jpg',
   '설렁탕':'https://images.pexels.com/photos/8054794/pexels-photo-8054794.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '육개장':'https://omechu-rouge.vercel.app/images/육개장.png',
-  '칼국수':'https://omechu-rouge.vercel.app/images/칼국수.png',
-  '삼계탕':'https://omechu-rouge.vercel.app/images/삼계탕.png',
+  '육개장':'https://omechu-rouge.vercel.app/images/육개장.jpg',
+  '칼국수':'https://omechu-rouge.vercel.app/images/칼국수.jpg',
+  '삼계탕':'https://omechu-rouge.vercel.app/images/삼계탕.jpg',
   '추어탕':'https://images.pexels.com/photos/31649644/pexels-photo-31649644.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
   '떡국':'https://images.unsplash.com/photo-1775883374700-bddbb6c80fcb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxfHwlRUIlOTYlQTElRUElQjUlQUR8ZW58MHx8fHwxNzc3NzI2MjExfDA&ixlib=rb-4.1.0&q=85',
   '수제비':'https://upload.wikimedia.org/wikipedia/commons/a/a4/Sujebi.jpg',
@@ -8050,14 +8061,14 @@ const EXTRA_IMAGES = {
   '물냉면':'https://images.unsplash.com/photo-1676686997059-fb817ebbb2b5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw5fHwlRUElQjklODAlRUMlQjklOTglRUMlQjAlOEMlRUElQjAlOUN8ZW58MHx8fHwxNzc3NzI2ODk0fDA&ixlib=rb-4.1.0&q=85&w=400',
   '닭강정':'https://images.pexels.com/photos/20152618/pexels-photo-20152618.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
   '잣죽':'https://upload.wikimedia.org/wikipedia/commons/1/1d/Jatjuk.jpg',
-  '굴국밥':'https://omechu-rouge.vercel.app/images/굴국밥.png',
+  '굴국밥':'https://omechu-rouge.vercel.app/images/굴국밥.jpg',
   '돼지국밥':'https://images.unsplash.com/photo-1673520859629-ae3f781cf034?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw0fHxLb3JlYW4lMjBwb3JrJTIwcmljZSUyMHNvdXAlMjBkd2FlamklMjBndWtiYXB8ZW58MHx8fHwxNzc3NzMyMDQ0fDA&ixlib=rb-4.1.0&q=85',
   '소유라멘':'https://images.pexels.com/photos/37283917/pexels-photo-37283917.jpeg?w=400',
   '시오라멘':'https://images.pexels.com/photos/37014726/pexels-photo-37014726.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '두부김치':'https://omechu-rouge.vercel.app/images/두부김치.png',
+  '두부김치':'https://omechu-rouge.vercel.app/images/두부김치.jpg',
   '오징어볶음':'https://images.unsplash.com/photo-1702638372048-355b8193a01f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw3fHwlRUMlOTglQTQlRUMlQTclOTUlRUMlOTYlQjQlRUIlQjMlQjYlRUMlOUQlOEN8ZW58MHx8fHwxNzc3NzI2NDc5fDA&ixlib=rb-4.1.0&q=85',
   '육회':'https://images.pexels.com/photos/14316595/pexels-photo-14316595.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '도가니탕':'https://omechu-rouge.vercel.app/images/도가니탕.png',
+  '도가니탕':'https://omechu-rouge.vercel.app/images/도가니탕.jpg',
   '부리토':'https://images.pexels.com/photos/27603260/pexels-photo-27603260.jpeg?w=400',
   '나초':'https://images.pexels.com/photos/6399998/pexels-photo-6399998.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
   '파에야':'https://images.pexels.com/photos/24906297/pexels-photo-24906297.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
@@ -8068,40 +8079,40 @@ const EXTRA_IMAGES = {
   '평양냉면':'https://images.unsplash.com/photo-1673698968269-cc44ae70f296?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxfHwlRUQlOEYlODklRUMlOTYlOTElRUIlODMlODklRUIlQTklQjR8ZW58MHx8fHwxNzc3NzI2NjQ3fDA&ixlib=rb-4.1.0&q=85',
   '새우버거':'https://images.pexels.com/photos/27988496/pexels-photo-27988496.jpeg?w=400',
   '돈까스덮밥(가츠동)':'https://images.pexels.com/photos/37279873/pexels-photo-37279873.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '돼지불고기':'https://omechu-rouge.vercel.app/images/돼지불고기.png',
+  '돼지불고기':'https://omechu-rouge.vercel.app/images/돼지불고기.jpg',
   '갈치찌개':'https://omechu-rouge.vercel.app/images/갈치찌개.jpg',
-  '계란탕':'https://omechu-rouge.vercel.app/images/계란탕.png',
-  '골뱅이소면':'https://omechu-rouge.vercel.app/images/골뱅이소면.png',
-  '곱창전골':'https://omechu-rouge.vercel.app/images/곱창전골.png',
-  '그린커리':'https://omechu-rouge.vercel.app/images/그린커리.png',
-  '김치전':'https://omechu-rouge.vercel.app/images/김치전.png',
-  '닭개장':'https://omechu-rouge.vercel.app/images/닭개장.png',
-  '닭똥집볶음':'https://omechu-rouge.vercel.app/images/닭똥집볶음.png',
+  '계란탕':'https://omechu-rouge.vercel.app/images/계란탕.jpg',
+  '골뱅이소면':'https://omechu-rouge.vercel.app/images/골뱅이소면.jpg',
+  '곱창전골':'https://omechu-rouge.vercel.app/images/곱창전골.jpg',
+  '그린커리':'https://omechu-rouge.vercel.app/images/그린커리.jpg',
+  '김치전':'https://omechu-rouge.vercel.app/images/김치전.jpg',
+  '닭개장':'https://omechu-rouge.vercel.app/images/닭개장.jpg',
+  '닭똥집볶음':'https://omechu-rouge.vercel.app/images/닭똥집볶음.jpg',
   '대구탕':'https://omechu-rouge.vercel.app/images/대구탕.jpg',
-  '대창':'https://omechu-rouge.vercel.app/images/대창.png',
-  '동태탕':'https://omechu-rouge.vercel.app/images/동태탕.png',
+  '대창':'https://omechu-rouge.vercel.app/images/대창.jpg',
+  '동태탕':'https://omechu-rouge.vercel.app/images/동태탕.jpg',
   '돼지껍데기':'https://omechu-rouge.vercel.app/images/돼지껍데기.jpg',
-  '두루치기':'https://omechu-rouge.vercel.app/images/돼지두루치기.png',
-  '돼지찌개':'https://omechu-rouge.vercel.app/images/돼지찌개.png',
-  '복지리탕':'https://omechu-rouge.vercel.app/images/복지리탕.png',
-  '북어국':'https://omechu-rouge.vercel.app/images/북어국.png',
+  '두루치기':'https://omechu-rouge.vercel.app/images/돼지두루치기.jpg',
+  '돼지찌개':'https://omechu-rouge.vercel.app/images/돼지찌개.jpg',
+  '복지리탕':'https://omechu-rouge.vercel.app/images/복지리탕.jpg',
+  '북어국':'https://omechu-rouge.vercel.app/images/북어국.jpg',
   '불족발':'https://omechu-rouge.vercel.app/images/불족발.jpg',
-  '비지찌개':'https://omechu-rouge.vercel.app/images/비지찌개.png',
-  '새우장덮밥':'https://omechu-rouge.vercel.app/images/새우장덮밥.png',
-  '선지해장국':'https://omechu-rouge.vercel.app/images/선지해장국.png',
-  '소시지야채볶음':'https://omechu-rouge.vercel.app/images/소세지야채볶음.png',
-  '솥밥':'https://omechu-rouge.vercel.app/images/솥.png',
-  '순대볶음':'https://omechu-rouge.vercel.app/images/순대볶음.png',
-  '시래기국':'https://omechu-rouge.vercel.app/images/시래기국.png',
-  '열무김치국수':'https://omechu-rouge.vercel.app/images/열무김치국수.png',
-  '우럭매운탕':'https://omechu-rouge.vercel.app/images/우럭매운탕.png',
-  '잔치국수':'https://omechu-rouge.vercel.app/images/잔치국수.png',
+  '비지찌개':'https://omechu-rouge.vercel.app/images/비지찌개.jpg',
+  '새우장덮밥':'https://omechu-rouge.vercel.app/images/새우장덮밥.jpg',
+  '선지해장국':'https://omechu-rouge.vercel.app/images/선지해장국.jpg',
+  '소시지야채볶음':'https://omechu-rouge.vercel.app/images/소세지야채볶음.jpg',
+  '솥밥':'https://omechu-rouge.vercel.app/images/솥.jpg',
+  '순대볶음':'https://omechu-rouge.vercel.app/images/순대볶음.jpg',
+  '시래기국':'https://omechu-rouge.vercel.app/images/시래기국.jpg',
+  '열무김치국수':'https://omechu-rouge.vercel.app/images/열무김치국수.jpg',
+  '우럭매운탕':'https://omechu-rouge.vercel.app/images/우럭매운탕.jpg',
+  '잔치국수':'https://omechu-rouge.vercel.app/images/잔치국수.jpg',
   '전복버터구이':'https://omechu-rouge.vercel.app/images/전복버터구이.jpg',
-  '쭈꾸미볶음':'https://omechu-rouge.vercel.app/images/쭈꾸미볶음.png',
-  '참치마요덮밥':'https://omechu-rouge.vercel.app/images/참치마요.png',
-  '청국장':'https://omechu-rouge.vercel.app/images/청국장.png',
-  '콩나물불고기':'https://omechu-rouge.vercel.app/images/콩나물불고기.png',
-  '대창덮밥(호르몬동)':'https://omechu-rouge.vercel.app/images/호르몬동.png',
+  '쭈꾸미볶음':'https://omechu-rouge.vercel.app/images/쭈꾸미볶음.jpg',
+  '참치마요덮밥':'https://omechu-rouge.vercel.app/images/참치마요.jpg',
+  '청국장':'https://omechu-rouge.vercel.app/images/청국장.jpg',
+  '콩나물불고기':'https://omechu-rouge.vercel.app/images/콩나물불고기.jpg',
+  '대창덮밥(호르몬동)':'https://omechu-rouge.vercel.app/images/호르몬동.jpg',
 };
 
 
@@ -8127,6 +8138,36 @@ function getUserKey() {
   return key;
 }
 const MY_USER_KEY = getUserKey();
+
+// ── 실제 알림 불러오기: 내 글에 달린 댓글·좋아요 ──
+async function loadRealNotifications() {
+  try {
+    const { data: myPosts } = await sb.from('posts').select('id,text').eq('user_key', MY_USER_KEY).limit(100);
+    if (!myPosts || myPosts.length === 0) { notifications = []; updateNotifyBadge(); return; }
+    const ids = myPosts.map(p => p.id);
+    const textOf = id => ((myPosts.find(p => p.id === id) || {}).text || '').slice(0, 30);
+    const myNick = getMyNick();
+    const [{ data: cmts }, { data: lks }] = await Promise.all([
+      sb.from('comments').select('*').in('post_id', ids).order('created_at', { ascending: false }).limit(30),
+      sb.from('likes').select('*').eq('target_type', 'post').in('target_id', ids).limit(50),
+    ]);
+    const read = getReadNotifIds();
+    const list = [];
+    (cmts || []).filter(c => c.nick !== myNick).forEach(c => list.push({
+      id: 'c_' + c.id, type: 'comment', avatar: c.avatar || '💬', nick: c.nick || '익명',
+      text: '댓글을 남겼어요', sub: '"' + (c.text || '').slice(0, 40) + '"', date: new Date(c.created_at).getTime(),
+    }));
+    (lks || []).filter(l => l.user_key !== MY_USER_KEY).forEach(l => list.push({
+      id: 'l_' + l.target_id + '_' + l.user_key, type: 'like', avatar: '❤️', nick: '누군가',
+      text: '회원님의 글을 좋아해요', sub: textOf(l.target_id), date: l.created_at ? new Date(l.created_at).getTime() : Date.now(),
+    }));
+    list.forEach(n => n.read = read.has(n.id));
+    notifications = list.sort((a, b) => b.date - a.date).slice(0, 30);
+    updateNotifyBadge();
+    if (document.getElementById('page-notify')?.style.display !== 'none') renderNotifyPage();
+  } catch (e) { console.warn('알림 불러오기 실패:', e?.message || String(e)); }
+}
+setTimeout(loadRealNotifications, 1500);
 
 // ── 닉네임 시스템 ──
 const NICK_ADJ = ['배고픈','맛있는','야식러','집밥파','다이어터','매운맛','담백한','든든한','가벼운','행복한','열정적인','느긋한'];
