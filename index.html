@@ -18,7 +18,17 @@
 <link rel="apple-touch-startup-image" href="icon-512.png">
 <meta name="description" content="오메추 — 오늘 메뉴 고민 끝! 조건에 맞는 메뉴를 추천해드려요. 저메추, 점메추, 야식 추천까지.">
 
-<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<!-- 공유 미리보기 (카톡/인스타/SNS 링크 썸네일) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="오메추">
+<meta property="og:title" content="오메추 — 오늘 뭐 먹지?">
+<meta property="og:description" content="오늘 메뉴 고민 끝! 음식 월드컵·메뉴 배틀로 골라주는 메뉴 추천 앱. 지금 바로 뽑아보세요 🍽️">
+<meta property="og:image" content="https://omechu-rouge.vercel.app/og-image.png">
+<meta property="og:url" content="https://omechu-rouge.vercel.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="오메추 — 오늘 뭐 먹지?">
+<meta name="twitter:description" content="오늘 메뉴 고민 끝! 음식 월드컵·메뉴 배틀로 골라주는 메뉴 추천 앱 🍽️">
+<meta name="twitter:image" content="https://omechu-rouge.vercel.app/og-image.png">
 
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
@@ -304,12 +314,19 @@
 
   /* ── 마이페이지 ── */
   .my-profile-card {
-    display:flex; align-items:center; gap:16px;
+    display:flex; flex-direction:column; gap:0;
     background:linear-gradient(135deg,rgba(255,71,87,0.1),rgba(204,26,46,0.05));
     border:1.5px solid rgba(255,71,87,0.2); border-radius:24px;
     padding:20px; margin-bottom:16px;
     box-shadow:0 4px 20px rgba(255,71,87,0.1);
   }
+  .my-profile-top { display:flex; align-items:center; gap:16px; }
+  .my-profile-stats { display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,71,87,0.18); }
+  .my-pchip { display:inline-flex; align-items:center; gap:4px; background:var(--card); border:1px solid var(--border); border-radius:13px; padding:6px 10px; font-size:11px; color:var(--text); font-weight:600; }
+  .my-pchip b { color:var(--orange); font-family:'Jua',sans-serif; font-weight:400; font-size:14px; }
+  .my-pchip.taste { justify-content:center; background:linear-gradient(135deg,rgba(255,209,102,0.15),rgba(255,71,87,0.08)); border-color:rgba(255,209,102,0.45); color:var(--yellow); font-weight:700; }
+  .my-acc-header { cursor:pointer; user-select:none; }
+  .my-acc-arrow { font-size:12px; color:var(--muted); transition:transform 0.2s; }
   .my-avatar { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--orange),#cc1a2e); display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; box-shadow:0 4px 16px rgba(255,71,87,0.35); }
   .my-profile-info { flex:1; }
   .my-nickname { font-family:'Jua',sans-serif; font-size:20px; }
@@ -560,17 +577,27 @@
   .result-rank { position:absolute; top:10px; right:14px; font-family:'Jua',sans-serif; font-size:20px; color:rgba(255,71,87,0.1); }
   .result-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(255,71,87,0.15); color:var(--orange); font-size:9px; font-weight:700; padding:3px 10px; border-radius:20px; margin-bottom:8px; border:1px solid rgba(255,71,87,0.3); }
   .result-badge.hate-badge { background:rgba(255,71,87,0.15); color:var(--red); border-color:rgba(255,71,87,0.3); }
+  .result-main { display:flex; gap:12px; align-items:flex-start; }
+  .result-left { width:150px; flex-shrink:0; display:flex; flex-direction:column; gap:8px; }
+  .result-img {
+    width:100%; aspect-ratio:1/1;
+    border-radius:14px; overflow:hidden; background:var(--surface);
+    display:flex; align-items:center; justify-content:center; font-size:46px;
+  }
+  .result-img img { width:100%; height:100%; object-fit:cover; display:block; }
+  .result-right { flex:1; min-width:0; display:flex; flex-direction:column; }
+  .result-right > :first-child { margin-top:0; }
   .result-row { display:flex; align-items:center; gap:10px; }
   .result-emoji { font-size:32px; flex-shrink:0; }
-  .result-name { font-family:'Jua',sans-serif; font-size:22px; line-height:1.1; }
-  .result-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:10px; }
+  .result-name { font-family:'Jua',sans-serif; font-size:17px; line-height:1.15; text-align:center; word-break:keep-all; }
+  .result-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:10px; }
   .similar-toggle-btn { width:100%; margin-top:10px; padding:8px; background:none; border:1px dashed var(--border); border-radius:10px; color:var(--muted); font-size:11px; cursor:pointer; transition:all 0.15s; }
   .similar-toggle-btn:hover { border-color:var(--orange); color:var(--orange); }
   .similar-wrap { display:none; flex-wrap:wrap; gap:6px; margin-top:8px; }
   .similar-wrap.open { display:flex; }
   .similar-chip { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:11px; color:var(--text); cursor:pointer; transition:all 0.15s; }
   .similar-chip:hover { border-color:var(--orange); color:var(--orange); }
-  .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px 4px; font-size:10px; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:3px; white-space:nowrap; font-weight:600; }
+  .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:7px 3px; font-size:9px; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:2px; white-space:nowrap; font-weight:600; }
   .result-btn:hover { border-color:var(--orange-soft); color:var(--orange-soft); }
   .result-btn.like-btn { border-color:var(--red) !important; color:var(--red); }
   .result-btn.like-btn.active { background:rgba(255,71,87,0.1); color:var(--red); border-color:var(--red) !important; }
@@ -723,7 +750,7 @@
 
   /* 카드 내 미니 영양정보 */
   .card-nutrition {
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; row-gap:4px;
     background:var(--surface); border-radius:12px; padding:8px 12px;
     margin-top:12px; border:1px solid var(--border);
   }
@@ -867,6 +894,7 @@
   .modal-input:focus { border-color:var(--orange); }
   .modal-input option { background:var(--card); }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
 <body>
 
@@ -1665,15 +1693,6 @@
     <div class="result-area" id="result-area"></div>
   </div>
 
-  <hr class="divider">
-  <div class="section-title" style="margin-top:20px">🚀 업데이트 예정</div>
-  <div class="coming-soon-row">
-    <div class="cs-tag"><div class="cs-dot"></div> 커뮤니티</div>
-    <div class="cs-tag"><div class="cs-dot"></div> 레시피/유튜브</div>
-    <div class="cs-tag"><div class="cs-dot"></div> 배달앱 연동</div>
-    <div class="cs-tag"><div class="cs-dot"></div> 쇼핑몰 연동</div>
-    <div class="cs-tag"><div class="cs-dot"></div> 즐겨찾기</div>
-  </div>
 </main>
 
 <!-- 커뮤니티 페이지 -->
@@ -2262,6 +2281,55 @@
   <div id="my-posts-page-list"></div>
 </div>
 
+<!-- 추천 히스토리 페이지 -->
+<div id="page-history" style="display:none;max-width:480px;margin:0 auto;padding:0 16px 170px">
+  <div style="display:flex;align-items:center;gap:10px;padding:16px 0 12px">
+    <button onclick="showPage('mypage')" style="background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:0;line-height:1">‹</button>
+    <span style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text)">🕘 추천 히스토리</span>
+  </div>
+  <div id="hist-page-list"></div>
+</div>
+
+<!-- 설정 페이지 -->
+<div id="page-settings" style="display:none;max-width:480px;margin:0 auto;padding:0 16px 170px">
+  <div style="display:flex;align-items:center;gap:10px;padding:16px 0 12px">
+    <button onclick="showPage('mypage')" style="background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:0;line-height:1">‹</button>
+    <span style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text)">⚙️ 설정</span>
+  </div>
+  <div class="my-section">
+    <div class="my-setting-row" onclick="showToast('알림 설정은 앱 출시 후 오픈!')">
+      <span>🔔 알림 설정</span><span class="my-setting-arrow">›</span>
+    </div>
+    <div class="my-setting-row" onclick="toggleTheme();this.querySelector('span:last-child').textContent=localStorage.getItem('wmjTheme')==='light'?'라이트':'다크'">
+      <span>🌙 다크/라이트 모드</span><span style="font-size:11px;color:var(--orange)" id="theme-label">다크</span>
+    </div>
+    <div class="my-setting-row" onclick="showOnboarding()">
+      <span>👋 앱 소개 다시 보기</span><span class="my-setting-arrow">›</span>
+    </div>
+    <div class="my-setting-row" onclick="showToast('공지사항 준비중!')">
+      <span>📢 공지사항</span><span class="my-setting-arrow">›</span>
+    </div>
+    <div class="my-setting-row" onclick="showToast('문의: contact@mwomukji.com')">
+      <span>💌 문의/피드백</span><span class="my-setting-arrow">›</span>
+    </div>
+    <div class="my-setting-row" onclick="openSuggest()">
+      <span>📮 메뉴 건의•추천하기</span><span class="my-setting-arrow">›</span>
+    </div>
+  </div>
+</div>
+
+<!-- 알림 페이지 -->
+<div id="page-notify" style="display:none;max-width:480px;margin:0 auto;padding:0 16px 170px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="showPage('mypage')" style="background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:0;line-height:1">‹</button>
+      <span style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text)">🔔 알림</span>
+    </div>
+    <button onclick="markAllRead()" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif">모두 읽음</button>
+  </div>
+  <div id="mypage-notify-list"></div>
+</div>
+
 <!-- 장보기 페이지 -->
 <div id="page-cart" style="display:none; max-width:480px; margin:0 auto; padding:0 16px 170px;">
   <div class="hero" style="padding:20px 0 10px">
@@ -2301,105 +2369,79 @@
 
   <!-- 프로필 -->
   <div class="my-profile-card">
-    <div class="my-avatar">😋</div>
-    <div class="my-profile-info">
-      <div class="my-nickname" id="my-profile-nick">로딩중...</div>
-      <div class="my-join">BETA 테스터 · 오메추</div>
-      <div id="diet-streak-badge" style="display:none;margin-top:5px"></div>
+    <div class="my-profile-top">
+      <div class="my-avatar">😋</div>
+      <div class="my-profile-info">
+        <div class="my-nickname" id="my-profile-nick">로딩중...</div>
+        <div class="my-join">BETA 테스터 · 오메추</div>
+        <div id="diet-streak-badge" style="display:none;margin-top:5px"></div>
+      </div>
+      <button class="my-edit-btn" onclick="openNicknameModal()">편집</button>
     </div>
-    <button class="my-edit-btn" onclick="openNicknameModal()">편집</button>
-  </div>
-
-  <!-- 통계 -->
-  <div class="my-stats-row">
-    <div class="my-stat"><div class="my-stat-num" id="stat-liked">0</div><div class="my-stat-label">좋아요한 메뉴</div></div>
-    <div class="my-stat"><div class="my-stat-num" id="stat-rec">0</div><div class="my-stat-label">추천받은 횟수</div></div>
-    <div class="my-stat"><div class="my-stat-num" id="stat-streak">0</div><div class="my-stat-label">🔥 식단 스트릭</div></div>
+    <div class="my-profile-stats" id="my-profile-stats"></div>
   </div>
 
   <!-- 좋아요한 메뉴 -->
   <div class="my-section">
-    <div class="my-section-header" onclick="toggleLikedAccordion()" style="cursor:pointer;user-select:none">
+    <div class="my-section-header my-acc-header" onclick="toggleAcc(this)">
       <span class="my-section-title">❤️ 좋아요한 메뉴</span>
       <span style="display:flex;align-items:center;gap:6px">
         <span class="my-section-hint" id="liked-count-label"></span>
-        <span id="liked-accordion-arrow" style="font-size:12px;color:var(--muted);transition:transform 0.2s">▾</span>
+        <span class="my-acc-arrow">▾</span>
       </span>
     </div>
-    <div id="my-liked-collapse">
+    <div class="my-acc-body" id="my-liked-collapse" style="display:none">
       <div id="my-liked-list"></div>
     </div>
   </div>
 
-  <!-- 입맛 통계 -->
-  <div class="my-section" id="my-taste-section">
-    <div class="my-section-header" onclick="toggleTasteAccordion()" style="cursor:pointer;user-select:none">
-      <span class="my-section-title">👅 나의 입맛 통계</span>
-      <span id="taste-accordion-arrow" style="font-size:12px;color:var(--muted);transition:transform 0.2s">▾</span>
-    </div>
-    <div id="my-taste-collapse">
-      <div id="my-taste-content"></div>
-    </div>
-  </div>
-
-  <!-- 장보기 목록 (마이페이지에서도) -->
+  <!-- 추천 히스토리 (별도 페이지) -->
   <div class="my-section">
-    <div class="my-section-header">
-      <span class="my-section-title">🛒 장보기 목록</span>
-      <button onclick="showPage('cart')" style="font-size:11px;color:var(--orange);background:none;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">전체보기 →</button>
-    </div>
-    <div id="my-cart-preview"></div>
-  </div>
-
-  <!-- 추천 히스토리 -->
-  <div class="my-section">
-    <div class="my-section-header" onclick="toggleHistAccordion()" style="cursor:pointer;user-select:none">
+    <div class="my-section-header" onclick="showPage('history')" style="cursor:pointer">
       <span class="my-section-title">🕘 추천 히스토리</span>
       <span style="display:flex;align-items:center;gap:6px">
         <span class="my-section-hint" id="hist-count-label"></span>
-        <span id="hist-accordion-arrow" style="font-size:12px;color:var(--muted);transition:transform 0.2s">▾</span>
+        <span style="font-size:12px;color:var(--muted)">›</span>
       </span>
     </div>
-    <div id="my-hist-collapse" style="display:none">
-      <div id="my-hist-list"></div>
-    </div>
   </div>
 
-  <!-- 투표 활동 뱃지 -->
-  <div class="my-section" id="my-vote-badge-section">
-    <div class="my-section-header">
-      <span class="my-section-title">🗳️ 투표 활동</span>
-    </div>
-    <div id="my-vote-badge-wrap" style="display:flex;gap:8px;flex-wrap:wrap;padding:4px 0"></div>
-  </div>
-
-  <!-- 먹방 달력 -->
+  <!-- 장보기 목록 -->
   <div class="my-section">
-    <div class="my-section-header" onclick="showPage('food-calendar')" style="cursor:pointer">
-      <span class="my-section-title">📅 먹방 달력</span>
-      <span style="font-size:12px;color:var(--muted)">›</span>
+    <div class="my-section-header my-acc-header" onclick="toggleAcc(this)">
+      <span class="my-section-title">🛒 장보기 목록</span>
+      <span style="display:flex;align-items:center;gap:10px">
+        <button onclick="event.stopPropagation();showPage('cart')" style="font-size:11px;color:var(--orange);background:none;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">전체보기 →</button>
+        <span class="my-acc-arrow">▾</span>
+      </span>
+    </div>
+    <div class="my-acc-body" style="display:none">
+      <div id="my-cart-preview"></div>
     </div>
   </div>
 
-  <!-- 저장한 커뮤니티 글 -->
-  <div class="my-section" id="my-saved-posts-section">
-    <div class="my-section-header" onclick="showPage('saved-posts')" style="cursor:pointer">
-      <span class="my-section-title">🔖 저장한 글</span>
-      <span style="display:flex;align-items:center;gap:6px">
-        <span class="my-section-hint" id="my-saved-posts-count"></span>
-        <span style="font-size:12px;color:var(--muted)">›</span>
-      </span>
+  <!-- 내 활동 (먹방 달력 · 저장한 글 · 내가 쓴 글 · 투표 활동 통합) -->
+  <div class="my-section" id="section-activity">
+    <div class="my-section-header my-acc-header" onclick="toggleAcc(this)">
+      <span class="my-section-title">📂 내 활동</span>
+      <span class="my-acc-arrow">▾</span>
     </div>
-  </div>
-
-  <!-- 내가 쓴 글 -->
-  <div class="my-section" id="my-posts-section">
-    <div class="my-section-header" onclick="showPage('my-posts')" style="cursor:pointer">
-      <span class="my-section-title">✍️ 내가 쓴 글</span>
-      <span style="display:flex;align-items:center;gap:6px">
-        <span class="my-section-hint" id="my-posts-count"></span>
-        <span style="font-size:12px;color:var(--muted)">›</span>
-      </span>
+    <div class="my-acc-body" style="display:none">
+      <div class="my-setting-row" onclick="showPage('food-calendar')">
+        <span>📅 먹방 달력</span><span class="my-setting-arrow">›</span>
+      </div>
+      <div class="my-setting-row" onclick="showPage('saved-posts')">
+        <span>🔖 저장한 글</span>
+        <span style="display:flex;align-items:center;gap:8px"><span class="my-section-hint" id="my-saved-posts-count"></span><span class="my-setting-arrow">›</span></span>
+      </div>
+      <div class="my-setting-row" onclick="showPage('my-posts')">
+        <span>✍️ 내가 쓴 글</span>
+        <span style="display:flex;align-items:center;gap:8px"><span class="my-section-hint" id="my-posts-count"></span><span class="my-setting-arrow">›</span></span>
+      </div>
+      <div style="padding-top:14px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">🗳️ 투표 활동</div>
+        <div id="my-vote-badge-wrap" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
     </div>
   </div>
 
@@ -2414,38 +2456,22 @@
     <div id="my-menu-request-list"></div>
   </div>
 
-  <!-- 알림 -->
+  <!-- 알림 (별도 페이지) -->
   <div class="my-section">
-    <div class="my-section-header">
+    <div class="my-section-header" onclick="showPage('notify')" style="cursor:pointer">
       <span class="my-section-title">🔔 알림</span>
-      <button onclick="markAllRead()" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif">모두 읽음</button>
+      <span style="display:flex;align-items:center;gap:6px">
+        <span class="my-section-hint" id="notify-count-label" style="color:var(--orange);font-weight:700"></span>
+        <span style="font-size:12px;color:var(--muted)">›</span>
+      </span>
     </div>
-    <div style="font-size:11px;color:var(--muted);background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:8px 12px;margin-bottom:8px;line-height:1.6">
-      💡 Supabase 연결 후 실시간 알림으로 업그레이드될 예정이에요.
-    </div>
-    <div id="mypage-notify-list"></div>
   </div>
 
-  <!-- 앱 설정 -->
+  <!-- 설정 (별도 페이지) -->
   <div class="my-section">
-    <div class="my-section-title" style="margin-bottom:10px">⚙️ 설정</div>
-    <div class="my-setting-row" onclick="showToast('알림 설정은 앱 출시 후 오픈!')">
-      <span>🔔 알림 설정</span><span class="my-setting-arrow">›</span>
-    </div>
-    <div class="my-setting-row" onclick="toggleTheme();this.querySelector('span:last-child').textContent=localStorage.getItem('wmjTheme')==='light'?'라이트':'다크'">
-      <span>🌙 다크/라이트 모드</span><span style="font-size:11px;color:var(--orange)" id="theme-label">다크</span>
-    </div>
-    <div class="my-setting-row" onclick="showOnboarding()">
-      <span>👋 앱 소개 다시 보기</span><span class="my-setting-arrow">›</span>
-    </div>
-    <div class="my-setting-row" onclick="showToast('공지사항 준비중!')">
-      <span>📢 공지사항</span><span class="my-setting-arrow">›</span>
-    </div>
-    <div class="my-setting-row" onclick="showToast('문의: contact@mwomukji.com')">
-      <span>💌 문의/피드백</span><span class="my-setting-arrow">›</span>
-    </div>
-    <div class="my-setting-row" onclick="openSuggest()">
-      <span>📮 메뉴 건의•추천하기</span><span class="my-setting-arrow">›</span>
+    <div class="my-section-header" onclick="showPage('settings')" style="cursor:pointer">
+      <span class="my-section-title">⚙️ 설정</span>
+      <span style="font-size:12px;color:var(--muted)">›</span>
     </div>
   </div>
 
@@ -2548,9 +2574,14 @@ let favTags = JSON.parse(localStorage.getItem('wmjFavTags') || '[]');
 function initFavStars() {
   document.querySelectorAll('.tag').forEach(tag => {
     if (tag.querySelector('.fav-star')) return;
-    // 태그의 순수 텍스트만 추출 (별 버튼 제외)
-    const textNode = [...tag.childNodes].find(n => n.nodeType === 3);
-    const text = textNode ? textNode.textContent.trim() : tag.textContent.trim();
+    // 태그의 순수 텍스트 추출 (별 버튼 제외, twemoji가 이모지를 <img>로 바꾼 경우 alt로 복원)
+    let text = '';
+    tag.childNodes.forEach(n => {
+      if (n.nodeType === 3) text += n.nodeValue;                                  // 텍스트 노드
+      else if (n.tagName === 'IMG' && n.alt) text += n.alt;                       // twemoji 변환 이모지
+      else if (!(n.classList && n.classList.contains('fav-star')) && n.textContent) text += n.textContent;
+    });
+    text = text.replace(/[★☆]/g,'').trim();
     if (!text) return;
     // data 속성에 태그 텍스트 저장
     tag.dataset.tagText = text;
@@ -3066,7 +3097,7 @@ const menuDB = [
   {id:303, name:'두루치기', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🥗 채소','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🍺 술안주','🍟 기름진 음식','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
   {id:304, name:'알탕', emoji:'🥚', cat:['delivery','dine'], tags:['🦐 해산물','🥗 채소','🍲 국물/찌개','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🤢 해장','🍺 술안주','🌨️ 눈/비오는 날','🥶 추운 날','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:305, name:'북어국', emoji:'🐟', cat:['cook','dine'], tags:['🐟 생선','🕒 30분 이내','👶 초보도 가능','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥑 저지방','🤢 해장','🌨️ 눈/비오는 날','🥶 추운 날']},
-  {id:306, name:'아귀찜', emoji:'🐟', cat:['delivery','dine'], tags:['🐟 생선','🥗 채소','♨️ 찜/조림','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🍺 술안주','🎉 홈파티/집들이','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
+  {id:306, name:'아구찜', emoji:'🐟', cat:['delivery','dine'], tags:['🐟 생선','🥗 채소','♨️ 찜/조림','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🍺 술안주','🎉 홈파티/집들이','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식','🫗 옷에 튀는 음식']},
   {id:307, name:'간장게장', emoji:'🦀', cat:['delivery','dine'], tags:['🦐 해산물','🥗 무침/생식','🍱 한식','🧂 짭짤한맛','🥑 저지방','🍺 술안주','🥂 데이트','🦀 갑각류','🗑️ 쓰레기 많은 것','💨 냄새 심한 음식','💨 냄새배는 음식','✋ 손 써야하는 음식']},
   {id:308, name:'육회', emoji:'🥩', cat:['delivery','dine'], tags:['🥩 고기','🥗 무침/생식','🍱 한식','💪 고단백','🍺 술안주','🥂 데이트']},
   {id:309, name:'꽃등심', emoji:'🥩', cat:['delivery','dine'], tags:['🥩 고기','🔥 구이','🍱 한식','🧂 짭짤한맛','🥩 저탄고지','🍺 술안주','🥂 데이트','🎉 홈파티/집들이','🍟 기름진 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
@@ -3138,6 +3169,21 @@ const menuDB = [
   {id:402, name:'돼지갈비', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🔥 구이','🍱 한식','🍯 달달한맛','🧂 짭짤한맛','🍺 술안주','🎉 홈파티/집들이','🍟 기름진 음식','🦴 뼈 있는 음식','💨 냄새 심한 음식','💨 냄새배는 음식','✋ 손 써야하는 음식']},
   {id:403, name:'돼지불고기', emoji:'🥩', cat:['cook','delivery','dine'], tags:['🥩 고기','🕒 30분 이내','👶 초보도 가능','🍳 볶음','🍱 한식','🍯 달달한맛','🧂 짭짤한맛','🌙 야식','💨 냄새 심한 음식','💨 냄새배는 음식']},
   {id:405, name:'닭똥집튀김', emoji:'🍗', cat:['delivery','dine'], tags:['🥩 고기','🫕 튀김','🍱 한식','🧂 짭짤한맛','🌙 야식','🍺 술안주','🌾 밀(글루텐)','🍟 기름진 음식','🗑️ 쓰레기 많은 것']},
+  {id:406, name:'오리백숙', emoji:'🦆', cat:['delivery','dine'], tags:['🥩 고기','🍲 국물/찌개','🍱 한식','💧 담백한맛','🥶 추운 날','🌨️ 눈/비오는 날','💪 고단백','🎉 홈파티/집들이','🦴 뼈 있는 음식','✋ 손 써야하는 음식']},
+  {id:407, name:'오리주물럭', emoji:'🦆', cat:['cook','delivery','dine'], tags:['🥩 고기','🍳 볶음','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🍺 술안주','🕒 30분 이내','👶 초보도 가능','🍟 기름진 음식','🌶️ 매운 음식','💨 냄새배는 음식']},
+  {id:408, name:'코다리찜', emoji:'🐟', cat:['delivery','dine'], tags:['🐟 생선','♨️ 찜/조림','🍱 한식','🌶️ 매운/얼큰한맛','🍯 달달한맛','🧂 짭짤한맛','💪 고단백','🥑 저지방','🍺 술안주','🌶️ 매운 음식','🦴 뼈 있는 음식','💨 냄새 심한 음식']},
+  {id:409, name:'닭목살', emoji:'🍗', cat:['delivery','dine'], tags:['🥩 고기','🔥 구이','🍱 한식','🧂 짭짤한맛','💪 고단백','🍺 술안주','🌙 야식','🍟 기름진 음식','💨 냄새배는 음식']},
+  {id:410, name:'꼼장어', emoji:'🐟', cat:['dine'], tags:['🐟 생선','🔥 구이','🍱 한식','🌶️ 매운/얼큰한맛','🧂 짭짤한맛','🍺 술안주','🌙 야식','🍟 기름진 음식','🌶️ 매운 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
+  {id:411, name:'장어구이', emoji:'🐟', cat:['delivery','dine'], tags:['🐟 생선','🔥 구이','🍱 한식','🍯 달달한맛','🧂 짭짤한맛','🧈 느끼한맛','💪 고단백','🥂 데이트','🍟 기름진 음식']},
+  {id:412, name:'동파육', emoji:'🥢', cat:['delivery','dine'], tags:['🥩 고기','♨️ 찜/조림','🥢 중식','🍯 달달한맛','🧂 짭짤한맛','🧈 느끼한맛','🍺 술안주','🥂 데이트','🎉 홈파티/집들이','🍟 기름진 음식']},
+  {id:413, name:'육회비빔밥', emoji:'🍚', cat:['delivery','dine'], tags:['🍚 밥','🥩 고기','🥗 채소','🥗 무침/생식','🍱 한식','🍯 달달한맛','🌶️ 매운/얼큰한맛','💪 고단백','🥚 계란','☀️ 더운 날']},
+  {id:414, name:'통닭', emoji:'🍗', cat:['delivery','dine'], tags:['🥩 고기','🫕 튀김','🍱 한식','🧂 짭짤한맛','🌙 야식','🍺 술안주','🎉 홈파티/집들이','🌾 밀(글루텐)','🍟 기름진 음식','🦴 뼈 있는 음식','✋ 손 써야하는 음식','🗑️ 쓰레기 많은 것']},
+  {id:415, name:'유부초밥', emoji:'🍙', cat:['cook','delivery','dine'], tags:['🍚 밥','🍣 일식','🍯 달달한맛','🍋 새콤/상큼한맛','⚡ 10분 이내','👶 초보도 가능','🚫🔥 불 안 쓰는 요리','🫘 두부/콩류','🫘 대두/콩','✋ 손 써야하는 음식']},
+  {id:416, name:'가지튀김', emoji:'🍆', cat:['cook','delivery','dine'], tags:['🥗 채소','🫕 튀김','🍱 한식','🧂 짭짤한맛','🍺 술안주','🕒 30분 이내','🌾 밀(글루텐)','🍟 기름진 음식']},
+  {id:417, name:'양꼬치', emoji:'🍢', cat:['delivery','dine'], tags:['🥩 고기','🔥 구이','🥢 중식','🧂 짭짤한맛','🌶️ 매운/얼큰한맛','🍺 술안주','🌙 야식','🍟 기름진 음식','✋ 손 써야하는 음식','💨 냄새 심한 음식','💨 냄새배는 음식']},
+  {id:418, name:'양갈비', emoji:'🍖', cat:['dine'], tags:['🥩 고기','🔥 구이','🧂 짭짤한맛','💪 고단백','🥩 저탄고지','🥂 데이트','🍺 술안주','🍟 기름진 음식','🦴 뼈 있는 음식','✋ 손 써야하는 음식','💨 냄새배는 음식']},
+  {id:419, name:'편백찜', emoji:'🥬', cat:['dine'], tags:['🥩 고기','🥗 채소','♨️ 찜/조림','🍣 일식','💧 담백한맛','🥑 저지방','💪 고단백','🥗 다이어트식','🥂 데이트','🥶 추운 날']},
+  {id:420, name:'찜닭', emoji:'🍗', cat:['cook','delivery','dine'], tags:['🥩 고기','♨️ 찜/조림','🍱 한식','🍯 달달한맛','🧂 짭짤한맛','🌶️ 매운/얼큰한맛','🎉 홈파티/집들이','🕐 1시간 이내','🌾 밀(글루텐)','🦴 뼈 있는 음식','🫗 옷에 튀는 음식']},
 ];
 
 function setMode(mode) {
@@ -3894,7 +3940,7 @@ const recipeDB = {
   '두루치기': {calories:360, carbs:15, protein:28, fat:20},
   '알탕': {calories:480, carbs:28, protein:42, fat:18},
   '북어국': {calories:180, carbs:10, protein:22, fat:5},
-  '아귀찜': {calories:380, carbs:22, protein:38, fat:12},
+  '아구찜': {calories:380, carbs:22, protein:38, fat:12},
   '간장게장': {calories:220, carbs:8, protein:26, fat:8},
   '육회': {calories:280, carbs:8, protein:30, fat:14},
   '꽃등심': {calories:680, carbs:2, protein:52, fat:50},
@@ -3980,6 +4026,41 @@ const recipeDB = {
   '돼지불고기': {calories:340, carbs:18, protein:26, fat:18},
   '소고기구이': {calories:520, carbs:4, protein:44, fat:34},
   '닭똥집튀김': {calories:380, carbs:22, protein:28, fat:20},
+  '오리백숙': {calories:650, carbs:20, protein:60, fat:35},
+  '오리주물럭': {
+    ingredients: ['오리고기','400g','오리 주물럭용 슬라이스','양파','1/2개','양파','대파','1대','대파','깻잎','10장','깻잎','고추장','2큰술','고추장','고춧가루','1큰술','고춧가루','간장','1큰술','진간장','다진마늘','1큰술','다진마늘','설탕','1큰술','설탕'],
+    steps: ['고추장·고춧가루·간장·다진마늘·설탕을 섞어 양념장을 만든다','오리고기에 양념장을 넣고 10분 재운다','양파는 채썰고 대파는 어슷썰기 한다','달군 팬에 오리고기를 넣고 중불에서 볶는다','고기가 반쯤 익으면 양파·대파를 넣고 함께 볶는다','불을 끄고 깻잎을 썰어 올린다'],
+    youtube: '오리주물럭 레시피',
+    calories: 520, carbs: 14, protein: 32, fat: 36,
+  },
+  '코다리찜': {calories:380, carbs:24, protein:42, fat:10},
+  '닭목살': {calories:420, carbs:3, protein:34, fat:30},
+  '꼼장어': {calories:450, carbs:18, protein:32, fat:28},
+  '장어구이': {calories:520, carbs:14, protein:36, fat:34},
+  '동파육': {calories:620, carbs:20, protein:24, fat:50},
+  '육회비빔밥': {calories:620, carbs:88, protein:30, fat:16},
+  '통닭': {calories:560, carbs:24, protein:45, fat:31},
+  '유부초밥': {
+    ingredients: ['조미유부','1팩','유부초밥 키트','밥','2공기','즉석밥','단촛물','1봉','유부초밥 키트','후리가케','1봉','후리가케','참깨','약간','볶음참깨'],
+    steps: ['따뜻한 밥에 키트의 단촛물과 후리가케를 넣고 섞는다','조미유부는 국물을 살짝 짠다','밥을 한입 크기로 뭉친다','유부를 벌려 밥을 채운다','위에 참깨를 뿌려 마무리한다'],
+    youtube: '유부초밥 만들기',
+    calories: 420, carbs: 72, protein: 12, fat: 9,
+  },
+  '가지튀김': {
+    ingredients: ['가지','2개','가지','튀김가루','1컵','튀김가루','찬물','3/4컵','탄산수','식용유','넉넉히','식용유','간장','2큰술','진간장','식초','1큰술','식초','설탕','1/2큰술','설탕'],
+    steps: ['가지를 손가락 두께로 길게 썬다','가지에 튀김가루를 얇게 묻힌다','남은 튀김가루에 찬물을 넣어 반죽을 만든다','가지에 반죽을 입혀 170도 기름에 노릇하게 튀긴다','간장·식초·설탕을 섞어 찍어 먹는다'],
+    youtube: '가지튀김 바삭하게',
+    calories: 380, carbs: 40, protein: 6, fat: 22,
+  },
+  '양꼬치': {calories:520, carbs:6, protein:38, fat:38},
+  '양갈비': {calories:600, carbs:4, protein:40, fat:46},
+  '편백찜': {calories:420, carbs:18, protein:42, fat:18},
+  '찜닭': {
+    ingredients: ['닭볶음탕용 닭','1kg','닭볶음탕용 닭','당면','1줌','당면','감자','2개','감자','당근','1/2개','당근','양파','1개','양파','간장','6큰술','진간장','흑설탕','3큰술','흑설탕','다진마늘','2큰술','다진마늘','건고추','3개','건고추','대파','1대','대파'],
+    steps: ['당면은 미지근한 물에 30분 불린다','닭은 끓는 물에 한 번 데쳐 헹군다','냄비에 닭·물 3컵·간장·흑설탕·다진마늘·건고추를 넣고 15분 끓인다','감자·당근·양파를 넣고 15분 더 끓인다','불린 당면과 대파를 넣고 5분 졸인다'],
+    youtube: '안동찜닭 레시피',
+    calories: 560, carbs: 52, protein: 40, fat: 20,
+  },
 };
 
 
@@ -4129,6 +4210,97 @@ function likeMenu(name, emoji) {
   });
 }
 
+// ─────────────────────────────────────────────
+//  제휴(어필리에이트) 링크 설정
+//  ⚠️ 쿠팡 추적(수수료)에 관한 중요한 점:
+//   · 아래 검색 URL은 "메뉴 검색"은 되지만 제휴 추적(수수료)은 안 됩니다.
+//   · 검색 + 추적을 동시에 하려면 쿠팡 파트너스 API로 메뉴마다 트래킹 링크를
+//     서버(Vercel 함수)에서 생성해야 해요. (API는 누적매출 15만원 후 활성화)
+//   · API 준비되면 buildCoupangLink를 서버 호출로 바꾸면 됨. (아래 주석 참고)
+// ─────────────────────────────────────────────
+// [추적 버전 예시] 형이 파트너스에서 만든 고정 딥링크 — 검색은 안 되고 추적만 됨:
+//   const COUPANG_DEEPLINK = 'https://link.coupang.com/a/eu5btk';
+const SHOP_AFFILIATE = {
+  coupang: {
+    name: '쿠팡', emoji: '🛒', color: '#e62e14', enabled: true,
+    url: (q) => `https://www.coupang.com/np/search?q=${encodeURIComponent(q)}&channel=user`
+  },
+  mealkit: {
+    name: '밀키트', emoji: '🍱', color: '#2e8b57', enabled: true,
+    // 밀키트 = 쿠팡에서 "○○ 밀키트" 검색
+    url: (q) => `https://www.coupang.com/np/search?q=${encodeURIComponent(q + ' 밀키트')}&channel=user`
+  },
+  kurly: {
+    name: '마켓컬리', emoji: '🥬', color: '#5f0080', enabled: false,
+    // 컬리큐레이터 승인 후 enabled:true + 아래를 받은 제휴 링크로 교체
+    url: (q) => `https://www.kurly.com/search?sword=${encodeURIComponent(q)}`
+  },
+};
+
+function shopButtons(menuName) {
+  return Object.values(SHOP_AFFILIATE).filter(s => s.enabled).map(s => `
+    <a href="${s.url(menuName)}" target="_blank" rel="noopener"
+       style="display:inline-flex;align-items:center;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 9px;font-size:11px;font-weight:700;color:${s.color};text-decoration:none;white-space:nowrap">
+      ${s.emoji} ${s.name}</a>`).join('');
+}
+
+// ── 공유하기 (오늘의 추천 메뉴) ──
+async function shareTodayMenu() {
+  const picks = (typeof currentPicked !== 'undefined' ? currentPicked : []) || [];
+  if (!picks.length) return;
+  const ranks = ['🥇','🥈','🥉'];
+  const menuLine = picks.map((m, i) => `${ranks[i] || '•'} ${m.name}`).join('   ');
+  const url = location.origin + location.pathname;
+  const text = `🍽️ 오메추가 뽑아준 오늘의 메뉴!\n${menuLine}\n\n오늘 뭐 먹지? 고민은 오메추가 👇`;
+  if (navigator.share) {
+    try { await navigator.share({ title: '오메추 - 오늘 뭐 먹지?', text, url }); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  try {
+    await navigator.clipboard.writeText(text + '\n' + url);
+    showToast('공유 문구를 복사했어요! 붙여넣기 해보세요 📋');
+  } catch (e) { showToast('이 브라우저는 공유를 지원하지 않아요'); }
+}
+
+function _loadHtml2Canvas() {
+  return new Promise((resolve, reject) => {
+    if (window.html2canvas) return resolve(window.html2canvas);
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = () => resolve(window.html2canvas);
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// ── 결과를 이미지로 저장/공유 ──
+async function saveMenuImage() {
+  const node = document.querySelector('#result-area .result-grid');
+  if (!node) return;
+  showToast('이미지 만드는 중... 🖼️');
+  try {
+    const h2c = await _loadHtml2Canvas();
+    const bg = getComputedStyle(document.body).backgroundColor || '#0f0e0c';
+    const canvas = await h2c(node, { backgroundColor: bg, scale: 2, useCORS: true, logging: false });
+    canvas.toBlob(async (blob) => {
+      if (!blob) { showToast('이미지 저장에 실패했어요'); return; }
+      const file = new File([blob], 'omechu-menu.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: '오메추 오늘의 메뉴' }); return; }
+        catch (e) { if (e && e.name === 'AbortError') return; }
+      }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'omechu-menu.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      showToast('이미지를 저장했어요! 인스타·카톡에 올려보세요 📸');
+    }, 'image/png');
+  } catch (e) {
+    showToast('이미지 저장이 안 되는 환경이에요. 공유하기를 써보세요!');
+  }
+}
+
 function renderResults(rejectPattern, flipIndex) {
   const isHate = currentMode === 'hate';
   const ranks = ['🥇','🥈','🥉'];
@@ -4148,24 +4320,27 @@ function renderResults(rejectPattern, flipIndex) {
     return `
     <div class="result-card ${isHate ? 'hate-result' : ''}" id="result-card-${i}">
       <div class="result-rank">${ranks[i]}</div>
-      <div class="result-badge ${isHate ? 'hate-badge' : ''}">${isHate ? '🙅 소거법' : '🎲 ' + label}</div>
-      <div id="menu-img-${i}" style="width:100%;height:160px;border-radius:14px;overflow:hidden;margin-bottom:12px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:48px">
-        ${cachedImg ? `<img src="${cachedImg}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='${item.emoji}'">` : item.emoji}
-      </div>
-      <div class="result-row">
-        <div class="result-name">${item.name}</div>
-      </div>
-      ${kcalHtml}${review}
-      <div class="result-actions">
-        <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${getLikedMenus().some(m=>m.name===item.name)?'❤️':'🤍'} 좋아요</button>
-        <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">😅 안땡겨</button>
-        <button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">📋 레시피</button>
-        <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">💬 후기 ${commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length}개</button>
+      <div class="result-main">
+        <div class="result-left">
+          <div id="menu-img-${i}" class="result-img">
+            ${cachedImg ? `<img src="${cachedImg}" onerror="this.parentElement.innerHTML='${item.emoji}'">` : item.emoji}
+          </div>
+          <div class="result-name">${item.name}</div>
+        </div>
+        <div class="result-right">
+          ${kcalHtml}${review}
+          <div class="result-actions">
+            <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${getLikedMenus().some(m=>m.name===item.name)?'❤️':'🤍'} 좋아요</button>
+            <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">😅 안땡겨</button>
+            <button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">📋 레시피</button>
+            <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">💬 후기 ${commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length}개</button>
+          </div>
+          <div id="similar-btn-wrap-${i}">
+            <button class="similar-toggle-btn" onclick="toggleSimilar('${item.name.replace(/'/g,"\\'")}',${i})">🔍 비슷한 메뉴</button>
+          </div>
+        </div>
       </div>
       <div class="similar-wrap" id="similar-${i}"></div>
-      <div id="similar-btn-wrap-${i}">
-        <button class="similar-toggle-btn" onclick="toggleSimilar('${item.name.replace(/'/g,"\\'")}',${i})">🔍 비슷한 메뉴</button>
-      </div>
     </div>`;
   }).join('');
 
@@ -4181,11 +4356,29 @@ function renderResults(rejectPattern, flipIndex) {
     </div>` : '';
 
   const rerollBtn = `<button class="cta-btn ${isHate ? 'hate-btn' : 'crave-btn'}" style="margin-top:10px;font-size:15px" onclick="getRecommendation()">🔄 3장 다시 뽑기</button>`;
+
+  const shareSection = !isHate ? `
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button onclick="shareTodayMenu()" style="flex:1;padding:11px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">📤 친구한테 공유</button>
+    <button onclick="saveMenuImage()" style="flex:1;padding:11px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">🖼️ 이미지 저장</button>
+  </div>` : '';
+
+  const shopSection = !isHate ? `
+  <div style="margin-top:10px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px">🛒 재료·밀키트 사러가기</div>
+    ${currentPicked.map(m => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="flex:1 0 70px;font-size:13px;min-width:70px">${m.emoji} ${m.name}</span>
+        <span style="display:flex;gap:6px;flex-wrap:wrap">${shopButtons(m.name)}</span>
+      </div>`).join('')}
+    <div style="font-size:9px;color:var(--muted);text-align:right;margin-top:2px">* 쿠팡 파트너스 등 제휴 링크</div>
+  </div>` : '';
+
   document.getElementById('result-area').innerHTML = `<div class="result-grid">${cards}</div>${feedbackHtml}${rerollBtn}
   ${!isHate && currentPicked.length >= 2 ? `
   <button onclick="createVotePost()" style="width:100%;margin-top:8px;padding:11px;background:rgba(120,120,255,0.1);border:1.5px solid #7878ff;border-radius:12px;color:#7878ff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">
     🗳️ 메뉴 추천받기 (커뮤니티 투표)
-  </button>` : ''}`;
+  </button>` : ''}${shareSection}${shopSection}`;
 
   // 추천받기일 때만 카드로 스크롤
   if (flipIndex === undefined) {
@@ -4263,7 +4456,7 @@ function openRecipe(menuName, emoji) {
         </div>
       </div>
       <div class="buy-btn-wrap">
-        <a href="https://link.coupang.com/a/eu5btk?q=${encodeURIComponent(ing.query)}" target="_blank">
+        <a href="${SHOP_AFFILIATE.coupang.url(ing.query)}" target="_blank" rel="noopener">
           <button class="buy-btn">🛒 구매</button>
         </a>
         <button class="cart-btn" id="cartbtn-${menuName}-${ing.name}" onclick="addToCart('${ing.name.replace(/'/g,"\\'")}','${ing.amount}','${menuName.replace(/'/g,"\\'")}')">+ 목록</button>
@@ -4313,7 +4506,7 @@ function openRecipe(menuName, emoji) {
     <div class="recipe-section">
       <div class="recipe-section-title">재료 (1인분 기준)</div>
       <div class="ingredient-list">${ingList}</div>
-      <a href="https://link.coupang.com/a/eu5btk?q=${encodeURIComponent(menuName + ' 재료')}" target="_blank">
+      <a href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener">
         <button class="buy-all-btn">🛒 전체 재료 쿠팡에서 보기</button>
       </a>
     </div>
@@ -4330,7 +4523,7 @@ function openRecipe(menuName, emoji) {
     </div>
 
     <div class="recipe-section" style="margin-top:4px;padding-bottom:20px">
-      <a class="coupang-partners-banner" href="https://link.coupang.com/a/eu5btk?q=${encodeURIComponent(menuName + ' 재료')}" target="_blank" rel="noopener">
+      <a class="coupang-partners-banner" href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener">
         <span class="cp-rocket">🚀</span>
         <div class="cp-text">
           <div class="cp-title">신선 재료 로켓배송으로 받기</div>
@@ -4406,7 +4599,7 @@ function cartClear() {
 
 function cartBuyAll() {
   const query = cartItems.map(i => i.name).join(' ');
-  window.open(`https://link.coupang.com/a/eu5btk?q=${encodeURIComponent(query)}`, '_blank');
+  window.open(SHOP_AFFILIATE.coupang.url(query), '_blank');
 }
 
 function openCart() {
@@ -4448,7 +4641,9 @@ updateCartBadge();
 renderFavSection();
 
 // ── 페이지 전환 ──
-const PAGES = ['main','page-community','page-cart','page-mypage','page-saved-posts','page-my-posts','page-fun','page-food-calendar'];
+const PAGES = ['main','page-community','page-cart','page-mypage','page-saved-posts','page-my-posts','page-fun','page-food-calendar','page-history','page-settings','page-notify'];
+// 내 활동 펼침 상태 유지: 그 하위(달력/저장글/내글)에 다녀오면 펼친 채로, 다른 메뉴 가면 접힘
+let keepActivityOpen = false;
 // ── 추천 히스토리 스냅샷 저장 ──
 // 현재 화면에 보이는 카드 기준으로 저장 (안땡겨요로 바뀐 최종 상태)
 function saveHistorySnapshot() {
@@ -4472,6 +4667,9 @@ function saveHistorySnapshot() {
 
 function showPage(page) {
   window.scrollTo(0, 0);
+  // 내 활동 하위 페이지(달력/저장글/내글)로 가면 펼침 유지, 그 외 다른 메뉴면 접힘
+  if (['food-calendar','saved-posts','my-posts'].includes(page)) keepActivityOpen = true;
+  else if (page !== 'mypage') keepActivityOpen = false;
   // 홈에서 다른 페이지로 이동할 때 현재 카드 스냅샷 저장
   const currentPage = document.querySelector('main').style.display !== 'none' ? 'home' :
     ['community','cart','mypage'].find(p => {
@@ -4542,6 +4740,19 @@ function showPage(page) {
     document.getElementById('page-fun').style.display = 'block';
     document.getElementById('nav-fun').classList.add('active');
     renderFunPage();
+  } else if (page === 'history') {
+    document.getElementById('page-history').style.display = 'block';
+    document.getElementById('nav-mypage').classList.add('active');
+    renderHistoryPage();
+  } else if (page === 'settings') {
+    document.getElementById('page-settings').style.display = 'block';
+    document.getElementById('nav-mypage').classList.add('active');
+    const tl = document.getElementById('theme-label');
+    if (tl) tl.textContent = localStorage.getItem('wmjTheme') === 'light' ? '라이트' : '다크';
+  } else if (page === 'notify') {
+    document.getElementById('page-notify').style.display = 'block';
+    document.getElementById('nav-mypage').classList.add('active');
+    renderNotifySection();
   }
 }
 
@@ -4573,7 +4784,7 @@ function renderPageCartList() {
         <div class="page-cart-item-meta">📋 ${item.from} 레시피</div>
       </div>
       <div class="page-cart-item-btns">
-        <button class="page-cart-buy" onclick="window.open('https://link.coupang.com/a/eu5btk?q=${encodeURIComponent(item.name)}','_blank')">🛒</button>
+        <button class="page-cart-buy" onclick="window.open('${SHOP_AFFILIATE.coupang.url(item.name)}','_blank')">🛒</button>
         <button class="page-cart-del" onclick="removeFromCart(${i});renderPageCartList()">✕</button>
       </div>
     </div>`).join('');
@@ -4611,6 +4822,17 @@ function calcDietStreak() {
 }
 
 function renderMyPage() {
+  resetMyAccordions();
+  // 내 활동 하위(달력/저장글/내글)에서 돌아온 경우 펼친 상태 복원
+  if (keepActivityOpen) {
+    const sec = document.getElementById('section-activity');
+    if (sec) {
+      const body = sec.querySelector('.my-acc-body');
+      const arrow = sec.querySelector('.my-acc-arrow');
+      if (body) body.style.display = 'block';
+      if (arrow) arrow.style.transform = 'rotate(180deg)';
+    }
+  }
   const hist = JSON.parse(localStorage.getItem('wmjHistory') || '[]');
   const likedMenus = getLikedMenus();
   const streak = calcDietStreak();
@@ -4623,10 +4845,17 @@ function renderMyPage() {
   const themeLabel = document.getElementById('theme-label');
   if (themeLabel) themeLabel.textContent = localStorage.getItem('wmjTheme') === 'light' ? '라이트' : '다크';
 
-  // 통계
-  document.getElementById('stat-liked').textContent = likedMenus.length;
-  document.getElementById('stat-rec').textContent = hist.length;
-  document.getElementById('stat-streak').textContent = streak;
+  // 프로필 내 스탯 칩 (입맛 캐릭터 · 추천 횟수 · 식단 스트릭)
+  const pStats = document.getElementById('my-profile-stats');
+  if (pStats) {
+    const taste = getTasteCharacter();
+    const tasteChip = taste
+      ? `<span class="my-pchip taste">👅 ${taste.key}</span>`
+      : `<span class="my-pchip taste" style="color:var(--muted);background:var(--card);border-color:var(--border)">👅 입맛 분석중</span>`;
+    pStats.innerHTML = tasteChip
+      + `<span class="my-pchip">🎲 추천 <b>${hist.length}</b>회</span>`
+      + `<span class="my-pchip">🔥 스트릭 <b>${streak}</b>일</span>`;
+  }
 
   // 스트릭 뱃지
   const badge = document.getElementById('diet-streak-badge');
@@ -4657,9 +4886,13 @@ function renderMyPage() {
       '</div>';
   }
 
-  // 입맛 통계
-  renderTasteStats();
   renderNotifySection();
+  // 알림 안 읽음 개수 (알림 카드에 표시)
+  const notifLabel = document.getElementById('notify-count-label');
+  if (notifLabel) {
+    const unread = (typeof notifications !== 'undefined' ? notifications : []).filter(n => !n.read).length;
+    notifLabel.textContent = unread > 0 ? `안 읽음 ${unread}` : '';
+  }
 
   // 장보기 미리보기
   const cartEl = document.getElementById('my-cart-preview');
@@ -4675,72 +4908,9 @@ function renderMyPage() {
     (cartItems.length > 4 ? `<div style="text-align:center;padding:8px;font-size:11px;color:var(--orange)">+${cartItems.length - 4}개 더 →</div>` : '');
   }
 
-  // ── 추천 히스토리 ──
-  const histEl = document.getElementById('my-hist-list');
+  // ── 추천 히스토리 카운트 (목록은 별도 페이지에서) ──
   const histLabel = document.getElementById('hist-count-label');
-  if (!histEl) return;
-  if (hist.length === 0) {
-    if (histLabel) histLabel.textContent = '';
-    histEl.innerHTML = `<div class="my-saved-empty">아직 추천받은 기록이 없어요<br><span style="font-size:10px;color:var(--muted)">추천받기 버튼을 눌러보세요!</span></div>`;
-    return;
-  }
-
-  const PAGE_SIZE = 5;
-  // 현재 페이지 상태 유지 (재렌더 시 보존)
-  if (typeof renderMyPage._histPage === 'undefined') renderMyPage._histPage = 0;
-  const totalPages = Math.ceil(hist.length / PAGE_SIZE);
-  // 페이지 범위 초과 방지
-  if (renderMyPage._histPage >= totalPages) renderMyPage._histPage = totalPages - 1;
-
-  const page = renderMyPage._histPage;
-  const pageItems = hist.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-
-  if (histLabel) histLabel.textContent = `총 ${hist.length}회`;
-
-  // 날짜 포맷
-  function fmtDate(iso) {
-    const d = new Date(iso);
-    const now = new Date();
-    const diffMs = now - d;
-    const diffMin = Math.floor(diffMs / 60000);
-    const diffH = Math.floor(diffMin / 60);
-    const diffD = Math.floor(diffH / 24);
-    if (diffMin < 1) return '방금';
-    if (diffMin < 60) return `${diffMin}분 전`;
-    if (diffH < 24) return `${diffH}시간 전`;
-    if (diffD < 7) return `${diffD}일 전`;
-    return `${d.getMonth()+1}/${d.getDate()}`;
-  }
-
-  const catLabel = { cook:'직접요리', delivery:'배달', dine:'외식' };
-  const modeLabel = { crave:'이런느낌땡겨', hate:'이것만은싫어' };
-  const globalStart = page * PAGE_SIZE;
-
-  histEl.innerHTML =
-    // 항목 목록
-    pageItems.map((h, i) => {
-      const globalIdx = globalStart + i;
-      return `
-      <div style="padding:10px 0;border-bottom:1px solid var(--border)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-          <span style="font-size:10px;color:var(--muted)">${fmtDate(h.date)} · ${catLabel[h.cat]||''} · ${modeLabel[h.mode]||''}</span>
-          <button onclick="deleteHistItem(${globalIdx})" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;line-height:1" title="삭제">×</button>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px">
-          ${h.menus.map(m => `<span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:12px">${m.emoji} ${m.name}</span>`).join('')}
-        </div>
-      </div>`;
-    }).join('') +
-
-    // 페이지네이션 + 전체삭제
-    `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px">
-      <div style="display:flex;align-items:center;gap:6px">
-        <button onclick="histGoPage(${page - 1})" ${page === 0 ? 'disabled' : ''} style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:5px 10px;font-size:13px;cursor:pointer;opacity:${page === 0 ? '0.3' : '1'}">‹</button>
-        <span style="font-size:11px;color:var(--muted)">${page + 1} / ${totalPages}</span>
-        <button onclick="histGoPage(${page + 1})" ${page >= totalPages - 1 ? 'disabled' : ''} style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:5px 10px;font-size:13px;cursor:pointer;opacity:${page >= totalPages - 1 ? '0.3' : '1'}">›</button>
-      </div>
-      <button onclick="clearAllHist()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline">전체 삭제</button>
-    </div>`;
+  if (histLabel) histLabel.textContent = hist.length > 0 ? `총 ${hist.length}회` : '';
 
   // ── 투표 활동 뱃지 ──
   const voteCount = parseInt(localStorage.getItem('wmjVoteCount')||'0');
@@ -4978,12 +5148,62 @@ function refreshSimilar(menuName, cardIdx) {
 }
 
 // ── 히스토리 페이지 이동 ──
+function renderHistoryPage() {
+  const hist = JSON.parse(localStorage.getItem('wmjHistory') || '[]');
+  const histEl = document.getElementById('hist-page-list');
+  if (!histEl) return;
+  if (hist.length === 0) {
+    histEl.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--muted)"><div style="font-size:44px;margin-bottom:14px">🕘</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">아직 추천받은 기록이 없어요</div><div style="font-size:12px">추천받기 버튼을 눌러보세요!</div></div>`;
+    return;
+  }
+  const PAGE_SIZE = 5;
+  if (typeof renderHistoryPage._histPage === 'undefined') renderHistoryPage._histPage = 0;
+  const totalPages = Math.ceil(hist.length / PAGE_SIZE);
+  if (renderHistoryPage._histPage >= totalPages) renderHistoryPage._histPage = totalPages - 1;
+  if (renderHistoryPage._histPage < 0) renderHistoryPage._histPage = 0;
+  const page = renderHistoryPage._histPage;
+  const pageItems = hist.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  function fmtDate(iso) {
+    const d = new Date(iso), now = new Date();
+    const diffMin = Math.floor((now - d)/60000), diffH = Math.floor(diffMin/60), diffD = Math.floor(diffH/24);
+    if (diffMin < 1) return '방금';
+    if (diffMin < 60) return diffMin + '분 전';
+    if (diffH < 24) return diffH + '시간 전';
+    if (diffD < 7) return diffD + '일 전';
+    return (d.getMonth()+1) + '/' + d.getDate();
+  }
+  const catLabel = { cook:'직접요리', delivery:'배달', dine:'외식' };
+  const modeLabel = { crave:'이런느낌땡겨', hate:'이것만은싫어' };
+  const globalStart = page * PAGE_SIZE;
+  histEl.innerHTML =
+    pageItems.map((h, i) => {
+      const globalIdx = globalStart + i;
+      return `<div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:10px;color:var(--muted)">${fmtDate(h.date)} · ${catLabel[h.cat]||''} · ${modeLabel[h.mode]||''}</span>
+          <button onclick="deleteHistItem(${globalIdx})" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;line-height:1" title="삭제">×</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          ${h.menus.map(m => `<span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:12px">${m.emoji} ${m.name}</span>`).join('')}
+        </div>
+      </div>`;
+    }).join('') +
+    `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0 4px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="histGoPage(${page-1})" ${page===0?'disabled':''} style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:5px 10px;font-size:13px;cursor:pointer;opacity:${page===0?'0.3':'1'}">‹</button>
+        <span style="font-size:11px;color:var(--muted)">${page+1} / ${totalPages}</span>
+        <button onclick="histGoPage(${page+1})" ${page>=totalPages-1?'disabled':''} style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:5px 10px;font-size:13px;cursor:pointer;opacity:${page>=totalPages-1?'0.3':'1'}">›</button>
+      </div>
+      <button onclick="clearAllHist()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline">전체 삭제</button>
+    </div>`;
+}
+
 function histGoPage(p) {
   const hist = JSON.parse(localStorage.getItem('wmjHistory') || '[]');
   const totalPages = Math.ceil(hist.length / 5);
   if (p < 0 || p >= totalPages) return;
-  renderMyPage._histPage = p;
-  renderMyPage();
+  renderHistoryPage._histPage = p;
+  renderHistoryPage();
 }
 
 // ── 히스토리 개별 삭제 ──
@@ -4993,16 +5213,16 @@ function deleteHistItem(idx) {
   localStorage.setItem('wmjHistory', JSON.stringify(hist));
   // 삭제 후 마지막 페이지 넘어가면 한 페이지 앞으로
   const totalPages = Math.ceil(hist.length / 5) || 1;
-  if (renderMyPage._histPage >= totalPages) renderMyPage._histPage = totalPages - 1;
-  renderMyPage();
+  if (renderHistoryPage._histPage >= totalPages) renderHistoryPage._histPage = totalPages - 1;
+  renderHistoryPage();
 }
 
 // ── 히스토리 전체 삭제 ──
 function clearAllHist() {
   if (!confirm('추천 히스토리를 전부 삭제할까요?')) return;
   localStorage.removeItem('wmjHistory');
-  renderMyPage._histPage = 0;
-  renderMyPage();
+  renderHistoryPage._histPage = 0;
+  renderHistoryPage();
 }
 
 function reportCommPost(postId) {
@@ -5193,11 +5413,23 @@ function collectTasteData() {
   return { tagScore, likedMenus, myPosts };
 }
 
+function getTasteCharacter() {
+  const { tagScore } = collectTasteData();
+  const totalScore = Object.values(tagScore).reduce((a,b) => a+b, 0);
+  if (totalScore < 5) return null;
+  let bestChar = null, bestScore = 0;
+  TASTE_CHARACTERS.forEach(c => {
+    const score = c.tags.reduce((s,t) => s + (tagScore[t]||0), 0);
+    if (score > bestScore) { bestScore = score; bestChar = c; }
+  });
+  return bestChar;
+}
+
 function renderTasteStats() {
   const el = document.getElementById('my-taste-content');
   if (!el) return;
 
-  const { tagScore, likedMenus, myPosts } = collectTasteData();
+  const { tagScore, likedMenus } = collectTasteData();
   const totalScore = Object.values(tagScore).reduce((a,b) => a+b, 0);
 
   // 데이터 부족
@@ -5209,35 +5441,10 @@ function renderTasteStats() {
     return;
   }
 
-  // 캐릭터 판정
-  let bestChar = null, bestScore = 0;
-  TASTE_CHARACTERS.forEach(c => {
-    const score = c.tags.reduce((s,t) => s + (tagScore[t]||0), 0);
-    if (score > bestScore) { bestScore = score; bestChar = c; }
-  });
-
-  // TOP3 메뉴
+  // 최애 메뉴 TOP3 (캐릭터 요약은 프로필로, 취향 분포는 숨김)
   const top3 = likedMenus.slice(0, 3);
-
-  // 맛 태그 TOP3 바차트
-  const allTagsSorted = Object.entries(tagScore).sort((a,b) => b[1]-a[1]);
-  const topTags = allTagsSorted.filter(([t]) =>
-    ['🌶️ 매운/얼큰한맛','💧 담백한맛','🧂 짭짤한맛','🧈 느끼한맛',
-     '🍱 한식','🍝 양식','🥢 중식','🍣 일식',
-     '🥩 고기','🍜 면','🍲 국물/찌개','🥗 채소'].includes(t)
-  ).slice(0, 4);
-  const maxTagScore = topTags[0]?.[1] || 1;
-
-  el.innerHTML = `
-    ${bestChar ? `
-    <div style="background:linear-gradient(135deg,rgba(255,209,102,0.1),rgba(255,71,87,0.08));border:1.5px solid var(--yellow);border-radius:14px;padding:16px;text-align:center;margin-bottom:12px">
-      <div style="font-size:40px;margin-bottom:6px">${bestChar.icon}</div>
-      <div style="font-size:17px;font-weight:700;color:var(--yellow);margin-bottom:4px">당신은 ${bestChar.key}!</div>
-      <div style="font-size:12px;color:var(--muted)">${bestChar.desc}</div>
-    </div>` : ''}
-
-    ${top3.length > 0 ? `
-    <div style="margin-bottom:12px">
+  el.innerHTML = top3.length > 0 ? `
+    <div>
       <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">❤️ 최애 메뉴 TOP${top3.length}</div>
       <div style="display:flex;gap:6px">
         ${top3.map((m,i) => `
@@ -5247,23 +5454,7 @@ function renderTasteStats() {
             <div style="font-size:11px;color:var(--text);word-break:keep-all;line-height:1.3">${m.name}</div>
           </div>`).join('')}
       </div>
-    </div>` : ''}
-
-    ${topTags.length > 0 ? `
-    <div>
-      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">📊 취향 분포</div>
-      ${topTags.map(([tag, score]) => `
-        <div style="margin-bottom:7px">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text);margin-bottom:3px">
-            <span>${tag}</span>
-            <span style="color:var(--muted)">${Math.round(score/maxTagScore*100)}%</span>
-          </div>
-          <div style="background:var(--surface);border-radius:4px;height:6px;overflow:hidden">
-            <div style="background:var(--orange);height:100%;border-radius:4px;width:${Math.round(score/maxTagScore*100)}%;transition:width 0.6s ease"></div>
-          </div>
-        </div>`).join('')}
-    </div>` : ''}
-  `;
+    </div>` : '';
 }
 
 let tasteAccordionOpen = true;
@@ -5290,6 +5481,25 @@ function toggleLikedAccordion() {
   const arrow = document.getElementById('liked-accordion-arrow');
   if (collapse) collapse.style.display = likedAccordionOpen ? 'block' : 'none';
   if (arrow) arrow.style.transform = likedAccordionOpen ? '' : 'rotate(-90deg)';
+}
+
+// 마이페이지 제네릭 아코디언 (기본 접힘, 헤더 클릭으로 토글)
+function toggleAcc(header) {
+  const section = header.closest('.my-section');
+  if (!section) return;
+  const body = section.querySelector('.my-acc-body');
+  if (!body) return;
+  const willOpen = getComputedStyle(body).display === 'none';
+  body.style.display = willOpen ? 'block' : 'none';
+  const arrow = header.querySelector('.my-acc-arrow');
+  if (arrow) arrow.style.transform = willOpen ? 'rotate(180deg)' : '';
+}
+// 마이페이지 진입 시 모든 아코디언을 접힌 상태로 초기화
+function resetMyAccordions() {
+  const page = document.getElementById('page-mypage');
+  if (!page) return;
+  page.querySelectorAll('.my-acc-body').forEach(b => { b.style.display = 'none'; });
+  page.querySelectorAll('.my-acc-arrow').forEach(a => { a.style.transform = ''; });
 }
 
 function unlikeMenuFromMyPage(name) {
@@ -6635,7 +6845,7 @@ function renderDailyMeal() {
     <div style="flex:1;background:var(--card);border:1.5px solid ${top ? 'var(--yellow)' : 'var(--border)'};border-radius:14px;padding:12px 8px;text-align:center;transition:border-color 0.15s"
       onmouseover="this.style.borderColor='var(--yellow)'" onmouseout="this.style.borderColor='${top ? 'var(--yellow)' : 'var(--border)'}'">
       <div style="font-size:11px;height:16px;margin-bottom:2px;color:var(--yellow);font-weight:700">${top ? '👑' : ''}</div>
-      <div style="font-size:26px;margin-bottom:4px">${m.emoji}</div>
+      ${wcFoodVisual(m, 50)}
       <div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:6px;word-break:keep-all">${m.name}</div>
       <div style="margin-bottom:7px">
         <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
@@ -6685,22 +6895,29 @@ function certifyDailyMeal(menuName) {
 // ── 오늘의 질문 ──
 // 질문은 나중에 추가 예정. 형식: { q:'질문', opts:[{label:'선택지1', emoji:'🍗'},{label:'선택지2', emoji:'🍕'}] }
 const DAILY_QUESTIONS = [
-  { q:'치킨 vs 피자, 오늘 저녁은?', opts:[{label:'치킨', emoji:'🍗'},{label:'피자', emoji:'🍕'}] },
-  { q:'짜장면 vs 짬뽕, 영원한 숙제', opts:[{label:'짜장면', emoji:'🍜'},{label:'짬뽕', emoji:'🌊'}] },
-  { q:'혼밥할 때 뭐 시켜요?', opts:[{label:'치킨', emoji:'🍗'},{label:'족발/보쌈', emoji:'🥬'}] },
-  { q:'숙취 해장, 뭐로 하세요?', opts:[{label:'해장국', emoji:'🍲'},{label:'라면', emoji:'🍜'}] },
-  { q:'떡볶이에 순대, 필수 vs 선택?', opts:[{label:'필수지!', emoji:'🌭'},{label:'떡볶이만으로 충분', emoji:'🌶️'}] },
+  { q:'치킨 vs 피자, 오늘 저녁은?', opts:[{label:'치킨', emoji:'🍗', menu:'후라이드 치킨'},{label:'피자', emoji:'🍕', menu:'피자'}] },
+  { q:'짜장면 vs 짬뽕, 영원한 숙제', opts:[{label:'짜장면', emoji:'🍜', menu:'짜장면'},{label:'짬뽕', emoji:'🌊', menu:'짬뽕'}] },
+  { q:'혼밥할 때 뭐 시켜요?', opts:[{label:'치킨', emoji:'🍗', menu:'후라이드 치킨'},{label:'족발/보쌈', emoji:'🥬', menu:'족발'}] },
+  { q:'숙취 해장, 뭐로 하세요?', opts:[{label:'해장국', emoji:'🍲', menu:'해장국'},{label:'라면', emoji:'🍜', menu:'라면'}] },
+  { q:'떡볶이에 순대, 필수 vs 선택?', opts:[{label:'필수지!', emoji:'🌭', menu:'순대'},{label:'떡볶이만으로 충분', emoji:'🌶️', menu:'떡볶이'}] },
   { q:'삼겹살엔 뭐가 맞아요?', opts:[{label:'소주', emoji:'🍶'},{label:'맥주', emoji:'🍺'}] },
   { q:'피자 도우 취향은?', opts:[{label:'씬 크러스트', emoji:'🍕'},{label:'두꺼운 도우', emoji:'🍞'}] },
   { q:'국물 없으면 밥을 못 먹겠다?', opts:[{label:'국물 없으면 못 살아', emoji:'🍲'},{label:'없어도 괜찮아', emoji:'🙆'}] },
-  { q:'야식 최강자는?', opts:[{label:'치킨', emoji:'🍗'},{label:'라면', emoji:'🍜'}] },
-  { q:'데이트 첫 식사, 어디 가요?', opts:[{label:'분위기 좋은 양식', emoji:'🍝'},{label:'부담없는 한식', emoji:'🍱'}] },
+  { q:'야식 최강자는?', opts:[{label:'치킨', emoji:'🍗', menu:'후라이드 치킨'},{label:'라면', emoji:'🍜', menu:'라면'}] },
+  { q:'데이트 첫 식사, 어디 가요?', opts:[{label:'분위기 좋은 양식', emoji:'🍝', menu:'까르보나라'},{label:'부담없는 한식', emoji:'🍱', menu:'비빔밥'}] },
   { q:'점심 혼밥, 뭐가 더 편해요?', opts:[{label:'식당 혼밥', emoji:'🍽️'},{label:'편의점 도시락', emoji:'🏪'}] },
   { q:'라면 끓일 때 계란은?', opts:[{label:'반숙 풀기', emoji:'🥚'},{label:'완숙 통으로', emoji:'🍳'}] },
   { q:'매운맛 취향은?', opts:[{label:'불닭도 거뜬해', emoji:'🔥'},{label:'순한맛이 좋아', emoji:'😌'}] },
-  { q:'밥 vs 면, 오늘은?', opts:[{label:'밥', emoji:'🍚'},{label:'면', emoji:'🍜'}] },
+  { q:'밥 vs 면, 오늘은?', opts:[{label:'밥', emoji:'🍚'},{label:'면', emoji:'🍜', menu:'라면'}] },
   { q:'치킨 먹을 때 뭐 찍어요?', opts:[{label:'치킨무', emoji:'🥒'},{label:'소스류', emoji:'🧴'}] },
 ];
+
+// 오늘의 질문 선택지 아이콘: 설정된 이미지 있으면 이미지, 없으면 이모지 (인라인용)
+function qOptIcon(opt, px) {
+  const img = getMenuImg(opt.menu || opt.label);
+  if (img) return `<img src="${img}" style="width:${px}px;height:${px}px;border-radius:5px;object-fit:cover;vertical-align:middle" onerror="this.outerHTML='${opt.emoji}'">`;
+  return opt.emoji;
+}
 
 function getTodayQuestion() {
   if (DAILY_QUESTIONS.length === 0) return null;
@@ -6778,7 +6995,7 @@ function renderDailyQ() {
           return `
           <div style="margin-bottom:8px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-              <span style="font-size:13px;color:${isVoted ? 'var(--green)' : 'var(--text)'};font-weight:${isVoted ? '700' : '400'}">${opt.emoji} ${opt.label}${isVoted ? ' ✓' : ''}</span>
+              <span style="font-size:13px;color:${isVoted ? 'var(--green)' : 'var(--text)'};font-weight:${isVoted ? '700' : '400'}">${qOptIcon(opt, 20)} ${opt.label}${isVoted ? ' ✓' : ''}</span>
               <span style="font-size:12px;color:var(--muted);font-weight:700">${pct}%</span>
             </div>
             <div style="background:var(--surface);border-radius:6px;height:8px;overflow:hidden">
@@ -6795,7 +7012,7 @@ function renderDailyQ() {
               style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 6px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;text-align:center"
               onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'"
               onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
-              <div style="font-size:24px;margin-bottom:4px">${opt.emoji}</div>
+              ${wcFoodVisual({name: opt.menu || opt.label, emoji: opt.emoji}, 52)}
               ${opt.label}
             </button>`).join('')}
         </div>
@@ -7018,7 +7235,7 @@ function renderTournamentMatches() {
       winnerEl.style.display = 'block';
       winnerEl.innerHTML = '<div style="background:linear-gradient(135deg,rgba(255,209,102,0.15),rgba(255,71,87,0.1));border:2px solid var(--yellow);border-radius:16px;padding:24px;text-align:center;margin-top:12px">'
         + '<div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:8px">🏆 이번 주 최강 메뉴 (현재 기준)</div>'
-        + '<div style="font-size:48px;margin-bottom:8px">' + winner.emoji + '</div>'
+        + wcFoodVisual(winner, 96)
         + '<div style="font-size:20px;font-weight:700;color:var(--text)">' + winner.name + '</div></div>';
     } else { winnerEl.style.display = 'none'; }
   } else if (winnerEl) { winnerEl.style.display = 'none'; }
@@ -7060,12 +7277,12 @@ function renderTournamentMatches() {
       + '<div style="font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:10px">' + (i+1) + '매치 &nbsp;·&nbsp; <span style="color:var(--orange)">' + total + '명 참여중</span></div>'
       + '<div style="display:flex;gap:10px;align-items:center">'
       + '<button onclick="voteTournament(' + i + ',\'a\')" ' + (!canVote?'disabled ':'') + 'style="flex:1;background:' + aBg + ';border:2px solid ' + aBorder + ';border-radius:12px;padding:12px 6px;text-align:center;cursor:' + cursor + ';transition:all 0.15s;font-family:\'Noto Sans KR\',sans-serif">'
-      + '<div style="font-size:28px;margin-bottom:4px">' + m.a.emoji + '</div>'
+      + wcFoodVisual(m.a, 62)
       + '<div style="font-size:11px;font-weight:700;color:' + aColor + ';word-break:keep-all;line-height:1.3">' + m.a.name + '</div>'
       + aBar + '</button>'
       + '<div style="font-size:14px;font-weight:700;color:var(--muted);flex-shrink:0">VS</div>'
       + '<button onclick="voteTournament(' + i + ',\'b\')" ' + (!canVote?'disabled ':'') + 'style="flex:1;background:' + bBg + ';border:2px solid ' + bBorder + ';border-radius:12px;padding:12px 6px;text-align:center;cursor:' + cursor + ';transition:all 0.15s;font-family:\'Noto Sans KR\',sans-serif">'
-      + '<div style="font-size:28px;margin-bottom:4px">' + m.b.emoji + '</div>'
+      + wcFoodVisual(m.b, 62)
       + '<div style="font-size:11px;font-weight:700;color:' + bColor + ';word-break:keep-all;line-height:1.3">' + m.b.name + '</div>'
       + bBar + '</button>'
       + '</div>'
@@ -7195,6 +7412,17 @@ function getRoundName(remaining) {
   return `${remaining}강`;
 }
 
+// 월드컵 음식 표시: 등록된 이미지가 있으면 사진, 없으면(또는 로드 실패 시) 이모지
+function wcFoodVisual(item, size) {
+  const fontSize = Math.round(size * 0.62);
+  const img = getMenuImg(item.name);
+  if (img) {
+    return `<div style="width:${size}px;height:${size}px;margin:0 auto 8px;border-radius:14px;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:${fontSize}px">
+      <img src="${img}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.innerHTML='${item.emoji}'"></div>`;
+  }
+  return `<div style="height:${size}px;display:flex;align-items:center;justify-content:center;font-size:${fontSize}px;margin-bottom:8px">${item.emoji}</div>`;
+}
+
 function renderWorldcup() {
   const el = document.getElementById('worldcup-content');
   if (!el) return;
@@ -7218,7 +7446,7 @@ function renderWorldcup() {
     el.innerHTML = `
       <div style="background:linear-gradient(135deg,rgba(6,214,160,0.1),rgba(255,71,87,0.08));border:2px solid var(--green);border-radius:16px;padding:24px;text-align:center">
         <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">🏆 나의 최애 메뉴!</div>
-        <div style="font-size:52px;margin-bottom:8px">${winner.emoji}</div>
+        ${wcFoodVisual(winner, 110)}
         <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:16px">${winner.name}</div>
         <button onclick="resetWorldcup()" style="background:var(--green);border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:700;color:white;cursor:pointer;font-family:'Noto Sans KR',sans-serif">다시 하기</button>
       </div>`;
@@ -7249,7 +7477,7 @@ function renderWorldcup() {
           style="flex:1;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:20px 8px;text-align:center;cursor:pointer;transition:all 0.15s;font-family:'Noto Sans KR',sans-serif"
           onmouseover="this.style.borderColor='var(--green)';this.style.background='rgba(6,214,160,0.08)'"
           onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
-          <div style="font-size:36px;margin-bottom:6px">${match.a.emoji}</div>
+          ${wcFoodVisual(match.a, 72)}
           <div style="font-size:12px;font-weight:700;color:var(--text);word-break:keep-all;line-height:1.3">${match.a.name}</div>
         </button>
         <div style="font-size:16px;font-weight:700;color:var(--muted);flex-shrink:0">VS</div>
@@ -7257,7 +7485,7 @@ function renderWorldcup() {
           style="flex:1;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:20px 8px;text-align:center;cursor:pointer;transition:all 0.15s;font-family:'Noto Sans KR',sans-serif"
           onmouseover="this.style.borderColor='var(--green)';this.style.background='rgba(6,214,160,0.08)'"
           onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
-          <div style="font-size:36px;margin-bottom:6px">${match.b.emoji}</div>
+          ${wcFoodVisual(match.b, 72)}
           <div style="font-size:12px;font-weight:700;color:var(--text);word-break:keep-all;line-height:1.3">${match.b.name}</div>
         </button>
       </div>
@@ -7286,7 +7514,7 @@ function renderFunPage() {
       <div style="flex:1;background:var(--card);border:1.5px solid ${top?'var(--yellow)':'var(--border)'};border-radius:14px;padding:12px 8px;text-align:center;transition:border-color 0.15s"
         onmouseover="this.style.borderColor='var(--yellow)'" onmouseout="this.style.borderColor='${top?'var(--yellow)':'var(--border)'}'">
         <div style="font-size:11px;height:16px;margin-bottom:2px;color:var(--yellow);font-weight:700">${top?'👑':''}</div>
-        <div style="font-size:26px;margin-bottom:4px">${m.emoji}</div>
+        ${wcFoodVisual(m, 50)}
         <div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:6px;word-break:keep-all">${m.name}</div>
         <div style="margin-bottom:7px">
           <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
@@ -7327,7 +7555,7 @@ function renderFunPage() {
                 const isVoted = votedIdx===i;
                 return `<div style="margin-bottom:8px">
                   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-                    <span style="font-size:13px;color:${isVoted?'var(--green)':'var(--text)'};font-weight:${isVoted?'700':'400'}">${opt.emoji} ${opt.label}${isVoted?' ✓':''}</span>
+                    <span style="font-size:13px;color:${isVoted?'var(--green)':'var(--text)'};font-weight:${isVoted?'700':'400'}">${qOptIcon(opt, 20)} ${opt.label}${isVoted?' ✓':''}</span>
                     <span style="font-size:12px;color:var(--muted);font-weight:700">${pct}%</span>
                   </div>
                   <div style="background:var(--surface);border-radius:6px;height:8px;overflow:hidden">
@@ -7343,7 +7571,7 @@ function renderFunPage() {
                     style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 6px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;text-align:center"
                     onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'"
                     onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
-                    <div style="font-size:24px;margin-bottom:4px">${opt.emoji}</div>
+                    ${wcFoodVisual({name: opt.menu || opt.label, emoji: opt.emoji}, 52)}
                     ${opt.label}
                   </button>`).join('')}
               </div>
@@ -7747,11 +7975,11 @@ const EXTRA_IMAGES = {
   '곰탕':'https://images.unsplash.com/photo-1645530656505-1b8a4057889b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw1fHwlRUElQjMlQjAlRUQlODMlOTV8ZW58MHx8fHwxNzc3NzI4ODYxfDA&ixlib=rb-4.1.0&q=85',
   '고등어찜':'https://images.pexels.com/photos/9077435/pexels-photo-9077435.jpeg?w=400',
   '쟁반막국수':'https://images.unsplash.com/photo-1670819917394-03031b377bea?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxMXx8S29yZWFuJTIwY29sZCUyMGJ1Y2t3aGVhdCUyMG5vb2RsZXMlMjBzaGFyaW5nJTIwcGxhdHRlcnxlbnwwfHx8fDE3Nzc3Mjk5Njl8MA&ixlib=rb-4.1.0&q=85',
-  '비빔냉면':'https://images.pexels.com/photos/8952543/pexels-photo-8952543.jpeg?w=400',
+  '비빔냉면':'https://images.unsplash.com/photo-1687701320941-122662fec058?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxNXx8JUVBJUI5JTgwJUVDJUI5JTk4JUVDJUIwJThDJUVBJUIwJTlDfGVufDB8fHx8MTc3NzcyNjg5NHww&ixlib=rb-4.1.0&q=85&w=400',
   '고추잡채':'https://images.pexels.com/photos/724291/pexels-photo-724291.jpeg?w=400',
   '꽃게찜':'https://images.pexels.com/photos/8352013/pexels-photo-8352013.jpeg?w=400',
   '달걀찜':'https://images.pexels.com/photos/35833815/pexels-photo-35833815.jpeg?w=400',
-  '아귀찜':'https://omechu-rouge.vercel.app/images/아귀찜.png',
+  '아구찜':'https://omechu-rouge.vercel.app/images/아구찜.png',
   '간장게장':'https://images.pexels.com/photos/8980370/pexels-photo-8980370.jpeg?w=400',
   '쌈밥':'https://images.pexels.com/photos/36964141/pexels-photo-36964141.jpeg?w=400',
   '모츠나베':'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Motsunabe.jpg/400px-Motsunabe.jpg',
@@ -7819,7 +8047,7 @@ const EXTRA_IMAGES = {
   '갈비탕':'https://images.pexels.com/photos/27420468/pexels-photo-27420468.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
   '닭꼬치':'https://upload.wikimedia.org/wikipedia/commons/e/ee/Dak-kkochi.jpg',
   '김치찜':'https://upload.wikimedia.org/wikipedia/commons/9/9d/%EA%B9%80%EC%B9%98%EC%B0%9C.jpg',
-  '물냉면':'https://images.unsplash.com/photo-1678685387070-a3205043eb7e?w=400',
+  '물냉면':'https://images.unsplash.com/photo-1676686997059-fb817ebbb2b5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw5fHwlRUElQjklODAlRUMlQjklOTglRUMlQjAlOEMlRUElQjAlOUN8ZW58MHx8fHwxNzc3NzI2ODk0fDA&ixlib=rb-4.1.0&q=85&w=400',
   '닭강정':'https://images.pexels.com/photos/20152618/pexels-photo-20152618.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
   '잣죽':'https://upload.wikimedia.org/wikipedia/commons/1/1d/Jatjuk.jpg',
   '굴국밥':'https://omechu-rouge.vercel.app/images/굴국밥.png',
@@ -9133,5 +9361,73 @@ if (!localStorage.getItem('wmjOnboarded')) {
   setTimeout(showOnboarding, 500);
 }
 </script>
+<script>
+window.addEventListener('load', function() {
+  if (typeof twemoji === 'undefined') {
+    console.warn('[twemoji] 라이브러리 로드 실패 - 네이티브 이모지로 표시됩니다.');
+    return;
+  }
+  const opts = {
+    folder: 'svg',
+    ext: '.svg',
+    base: 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/',
+    className: 'twemoji',
+  };
+
+  // 이모지 SVG가 로드 실패하면 → 원래 이모지 글자로 되돌려서
+  // 깨진 이미지 아이콘이 화면에 절대 안 뜨게 함 (capture 단계에서 잡아야 동작)
+  document.addEventListener('error', function(e) {
+    const el = e.target;
+    if (el && el.tagName === 'IMG' && el.classList && el.classList.contains('twemoji')) {
+      el.replaceWith(document.createTextNode(el.alt || ''));
+    }
+  }, true);
+
+  // 태그의 "이모지+글자" 텍스트를 twemoji 변환 전에 data 속성에 보존
+  //  → 변환 후 textContent에서 이모지가 사라져도 필터 매칭(TAG_GROUPS/메뉴태그)이 안 깨지게 함
+  function captureTagTexts() {
+    document.querySelectorAll('.tag').forEach(function(tag) {
+      if (tag.dataset.tagText) return;
+      let t = '';
+      tag.childNodes.forEach(function(n) {
+        if (n.nodeType === 3) t += n.nodeValue;
+        else if (n.tagName === 'IMG' && n.alt) t += n.alt;
+        else if (!(n.classList && n.classList.contains('fav-star')) && n.textContent) t += n.textContent;
+      });
+      t = t.replace(/[★☆]/g, '').trim();
+      if (t) tag.dataset.tagText = t;
+    });
+  }
+
+  captureTagTexts();
+  // 최초 1회 전체 변환
+  twemoji.parse(document.body, opts);
+
+  // DOM이 바뀔 때마다 재변환하되,
+  // - 자기 자신이 삽입한 <img>로 인해 다시 트리거되지 않도록 observer를 잠시 끊고
+  // - 잦은 변경은 디바운스로 묶어서 성능 부담을 줄임
+  let scheduled = false;
+  const observer = new MutationObserver(function() {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(function() {
+      scheduled = false;
+      observer.disconnect();
+      captureTagTexts();
+      twemoji.parse(document.body, opts);
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+});
+</script>
+<style>
+img.twemoji {
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: -0.2em;
+  display: inline-block;
+}
+</style>
 </body>
 </html>
