@@ -90,11 +90,11 @@ function show() { document.getElementById('login').style.display = 'none'; docum
 function go(t) {
   tab = t;
   document.querySelectorAll('.tabs button[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  ({ stats, reports, requests, top, posts, settings })[t]();
+  ({ stats: vStats, reports: vReports, requests: vRequests, top: vTop, posts: vPosts, settings: vSettings })[t]();
 }
 const V = html => document.getElementById('view').innerHTML = html;
 
-async function stats() {
+async function vStats() {
   V('<div class="empty">불러오는 중...</div>');
   const s = await call('admin_stats');
   const item = (label, v, sub) => `<div class="stat"><small>${label}</small><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
@@ -109,7 +109,7 @@ async function stats() {
   </div>`);
 }
 
-async function reports() {
+async function vReports() {
   V('<div class="empty">불러오는 중...</div>');
   const list = await call('admin_reported_posts');
   if (!list.length) return V('<div class="empty">처리할 신고가 없어요 👍</div>');
@@ -127,7 +127,7 @@ async function reports() {
 async function delPost(id) { if (!confirm('이 글을 삭제할까요? 댓글·좋아요도 같이 지워지고 되돌릴 수 없어요.')) return; await call('admin_delete_post', { p_id: id }); toast('삭제했어요'); go(tab); }
 async function clearRep(id) { await call('admin_clear_reports', { p_post_id: id }); toast('신고를 정리했어요. 글은 다시 보여요'); go(tab); }
 
-async function requests() {
+async function vRequests() {
   V('<div class="empty">불러오는 중...</div>');
   const list = await call('admin_menu_requests');
   if (!list.length) return V('<div class="empty">아직 메뉴 건의가 없어요</div>');
@@ -139,7 +139,7 @@ async function requests() {
 }
 async function delReq(btn) { await call('admin_delete_menu_request', { p_name: btn.dataset.name }); toast('정리했어요'); go(tab); }
 
-async function top() {
+async function vTop() {
   V('<div class="empty">불러오는 중...</div>');
   const list = await call('admin_top_menus', { p_days: 30 });
   if (!list.length) return V('<div class="empty">아직 추천 기록이 없어요</div>');
@@ -149,7 +149,7 @@ async function top() {
       <div class="bar" style="width:${Math.max(4, m.count / max * 100)}%"></div></div>`).join(''));
 }
 
-async function posts() {
+async function vPosts() {
   V('<div class="empty">불러오는 중...</div>');
   const list = await call('admin_recent_posts');
   if (!list.length) return V('<div class="empty">아직 글이 없어요</div>');
@@ -160,7 +160,7 @@ async function posts() {
       <div class="actions"><button class="danger" onclick="delPost('${esc(p.id)}')">삭제</button></div></div>`).join(''));
 }
 
-function settings() {
+function vSettings() {
   V(`<div style="font-size:14px;margin-bottom:10px">관리자 비밀번호 바꾸기</div>
      <input id="np1" type="password" placeholder="새 비밀번호 (10자 이상)" autocomplete="new-password">
      <input id="np2" type="password" placeholder="새 비밀번호 다시" autocomplete="new-password" style="margin-top:8px">
@@ -171,7 +171,7 @@ async function changePw() {
   if (a.length < 10) return toast('10자 이상으로 정해주세요');
   if (a !== b) return toast('두 번 입력한 비밀번호가 달라요');
   const ok = await call('admin_change_password', { p_new: a });
-  if (ok) { PASS = a; sessionStorage.setItem('omechuAdmin', a); toast('비밀번호를 바꿨어요'); settings(); }
+  if (ok) { PASS = a; sessionStorage.setItem('omechuAdmin', a); toast('비밀번호를 바꿨어요'); vSettings(); }
 }
 
 if (PASS) sb.rpc('admin_login', { p_pass: PASS }).then(({ data }) => data === true ? show() : logout());
