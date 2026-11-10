@@ -935,7 +935,7 @@
     <div id="preset-my-wrap" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px"></div>
   </div>
 
-  <div class="section-title">STEP 1 &nbsp; 어디서? <span class="sec-badge">필수</span></div>
+  <div class="section-title">1. 어디서 먹을까요? <span class="sec-badge">필수</span></div>
   <div class="cat-grid">
     <div class="cat-card" onclick="selectCat('cook')" id="cat-cook">
       <span class="cat-icon">👨‍🍳</span>
@@ -971,7 +971,7 @@
 
   <div id="filter-area" style="display:none">
     <div class="section-title">
-      STEP 2 &nbsp; 조건 선택
+      2. 조건 고르기
     </div>
 
     <div id="filter-tags" class="crave-mode">
@@ -2016,7 +2016,7 @@
   <div class="pwa-banner-icon">🍽️</div>
   <div class="pwa-banner-text">
     <div class="pwa-banner-title">홈화면에 추가하기</div>
-    <div class="pwa-banner-sub">앱처럼 바로 실행 가능해요!</div>
+    <div class="pwa-banner-sub">홈 화면에서 앱처럼 바로 열려요</div>
   </div>
   <div class="pwa-banner-btns">
     <button class="pwa-install-btn" id="pwa-install-btn">설치</button>
@@ -2325,17 +2325,11 @@
     <span style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text)">⚙️ 설정</span>
   </div>
   <div class="my-section">
-    <div class="my-setting-row" onclick="showToast('알림 설정은 앱 출시 후 오픈!')">
-      <span>🔔 알림 설정</span><span class="my-setting-arrow">›</span>
-    </div>
     <div class="my-setting-row" onclick="toggleTheme();this.querySelector('span:last-child').textContent=localStorage.getItem('wmjTheme')==='light'?'라이트':'다크'">
       <span>🌙 다크/라이트 모드</span><span style="font-size:11px;color:var(--orange)" id="theme-label">다크</span>
     </div>
     <div class="my-setting-row" onclick="showOnboarding()">
       <span>👋 앱 소개 다시 보기</span><span class="my-setting-arrow">›</span>
-    </div>
-    <div class="my-setting-row" onclick="showToast('공지사항 준비중!')">
-      <span>📢 공지사항</span><span class="my-setting-arrow">›</span>
     </div>
     <div class="my-setting-row" onclick="location.href='mailto:aihana.maker@gmail.com?subject=%5B%EC%98%A4%EB%A9%94%EC%B6%94%5D%20%EB%AC%B8%EC%9D%98'">
       <span>💌 문의/피드백</span><span class="my-setting-arrow">›</span>
@@ -2964,7 +2958,7 @@ function renderTasteAnalysis() {
   if (!el) return;
   const a = analyzeMyTaste();
   if (!a.ready) {
-    el.innerHTML = `<div style="font-size:12px;color:var(--muted);line-height:1.7">아직 분석할 기록이 부족해요 (${a.signals}/5)<br>추천 카드에서 ❤️ 좋아요나 😅 안땡겨를 누를수록 정확해져요.</div>`;
+    el.innerHTML = `<div style="font-size:12px;color:var(--muted);line-height:1.7">아직 분석할 기록이 부족해요 (${a.signals}/5)<br>추천 카드에서 ❤️ 좋아요나 😅 안 땡겨를 누를수록 정확해져요.</div>`;
     return;
   }
   const chip = (t, c) => `<span style="display:inline-block;padding:4px 10px;border-radius:14px;font-size:12px;margin:0 4px 6px 0;background:var(--surface);border:1px solid ${c};color:var(--text)">${t}</span>`;
@@ -4346,7 +4340,7 @@ const menuReviews = {
   '짬뽕':'칼칼하게 속 풀리는 맛','떡볶이':'야식으로 먹으면 행복해요',
   '후라이드 치킨':'맥주랑 조합이 끝내줘요 🍺','양념치킨':'달콤매콤 중독성 있어요',
   '초밥 세트':'데이트 때 분위기 좋아요','연어덮밥':'다이어트 중에도 든든해요',
-  '시저샐러드':'상큼하고 배 안 불러요','오마카세':'특별한 날에 최고의 선택',
+  '시저샐러드':'상큼하고 배 안 불러요','오마카세':'기념일에 먹기 좋아요',
   '오야코동':'부드럽고 포근한 맛이에요','닭가슴살 샐러드':'가볍고 맛있어요!',
 };
 
@@ -4604,7 +4598,7 @@ function renderResults(rejectPattern, flipIndex) {
           ${why}${kcalHtml}${review}
           <div class="result-actions">
             <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${getLikedMenus().some(m=>m.name===item.name)?'❤️':'🤍'} 좋아요</button>
-            <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">😅 안땡겨</button>
+            <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">😅 안 땡겨</button>
             ${selectedCat === 'cook'
               ? `<button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">📋 레시피</button>`
               : `<button class="result-btn" onclick="openNearbyMap('${item.name.replace(/'/g,"\\'")}')" style="color:var(--orange)">📍 근처 찾기</button>`}
@@ -5636,7 +5630,7 @@ async function confirmReportPost(postId) {
     showToast('🚨 신고가 접수됐어요. 이 글은 더 이상 보이지 않아요.');
   } catch (e) {
     console.warn('신고 저장 실패:', e?.message || String(e));
-    showToast('🚨 신고했어요. 이 글은 더 이상 보이지 않아요.');
+    showToast('🚨 신고가 접수됐어요. 이 글은 더 이상 보이지 않아요.');
   }
   renderCommFeed(currentCommTab);
 }
@@ -6324,7 +6318,7 @@ function renderNotifyPage() {
       <!-- 내용 -->
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;color:var(--text);margin-bottom:2px">
-          <strong>${n.nick}</strong>님이 ${n.text}
+          ${n.nick ? `<strong>${n.nick}</strong>님이 ` : ''}${n.text}
         </div>
         <div style="font-size:11px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${n.sub}</div>
         <div style="font-size:10px;color:var(--muted);margin-top:3px">${fmtCommDate(n.date)}</div>
@@ -8052,7 +8046,7 @@ function renderNotifySection() {
         <span style="position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:${TYPE_COLOR[n.type]};display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid var(--card)">${TYPE_ICON[n.type]}</span>
       </div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;color:var(--text);margin-bottom:1px"><strong>${n.nick}</strong>님이 ${n.text}</div>
+        <div style="font-size:12px;color:var(--text);margin-bottom:1px">${n.nick ? `<strong>${n.nick}</strong>님이 ` : ''}${n.text}</div>
         <div style="font-size:11px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${n.sub}</div>
         <div style="font-size:10px;color:var(--muted);margin-top:2px">${fmtCommDate(n.date)}</div>
       </div>
@@ -8656,8 +8650,8 @@ async function loadRealNotifications() {
       text: '댓글을 남겼어요', sub: '"' + escHtml((c.text || '').slice(0, 40)) + '"', date: new Date(c.created_at).getTime(),
     }));
     (lks || []).filter(l => l.user_key !== MY_USER_KEY).forEach(l => list.push({
-      id: 'l_' + l.target_id + '_' + l.user_key, type: 'like', avatar: '❤️', nick: '누군가',
-      text: '회원님의 글을 좋아해요', sub: textOf(l.target_id), date: l.created_at ? new Date(l.created_at).getTime() : Date.now(),
+      id: 'l_' + l.target_id + '_' + l.user_key, type: 'like', avatar: '❤️', nick: '',
+      text: '누군가 회원님의 글을 좋아해요', sub: textOf(l.target_id), date: l.created_at ? new Date(l.created_at).getTime() : Date.now(),
     }));
     list.forEach(n => n.read = read.has(n.id));
     notifications = list.sort((a, b) => b.date - a.date).slice(0, 30);
@@ -8711,16 +8705,6 @@ async function changeNickname(newNick) {
   if (newNick.trim().length > 12) { showToast('닉네임은 12자 이하여야 해요'); return; }
   const nick = newNick.trim();
 
-  // 변경 횟수 체크
-  try {
-    const { data: userData } = await sb.from('users').select('nick_change_count').eq('user_key', MY_USER_KEY).single();
-    const count = userData?.nick_change_count || 0;
-    if (count >= 3) {
-      showToast('닉네임 변경은 3회까지만 무료예요 🙏');
-      return;
-    }
-  } catch(_) {}
-
   // 중복 체크
   try {
     const { data: existing } = await sb.from('users').select('user_key').eq('nickname', nick).single();
@@ -8734,12 +8718,10 @@ async function changeNickname(newNick) {
   try {
     const res = await ownerRpc('set_my_nickname', { p_nick: nick });
     if (res === 'taken') { showToast('이미 사용 중인 닉네임이에요 😅'); return; }
-    if (res === 'limit') { showToast('닉네임 변경은 3회까지만 무료예요 🙏'); return; }
+    if (typeof res === 'string' && res.startsWith('wait:')) { showToast(`닉네임은 3일에 한 번 바꿀 수 있어요 (${nickWaitText(+res.slice(5))} 뒤 가능)`); return; }
     if (res !== 'ok') { showToast('닉네임을 바꾸지 못했어요. 잠시 후 다시 해주세요'); return; }
     localStorage.setItem('wmjMyNick', nick);
-    const { data: userData } = await sb.from('users').select('nick_change_count').eq('user_key', MY_USER_KEY).single();
-    const remaining = 3 - (userData?.nick_change_count || 0);
-    showToast(`✅ 닉네임이 변경됐어요! (남은 무료 변경: ${remaining}회)`);
+    showToast('✅ 닉네임이 변경됐어요! 다음 변경은 3일 뒤에 할 수 있어요');
   } catch(_) {
     localStorage.setItem('wmjMyNick', nick);
     showToast('✅ 닉네임이 변경됐어요!');
@@ -8755,11 +8737,11 @@ function openNicknameModal() {
   backdrop.innerHTML = `
     <div onclick="event.stopPropagation()" style="background:var(--card);border-radius:20px;padding:24px;width:100%;max-width:340px">
       <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px">닉네임 변경</div>
-      <div id="nick-change-count-label" style="font-size:11px;color:var(--muted);margin-bottom:16px">잔여 횟수 확인 중...</div>
-      <input id="nick-input" type="text" value="${current}" maxlength="12" placeholder="닉네임 (2~12자)"
+      <div id="nick-change-count-label" style="font-size:11px;color:var(--muted);margin-bottom:16px">3일에 한 번 바꿀 수 있어요</div>
+      <input id="nick-input" type="text" value="${escHtml(current)}" maxlength="12" placeholder="닉네임 (2~12자)"
         style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
         onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
-      <div style="font-size:11px;color:var(--muted);margin-top:6px">현재: ${current}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">현재: ${escHtml(current)}</div>
       <div style="display:flex;gap:8px;margin-top:14px">
         <button onclick="document.getElementById('nickname-modal').remove()"
           style="flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">취소</button>
@@ -8771,25 +8753,16 @@ function openNicknameModal() {
   document.body.appendChild(backdrop);
   setTimeout(() => document.getElementById('nick-input')?.focus(), 100);
 
-  // 잔여 횟수 불러오기
-  sb.from('users').select('nick_change_count').eq('user_key', MY_USER_KEY).single()
+  // 다음 변경 가능 시간 불러오기
+  sb.from('users').select('nick_changed_at').eq('user_key', MY_USER_KEY).single()
     .then(({ data }) => {
-      const count = data?.nick_change_count || 0;
-      const remaining = 3 - count;
       const label = document.getElementById('nick-change-count-label');
-      if (label) {
-        if (remaining <= 0) {
-          label.style.color = 'var(--red)';
-          label.textContent = '무료 변경 횟수를 모두 사용했어요';
-        } else {
-          label.textContent = `무료 변경 ${remaining}회 남음`;
-        }
-      }
-    }).catch(() => {
-      const label = document.getElementById('nick-change-count-label');
-      if (label) label.textContent = '무료 변경 3회 제공';
-    });
+      if (!label || !data?.nick_changed_at) return;
+      const hrs = Math.ceil((new Date(data.nick_changed_at).getTime() + 3 * 864e5 - Date.now()) / 36e5);
+      if (hrs > 0) { label.style.color = 'var(--red)'; label.textContent = `${nickWaitText(hrs)} 뒤에 다시 바꿀 수 있어요`; }
+    }).catch(() => {});
 }
+function nickWaitText(hrs) { return hrs >= 24 ? `${Math.ceil(hrs / 24)}일` : `${hrs}시간`; }
 
 // 앱 시작 시 닉네임 초기화
 initUserNickname();
