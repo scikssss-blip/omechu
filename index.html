@@ -8,6 +8,7 @@
 <!-- PWA -->
 <link rel="icon" type="image/png" href="icon-192.png">
   <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="pocha.css">
 <meta name="theme-color" content="#ff4757">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -909,6 +910,11 @@
     <span class="hero-emoji">🍽️</span>
     <h1>오늘 메뉴<br><em>추천해드려요</em></h1>
     <p>원하는 느낌을 고르거나, 싫은 것만 빼도 돼요</p>
+  </div>
+  <div class="pc-entry" onclick="showPage('pocha')">
+    <span style="font-size:28px">🏮</span>
+    <div><div class="t">오메추 포차</div><div class="s" id="pc-entry-home">모르는 사람과 한 테이블, 오늘 안주 같이 골라요</div></div>
+    <span class="go">들어가기</span>
   </div>
 
   <div class="mode-wrap">
@@ -2092,6 +2098,13 @@
   </div>
 </div>
 
+<!-- 오메추 포차 -->
+<div id="page-pocha"><div id="pocha-root"></div></div>
+<div id="pc-dress" onclick="if(event.target===this)Pocha.closeDress()"><div class="sheet">
+  <div style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text)">내 캐릭터 꾸미기</div>
+  <div id="pc-dress-body"></div>
+</div></div>
+
 <nav class="nav-bar bottom-nav">
   <button class="nav-item active" id="nav-home" onclick="showPage('home')">
     <div class="nav-icon-wrap"><span class="nav-icon">🏠</span></div>
@@ -2176,6 +2189,11 @@
 <div id="page-fun" style="display:none;max-width:480px;margin:0 auto;padding:0 16px 170px">
   <div style="padding:20px 0 16px">
     <span style="font-family:'Jua',sans-serif;font-size:24px;color:var(--text)">🎮 놀거리</span>
+  </div>
+  <div class="pc-entry" onclick="showPage('pocha')">
+    <span style="font-size:28px">🏮</span>
+    <div><div class="t">오메추 포차</div><div class="s" id="pc-entry-fun">모르는 사람과 한 테이블, 오늘 안주 같이 골라요</div></div>
+    <span class="go">들어가기</span>
   </div>
 
   <!-- 오늘의 급식 -->
@@ -4907,7 +4925,7 @@ updateCartBadge();
 renderFavSection();
 
 // ── 페이지 전환 ──
-const PAGES = ['main','page-community','page-cart','page-mypage','page-saved-posts','page-my-posts','page-fun','page-food-calendar','page-history','page-settings','page-notify'];
+const PAGES = ['main','page-pocha','page-community','page-cart','page-mypage','page-saved-posts','page-my-posts','page-fun','page-food-calendar','page-history','page-settings','page-notify'];
 // 내 활동 펼침 상태 유지: 그 하위(달력/저장글/내글)에 다녀오면 펼친 채로, 다른 메뉴 가면 접힘
 let keepActivityOpen = false;
 // ── 추천 히스토리 스냅샷 저장 ──
@@ -4933,6 +4951,7 @@ function saveHistorySnapshot() {
 
 function showPage(page) {
   window.scrollTo(0, 0);
+  if (page !== 'pocha' && window.Pocha) Pocha.close();
   if (page === 'settings') setTimeout(updateMapLabel, 0);
   // 내 활동 하위 페이지(달력/저장글/내글)로 가면 펼침 유지, 그 외 다른 메뉴면 접힘
   if (['food-calendar','saved-posts','my-posts'].includes(page)) keepActivityOpen = true;
@@ -5003,6 +5022,10 @@ function showPage(page) {
     document.getElementById('page-food-calendar').style.display = 'block';
     document.getElementById('nav-mypage').classList.add('active');
     renderFoodCalendar();
+  } else if (page === 'pocha') {
+    document.getElementById('page-pocha').style.display = 'block';
+    document.getElementById('nav-fun').classList.add('active');
+    Pocha.open();
   } else if (page === 'fun') {
     document.getElementById('page-fun').style.display = 'block';
     document.getElementById('nav-fun').classList.add('active');
@@ -9915,5 +9938,6 @@ img.twemoji {
   display: inline-block;
 }
 </style>
+<script src="pocha.js"></script>
 </body>
 </html>
