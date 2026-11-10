@@ -47,7 +47,7 @@
   let logs = {}, votes = {}, dishes = {}, bubbles = {};
   let muted = new Set(), lastSend = 0, rainCtx = null;
   let pos = { x: R.spawn[0], y: R.spawn[1] }, target = null, pendingSeat = null, pendingDoor = null, walkRAF = 0, follow = false;
-  let lastDrawn = {}, K = 1;   // K: 골목을 폰 폭에 맞추는 배율
+  let lastDrawn = {}, K = 1, isOpen = false;   // K: 골목을 폰 폭에 맞추는 배율
 
   const look = () => {
     try { return Object.assign({ color: COLORS[Math.floor(Math.random() * COLORS.length)], acc: 'towel', face: 'smile' }, JSON.parse(localStorage.getItem('wmjPochaLook') || '{}')); }
@@ -519,7 +519,9 @@
     if (follow) { const v = document.getElementById('pc-view'); if (v) { const cx = x * K - v.clientWidth / 2, cy = y * K - v.clientHeight / 2; v.scrollLeft += (cx - v.scrollLeft) * 0.12; v.scrollTop += (cy - v.scrollTop) * 0.12; } }
   }
   function roomCounts() {
-    const c = {}; Object.values(lobbyState).forEach(p => { c[p.room] = (c[p.room] || 0) + 1; }); return c;
+    const c = {}; Object.entries(lobbyState).forEach(([k, p]) => { const r = k === SID ? room : p.room; c[r] = (c[r] || 0) + 1; });
+    if (!lobbyState[SID] && isOpen) c[room] = (c[room] || 0) + 1;
+    return c;
   }
   function updateWorld() {
     const layer = document.getElementById('pc-people'); if (!layer) return;
@@ -612,13 +614,16 @@
     updateWorld(); renderPanel();
   }
 
+  // 위치 공유가 가끔 빠질 수 있어 열려 있는 동안 주기적으로 다시 알림
+  setInterval(() => { if (isOpen && !document.hidden) track(); }, 20000);
+
   // 투표 남은 시간 표시 갱신
   setInterval(() => { if (myTable !== null && votes[myTable] && !votes[myTable].done) render(); }, 1000);
 
   window.Pocha = { findWinner,
-    open(startRoom) { connectLobby(); trackLobby(); if (startRoom && ROOMS[startRoom] && startRoom !== room) enterRoom(startRoom); else { connectRoom(); render(); } },
+    open(startRoom) { isOpen = true; connectLobby(); trackLobby(); if (startRoom && ROOMS[startRoom] && startRoom !== room) enterRoom(startRoom); else { connectRoom(); render(); } },
     // 다른 화면으로 나가면 골목으로 돌아가고, 인원 집계에서도 빠진다
-    close() { if (room !== 'street') enterRoom('street'); if (lobby) { try { lobby.untrack(); } catch (e) {} } },
+    close() { isOpen = false; if (room !== 'street') enterRoom('street'); if (lobby) { try { lobby.untrack(); } catch (e) {} } },
     back() { if (room !== 'street') enterRoom('street'); else showPage('fun'); },
     go(id) { if (room !== 'street') return; const d = ROOMS[id]?.door; if (!d) return; pendingSeat = null; pendingDoor = id; walkTo(d[0], d[1]); },
     leave, sit, sitAny, stand, goSit, walkTo, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
