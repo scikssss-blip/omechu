@@ -186,7 +186,7 @@
       if (!target) { walkRAF = 0; return; }
       const dx = target.x - pos.x, dy = target.y - pos.y, d = Math.hypot(dx, dy), mv = SPEED * dt;
       if (d <= mv) {
-        pos = { ...target }; target = null; walkRAF = 0; drawMe(false);
+        pos = { ...target }; target = null; walkRAF = 0; drawMe(false); if (follow) centerOn(pos.x, pos.y, true);
         if (pendingSeat) { const ps = pendingSeat; pendingSeat = null; sitNow(ps.t, ps.s); } else { track(); render(); }
         return;
       }
