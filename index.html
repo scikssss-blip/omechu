@@ -2023,7 +2023,7 @@
 <div id="map-picker" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1100;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeMapPicker()">
   <div style="width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;padding:22px 20px 28px">
     <div style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text);margin-bottom:4px">어떤 지도로 열까요?</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:16px">한 번 고르면 다음부터 바로 열려요. 설정에서 언제든 바꿀 수 있어요.</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">한 번 고르면 다음부터 바로 열려요. 설정에서 언제든 바꿀 수 있어요.<br>📍 위치를 허용하면 지금 있는 곳 근처 가게를 찾아드려요.</div>
     <div style="display:flex;gap:10px">
       <button onclick="chooseMapApp('kakao')" style="flex:1;padding:16px 8px;border-radius:14px;border:1.5px solid var(--border);background:#FEE500;color:#191919;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">카카오맵</button>
       <button onclick="chooseMapApp('naver')" style="flex:1;padding:16px 8px;border-radius:14px;border:1.5px solid var(--border);background:#03C75A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">네이버지도</button>
@@ -2328,6 +2328,9 @@
     </div>
     <div class="my-setting-row" onclick="openMapPicker()">
       <span>🗺️ 지도 앱</span><span style="font-size:11px;color:var(--orange)" id="map-app-label">선택 안 함</span>
+    </div>
+    <div class="my-setting-row" onclick="toggleLocationSetting()">
+      <span>📍 현재 위치 사용</span><span style="font-size:11px;color:var(--orange)" id="location-label">허용 전</span>
     </div>
     <div class="my-setting-row" onclick="clearBlockedUsers()">
       <span>🚫 차단한 사용자 해제</span><span class="my-setting-arrow">›</span>
@@ -4663,7 +4666,8 @@ function openRecipe(menuName, emoji) {
   const modal = document.getElementById('recipe-modal');
   const box = document.getElementById('recipe-modal-box');
 
-  if (!r) {
+  const ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent((r && r.youtube) || (menuName + ' 레시피'));
+  if (!r || !(r.steps && r.steps.length)) {
     box.innerHTML = `
       <div class="recipe-header">
         <div class="recipe-title-row">
@@ -4672,8 +4676,16 @@ function openRecipe(menuName, emoji) {
         </div>
         <button class="recipe-close" onclick="closeRecipe()">✕</button>
       </div>
-      <div class="no-recipe">
-        😅 아직 레시피가 등록되지 않았어요.<br>곧 업데이트될 예정이에요!
+      ${r && r.calories ? `<div style="font-size:12px;color:var(--muted);text-align:center;margin:4px 0 10px">1인분 약 ${r.calories}kcal · 탄${r.carbs}g · 단${r.protein}g · 지${r.fat}g</div>` : ''}
+      <div class="no-recipe" style="padding-bottom:8px">
+        아직 오메추 레시피는 준비 중이에요.<br>유튜브에서 인기 레시피 영상을 바로 볼 수 있어요!
+      </div>
+      <div class="recipe-section" style="margin-top:8px">
+        <a href="${ytUrl}" target="_blank" rel="noopener"><button class="youtube-btn">▶ 유튜브에서 ${menuName} 레시피 보기</button></a>
+      </div>
+      <div class="recipe-section" style="margin-top:8px;padding-bottom:20px">
+        <a href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener"><button class="buy-all-btn">🛒 ${menuName} 재료·밀키트 보기</button></a>
+        ${SHOP_AFFILIATE.coupang.tracked ? '<div class="cp-disclaimer">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : ''}
       </div>`;
     modal.classList.add('show');
     return;
@@ -4763,7 +4775,7 @@ function openRecipe(menuName, emoji) {
     </div>
 
     <div class="recipe-section" style="margin-top:16px; padding-bottom:10px">
-      <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(r.youtube)}" target="_blank">
+      <a href="${ytUrl}" target="_blank" rel="noopener">
         <button class="youtube-btn">▶ 유튜브 레시피 영상 보기</button>
       </a>
     </div>
@@ -5492,31 +5504,86 @@ function reportCommPost(postId) {
   setTimeout(() => { if (bar.parentNode) bar.remove(); }, 5000);
 }
 
-// ── 지도 연결 ──
+// ── 지도 연결 (현재 위치 기준으로 근처 가게 찾기) ──
+const IS_ANDROID = /Android/i.test(navigator.userAgent);
+const APP_ID = location.hostname || 'omechu';
 const MAP_APPS = {
-  kakao: { name: '카카오맵', url: q => 'https://map.kakao.com/link/search/' + encodeURIComponent(q) },
-  naver: { name: '네이버지도', url: q => 'https://map.naver.com/p/search/' + encodeURIComponent(q) },
+  kakao: {
+    name: '카카오맵',
+    web: (q) => 'https://map.kakao.com/link/search/' + encodeURIComponent(q),
+    // 안드로이드: 카카오맵 앱으로 (없으면 웹으로)
+    intent: (q, pos) => `intent://search?q=${encodeURIComponent(q)}${pos ? `&p=${pos.lat},${pos.lng}` : ''}#Intent;scheme=kakaomap;package=net.daum.android.map;S.browser_fallback_url=${encodeURIComponent(MAP_APPS.kakao.web(q))};end`,
+  },
+  naver: {
+    name: '네이버지도',
+    web: (q, pos) => 'https://map.naver.com/p/search/' + encodeURIComponent(q) + (pos ? `?c=${pos.lng},${pos.lat},15,0,0,0,dh` : ''),
+    intent: (q, pos) => `intent://search?query=${encodeURIComponent(q)}&appname=${APP_ID}#Intent;scheme=nmap;package=com.nhn.android.nmap;S.browser_fallback_url=${encodeURIComponent(MAP_APPS.naver.web(q, pos))};end`,
+  },
 };
 let pendingMapQuery = null;
 function getMapApp() { const v = localStorage.getItem('wmjMapApp'); return MAP_APPS[v] ? v : null; }
-function updateMapLabel() {
-  const el = document.getElementById('map-app-label');
-  if (el) el.textContent = getMapApp() ? MAP_APPS[getMapApp()].name : '선택 안 함';
+
+// 위치: 이 기기 안에서만 쓰고 서버로 보내지 않음 (15분 동안 재사용)
+function getCachedPos() {
+  try { const p = JSON.parse(localStorage.getItem('wmjLastPos') || 'null'); return p && Date.now() - p.t < 15 * 60 * 1000 ? p : null; } catch(e) { return null; }
 }
-function openNearbyMap(menuName) {
+function requestPos(timeoutMs = 6000) {
+  return new Promise(resolve => {
+    if (!navigator.geolocation || localStorage.getItem('wmjUseLocation') === 'off') return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      p => { const pos = { lat: +p.coords.latitude.toFixed(5), lng: +p.coords.longitude.toFixed(5), t: Date.now() };
+             localStorage.setItem('wmjLastPos', JSON.stringify(pos)); localStorage.setItem('wmjUseLocation', 'on'); updateLocationLabel(); resolve(pos); },
+      err => { if (err.code === 1) { localStorage.setItem('wmjUseLocation', 'denied'); updateLocationLabel(); } resolve(null); },
+      { enableHighAccuracy: false, timeout: timeoutMs, maximumAge: 10 * 60 * 1000 }
+    );
+  });
+}
+function openUrl(url) { const w = window.open(url, '_blank'); if (!w) location.href = url; }
+function launchMap(app, q, pos) {
+  const A = MAP_APPS[app];
+  openUrl(IS_ANDROID ? A.intent(q, pos) : A.web(q, pos));
+}
+async function openNearbyMap(menuName) {
   const app = getMapApp();
   if (!app) { pendingMapQuery = menuName; openMapPicker(); return; }
-  window.open(MAP_APPS[app].url(menuName), '_blank');
+  let pos = getCachedPos();
+  if (!pos) { showToast('📍 현재 위치 확인 중...'); pos = await requestPos(); }
+  launchMap(app, menuName, pos);
 }
 function openMapPicker() { document.getElementById('map-picker').style.display = 'flex'; }
 function closeMapPicker() { document.getElementById('map-picker').style.display = 'none'; pendingMapQuery = null; }
-function chooseMapApp(app) {
+async function chooseMapApp(app) {
   localStorage.setItem('wmjMapApp', app);
   updateMapLabel();
   const q = pendingMapQuery;
   closeMapPicker();
   showToast(`🗺️ 앞으로 ${MAP_APPS[app].name}로 열게요`);
-  if (q) window.open(MAP_APPS[app].url(q), '_blank');
+  if (q) { const pos = getCachedPos() || await requestPos(); launchMap(app, q, pos); }
+}
+function updateMapLabel() {
+  const el = document.getElementById('map-app-label');
+  if (el) el.textContent = getMapApp() ? MAP_APPS[getMapApp()].name : '선택 안 함';
+  updateLocationLabel();
+}
+function updateLocationLabel() {
+  const el = document.getElementById('location-label');
+  if (!el) return;
+  const v = localStorage.getItem('wmjUseLocation');
+  el.textContent = v === 'on' ? '사용 중' : v === 'off' ? '사용 안 함' : v === 'denied' ? '차단됨' : '허용 전';
+}
+async function toggleLocationSetting() {
+  const v = localStorage.getItem('wmjUseLocation');
+  if (v === 'on') {
+    localStorage.setItem('wmjUseLocation', 'off'); localStorage.removeItem('wmjLastPos');
+    showToast('📍 위치를 쓰지 않을게요'); updateLocationLabel(); return;
+  }
+  localStorage.removeItem('wmjUseLocation');
+  const pos = await requestPos(8000);
+  if (pos) showToast('📍 현재 위치로 근처 가게를 찾아드릴게요');
+  else if (localStorage.getItem('wmjUseLocation') === 'denied')
+    alert('위치 권한이 꺼져 있어요.\n폰 설정(또는 브라우저 주소창 왼쪽 자물쇠 아이콘)에서 이 앱의 위치 권한을 허용해 주세요.');
+  else showToast('위치를 가져오지 못했어요. 잠시 후 다시 시도해 주세요');
+  updateLocationLabel();
 }
 
 // ── 신고·차단 ──
