@@ -52,8 +52,8 @@
   let lastDrawn = {}, K = 1, isOpen = false;   // K: 골목을 폰 폭에 맞추는 배율
 
   const look = () => {
-    try { return Object.assign({ color: COLORS[Math.floor(Math.random() * COLORS.length)], acc: 'towel', face: 'smile' }, JSON.parse(localStorage.getItem('wmjPochaLook') || '{}')); }
-    catch (e) { return { color: COLORS[0], acc: 'towel', face: 'smile' }; }
+    try { return Object.assign({ kind: 'onigiri', color: COLORS[Math.floor(Math.random() * COLORS.length)], acc: 'none', face: 'smile' }, JSON.parse(localStorage.getItem('wmjPochaLook') || '{}')); }
+    catch (e) { return { kind: 'onigiri', color: COLORS[0], acc: 'none', face: 'smile' }; }
   };
   let me = look();
   const esc = (v) => (typeof escHtml === 'function' ? escHtml(String(v ?? '')) : String(v ?? '').replace(/[&<>"']/g, ''));
@@ -71,6 +71,7 @@
     const table = okTable(p.table) ? p.table : null;
     return {
       nick: String(p.nick ?? '손님').slice(0, 12),
+      kind: window.FoodChars && FoodChars.IDS.includes(p.kind) ? p.kind : 'onigiri',
       color: COLORS.includes(p.color) ? p.color : COLORS[6],
       acc: ACC_KEYS.includes(p.acc) ? p.acc : 'none',
       face: FACE_KEYS.includes(p.face) ? p.face : 'smile',
@@ -82,27 +83,11 @@
     };
   }
 
-  // ── 캐릭터 그림 (오리지널 '주먹밥' 캐릭터) ──
+  // ── 캐릭터 그림: 음식 친구들 16종 (pocha-chars.js, 크레파스 그림체) ──
   function avatarSVG(l, size = 64) {
-    const c = l.color || '#f5f0e8';
-    const eyes = {
-      smile: '<circle cx="23" cy="34" r="2.6" fill="#2b2b2b"/><circle cx="41" cy="34" r="2.6" fill="#2b2b2b"/><path d="M27 41 q5 5 10 0" stroke="#2b2b2b" stroke-width="2.2" fill="none" stroke-linecap="round"/>',
-      happy: '<path d="M20 35 q3-4 6 0 M38 35 q3-4 6 0" stroke="#2b2b2b" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M26 40 q6 7 12 0 z" fill="#e2564b"/>',
-      sleepy: '<path d="M20 35 h6 M38 35 h6" stroke="#2b2b2b" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="32" cy="42" rx="2.5" ry="2" fill="#2b2b2b"/>',
-      wow: '<circle cx="23" cy="34" r="3.2" fill="#2b2b2b"/><circle cx="41" cy="34" r="3.2" fill="#2b2b2b"/><ellipse cx="32" cy="43" rx="3" ry="4" fill="#2b2b2b"/>',
-    }[l.face] || '';
-    const acc = {
-      towel: '<path d="M10 22 q22-10 44 0 l-2 6 q-20-8-40 0 z" fill="#fff" stroke="#ddd"/><path d="M51 24 l8 -3 l-1 7 z" fill="#fff" stroke="#ddd"/>',
-      beanie: '<path d="M12 24 q20-22 40 0 z" fill="#e2564b"/><rect x="10" y="21" width="44" height="6" rx="3" fill="#b83b31"/><circle cx="32" cy="7" r="4" fill="#fff"/>',
-      glasses: '<circle cx="23" cy="34" r="6.5" fill="none" stroke="#2b2b2b" stroke-width="2"/><circle cx="41" cy="34" r="6.5" fill="none" stroke="#2b2b2b" stroke-width="2"/><path d="M29.5 34 h5" stroke="#2b2b2b" stroke-width="2"/>',
-      ribbon: '<path d="M32 16 l-10 -6 v12 z M32 16 l10 -6 v12 z" fill="#ff6b9a"/><circle cx="32" cy="16" r="3" fill="#e0457a"/>',
-      chef: '<rect x="18" y="12" width="28" height="10" rx="3" fill="#fff" stroke="#ddd"/><circle cx="22" cy="10" r="6" fill="#fff"/><circle cx="32" cy="7" r="7" fill="#fff"/><circle cx="42" cy="10" r="6" fill="#fff"/>',
-    }[l.acc] || '';
-    return `<svg class="pc-ava" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true">
-      <path d="M32 10 C46 10 56 30 57 44 C58 54 48 58 32 58 C16 58 6 54 7 44 C8 30 18 10 32 10 Z" fill="${c}" stroke="rgba(0,0,0,.18)" stroke-width="1.5"/>
-      <rect x="18" y="47" width="28" height="10" rx="3" fill="#2b3a2e"/>
-      <ellipse cx="17" cy="41" rx="4" ry="2.5" fill="#ff8a8a" opacity=".55"/><ellipse cx="47" cy="41" rx="4" ry="2.5" fill="#ff8a8a" opacity=".55"/>
-      ${eyes}${acc}</svg>`;
+    if (!window.FoodChars) return '';
+    const src = FoodChars.url(l.kind || 'onigiri', l.color || COLORS[0], l.acc || 'none', l.face || 'smile', size <= 60);
+    return `<img class="pc-ava" width="${size}" height="${size}" src="${src}" alt="" draggable="false">`;
   }
 
   // ── 접속: 골목 채널(어느 가게에 있는지) ──
@@ -126,7 +111,7 @@
   function trackLobby() {
     if (!lobby) return;
     const dest = target || pos;
-    return lobby.track({ nick: nick(), color: me.color, acc: me.acc, face: me.face, room, x: Math.round(dest.x), y: Math.round(dest.y) });
+    return lobby.track({ nick: nick(), kind: me.kind, color: me.color, acc: me.acc, face: me.face, room, x: Math.round(dest.x), y: Math.round(dest.y) });
   }
   // ── 접속: 가게 채널 ──
   function connectRoom() {
@@ -187,7 +172,7 @@
     trackLobby();
     if (!ch || room === 'street') return;
     const dest = target || pos;
-    return ch.track({ nick: nick(), color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, at: seatAt, x: Math.round(dest.x), y: Math.round(dest.y) });
+    return ch.track({ nick: nick(), kind: me.kind, color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, at: seatAt, x: Math.round(dest.x), y: Math.round(dest.y) });
   }
 
   // ── 걷는 위치는 메시지(broadcast)로, 위치 공유(presence)는 상태가 바뀔 때만 ──
@@ -417,18 +402,37 @@
   // ── 꾸미기 ──
   function openDress() { document.getElementById('pc-dress').style.display = 'flex'; renderDress(); }
   function closeDress() { document.getElementById('pc-dress').style.display = 'none'; }
-  function setLook(k, v) { me[k] = v; localStorage.setItem('wmjPochaLook', JSON.stringify(me)); renderDress(); track(); render(); }
+  function setLook(k, v) {
+    if (k === 'kind' && !(window.FoodChars && FoodChars.isOpen(v))) { const pr = FoodChars.progress(v); showToast(`🔒 ${pr.label}에 좋아요를 ${pr.need}번 누르면 열려요 (지금 ${pr.have}번)`); return; }
+    me[k] = v; const { face_dir, ...save } = me; localStorage.setItem('wmjPochaLook', JSON.stringify(save)); renderDress(); track(); render();
+  }
   function renderDress() {
-    const el = document.getElementById('pc-dress-body'); if (!el) return;
+    const el = document.getElementById('pc-dress-body'); if (!el || !window.FoodChars) return;
+    if (!FoodChars.isOpen(me.kind)) me.kind = 'onigiri';
+    const chars = FoodChars.IDS.map(id => { const pr = FoodChars.progress(id); const on = me.kind === id;
+      return `<button class="pc-char ${on ? 'on' : ''} ${pr.open ? '' : 'locked'}" onclick="Pocha.setLook('kind','${id}')" aria-label="${FoodChars.name(id)}${pr.open ? '' : ' (잠김)'}">
+        <img src="${FoodChars.url(id, me.color, 'none', 'smile', false)}" alt="">${pr.open ? '' : `<span class="lock">🔒 ${pr.have}/${pr.need}</span>`}<span class="nm">${FoodChars.name(id)}</span></button>`; }).join('');
+    const openN = FoodChars.IDS.filter(FoodChars.isOpen).length;
     el.innerHTML = `
-      <div class="pc-preview">${avatarSVG(me, 96)}</div>
-      <div style="font-size:12px;color:var(--muted)">색깔</div>
-      <div class="pc-opts">${COLORS.map(c => `<button class="pc-swatch ${me.color === c ? 'on' : ''}" style="background:${c}" onclick="Pocha.setLook('color','${c}')"></button>`).join('')}</div>
+      <div class="pc-preview">${avatarSVG(me, 112)}</div>
+      <div style="font-size:12px;color:var(--muted)">음식 친구 <b style="color:var(--text)">${openN}</b>/${FoodChars.IDS.length} · 메뉴에 좋아요를 누르면 새 친구가 열려요</div>
+      <div class="pc-chars">${chars}</div>
+      <div style="font-size:12px;color:var(--muted)">신발 색</div>
+      <div class="pc-opts">${COLORS.map(c => `<button class="pc-swatch ${me.color === c ? 'on' : ''}" style="background:${c}" aria-label="신발 색" onclick="Pocha.setLook('color','${c}')"></button>`).join('')}</div>
       <div style="font-size:12px;color:var(--muted)">소품</div>
       <div class="pc-opts">${ACCS.map(([k, n]) => `<button class="${me.acc === k ? 'on' : ''}" onclick="Pocha.setLook('acc','${k}')">${n}</button>`).join('')}</div>
       <div style="font-size:12px;color:var(--muted)">표정</div>
       <div class="pc-opts">${FACES.map(([k, n]) => `<button class="${me.face === k ? 'on' : ''}" onclick="Pocha.setLook('face','${k}')">${n}</button>`).join('')}</div>
       <button class="cta-btn crave-btn" style="margin-top:4px" onclick="Pocha.closeDress()">이걸로 할게요</button>`;
+  }
+  // 새로 열린 친구 알림
+  function checkNewFriends() {
+    if (!window.FoodChars) return;
+    let seen = []; try { seen = JSON.parse(localStorage.getItem('wmjPochaUnlocked') || '[]'); } catch (e) {}
+    const now = FoodChars.IDS.filter(FoodChars.isOpen);
+    const fresh = now.filter(id => !seen.includes(id) && FoodChars.BY[id][8]);
+    localStorage.setItem('wmjPochaUnlocked', JSON.stringify(now));
+    if (fresh.length && seen.length) showToast(`🎉 새 친구 ${fresh.map(FoodChars.name).join(', ')}이(가) 생겼어요! 꾸미기에서 바꿔 보세요`);
   }
 
   // ══════════ 그림: 골목과 가게 ══════════
@@ -597,7 +601,7 @@
     const layer = document.getElementById('pc-people'); if (!layer) return;
     const people = {};
     Object.entries(state).forEach(([sid, p]) => { if (room !== 'street' || p.room === 'street') people[sid] = p; });
-    people[SID] = { nick: nick(), color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, x: pos.x, y: pos.y };
+    people[SID] = { nick: nick(), kind: me.kind, color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, x: pos.x, y: pos.y };
     const seen = new Set();
     Object.entries(people).forEach(([sid, p]) => {
       seen.add(sid);
@@ -695,7 +699,7 @@
   setInterval(() => { if (myTable !== null && votes[myTable] && !votes[myTable].done) render(); }, 1000);
 
   window.Pocha = { findWinner,
-    open(startRoom) { isOpen = true; connectLobby(); trackLobby(); if (startRoom && ROOMS[startRoom] && startRoom !== room) enterRoom(startRoom); else { connectRoom(); render(); } },
+    open(startRoom) { isOpen = true; checkNewFriends(); connectLobby(); trackLobby(); if (startRoom && ROOMS[startRoom] && startRoom !== room) enterRoom(startRoom); else { connectRoom(); render(); } },
     // 다른 화면으로 나가면 골목으로 돌아가고, 인원 집계에서도 빠진다
     close() { isOpen = false; if (room !== 'street') enterRoom('street'); if (lobby) { try { lobby.untrack(); } catch (e) {} } },
     back() { if (room !== 'street') enterRoom('street'); else showPage('fun'); },

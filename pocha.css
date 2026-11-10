@@ -110,3 +110,13 @@
 .pc-bubble.pc-emo { font-size:28px; background:transparent; box-shadow:none; padding:0; animation:pcPop .4s ease-out; }
 .pc-bubble.pc-emo::after { display:none; }
 @keyframes pcPop { 0% { transform:translateX(-50%) scale(.3); opacity:0; } 70% { transform:translateX(-50%) scale(1.25); } 100% { transform:translateX(-50%) scale(1); opacity:1; } }
+
+/* 음식 친구 고르기 */
+.pc-chars { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; max-height:260px; overflow-y:auto; padding:2px; }
+.pc-char { position:relative; background:#fbf6ea; border:2px solid transparent; border-radius:14px; padding:4px 2px 6px; cursor:pointer; display:flex; flex-direction:column; align-items:center; font-family:'Jua',sans-serif; }
+.pc-char img { width:58px; height:58px; }
+.pc-char .nm { font-size:11px; color:#4a3426; margin-top:-2px; }
+.pc-char.on { border-color:#ff7a1a; box-shadow:0 0 0 2px rgba(255,122,26,.25); }
+.pc-char.locked img { filter:grayscale(1) brightness(.7); opacity:.55; }
+.pc-char .lock { position:absolute; top:4px; right:4px; font-size:10px; background:rgba(0,0,0,.55); color:#fff; border-radius:8px; padding:1px 5px; font-family:sans-serif; }
+.pc-preview { background:#fbf6ea; border-radius:18px; }
