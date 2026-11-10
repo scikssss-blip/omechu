@@ -174,8 +174,13 @@
   function walkTo(x, y) {
     x = Math.max(16, Math.min(W - 16, x)); y = Math.max(30, Math.min(H - 10, y));
     target = { x, y }; follow = true; track(); render();
-    // 화면이 가려져 있을 때도 멈추지 않게(백그라운드에선 rAF가 멈춤)
-    const next = (fn) => document.hidden ? setTimeout(() => fn(performance.now()), 100) : requestAnimationFrame(fn);
+    // 화면이 가려져 있을 때도 멈추지 않게
+    const next = (fn) => {   // 보통은 화면 주사율(rAF)로, rAF가 멈춘 환경에선 타이머로 대신
+      let done = false;
+      const id = requestAnimationFrame((t) => { if (!done) { done = true; clearTimeout(to); fn(t); } });
+      const to = setTimeout(() => { if (!done) { done = true; cancelAnimationFrame(id); fn(performance.now()); } }, 80);
+      return 1;
+    };
     if (!walkRAF) { let last = performance.now(); const step = (now) => {
       const dt = Math.min(0.3, (now - last) / 1000); last = now;
       if (!target) { walkRAF = 0; return; }
