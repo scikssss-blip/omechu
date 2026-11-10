@@ -120,3 +120,10 @@
 .pc-char.locked img { filter:grayscale(1) brightness(.7); opacity:.55; }
 .pc-char .lock { position:absolute; top:4px; right:4px; font-size:10px; background:rgba(0,0,0,.55); color:#fff; border-radius:8px; padding:1px 5px; font-family:sans-serif; }
 .pc-preview { background:#fbf6ea; border-radius:18px; }
+
+.pc-doorcount.hot { background:#c8102e; color:#fff; }
+.pc-tabs { display:flex; gap:6px; margin-bottom:8px; }
+.pc-tabs button { flex:1; position:relative; padding:9px 4px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--muted); font-size:12px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+.pc-tabs button.on { background:#ff7a1a; border-color:#ff7a1a; color:#2b1300; }
+.pc-tabs .dot { position:absolute; top:-6px; right:-4px; min-width:18px; height:18px; border-radius:9px; background:#c8102e; color:#fff; font-size:10px; line-height:18px; padding:0 4px; }
+.pc-trow .pc-ghost { background:var(--surface); color:var(--text); border:1px solid var(--border); }
