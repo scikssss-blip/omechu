@@ -5,7 +5,14 @@
 // - 오메추 추천 엔진으로 '오늘의 안주' 투표
 // ═════════════════════════════════════════════
 (function () {
-  const TABLES = 3, SEATS = 4;
+  const TABLES = 4, SEATS = 4;                                  // 0~2: 천막 테이블, 3: 혼술 바
+  const W = 720, H = 960, SPEED = 170;                          // 골목 크기(px), 걷는 속도(px/초)
+  const TABLE_POS = [[180, 250], [540, 250], [180, 720], [540, 720]];
+  const TABLE_NAME = ['1번 테이블', '2번 테이블', '3번 테이블', '이모네 바'];
+  const SEAT_OFF = [[-74, -4], [74, -4], [-44, 58], [44, 58]];   // 둥근 테이블 둘레
+  const BAR_OFF = [[-81, 40], [-27, 40], [27, 40], [81, 40]];    // 바 의자 한 줄
+  const seatXY = (t, s) => { const [cx, cy] = TABLE_POS[t], o = (t === 3 ? BAR_OFF : SEAT_OFF)[s]; return [cx + o[0], cy + o[1]]; };
+  const SPAWN = [360, 900];
   const SID = Math.random().toString(36).slice(2, 10);          // 이번 접속용 임시 ID (개인 식별 X)
   const COLORS = ['#ffb3a7', '#ffd36b', '#a8e6a1', '#9ad0ff', '#c9b6ff', '#ffb3de', '#f5f0e8', '#ffa94d'];
   const ACCS = [['none', '없음'], ['towel', '수건 머리띠'], ['beanie', '털모자'], ['glasses', '안경'], ['ribbon', '리본'], ['chef', '요리사 모자']];
@@ -21,6 +28,8 @@
   let muted = new Set();
   let lastSend = 0;
   let rainCtx = null;
+  let pos = { x: SPAWN[0], y: SPAWN[1] }, target = null, pendingSeat = null, walkRAF = 0, follow = false;
+  const lastDrawn = {};          // sid -> {x, y} 다른 손님 이동 애니메이션용
 
   const look = () => {
     try { return Object.assign({ color: COLORS[Math.floor(Math.random() * COLORS.length)], acc: 'towel', face: 'smile' }, JSON.parse(localStorage.getItem('wmjPochaLook') || '{}')); }
@@ -45,6 +54,8 @@
       face: FACE_KEYS.includes(p.face) ? p.face : 'smile',
       table, seat: table !== null && okSeat(p.seat) ? p.seat : null,
       at: typeof p.at === 'number' && isFinite(p.at) ? p.at : Date.now(),
+      x: Number.isFinite(p.x) ? Math.max(0, Math.min(W, Math.round(p.x))) : SPAWN[0],
+      y: Number.isFinite(p.y) ? Math.max(0, Math.min(H, Math.round(p.y))) : SPAWN[1],
     };
   }
 
@@ -120,29 +131,74 @@
     });
   }
   function disconnect() { if (ch) { try { sb.removeChannel(ch); } catch (e) {} ch = null; joined = false; myTable = null; mySeat = null; state = {}; } }
-  function track() { if (!ch) return; return ch.track({ nick: nick(), color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, at: seatAt }); }
+  function track() {
+    if (!ch) return;
+    const dest = target || pos;
+    return ch.track({ nick: nick(), color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, at: seatAt, x: Math.round(dest.x), y: Math.round(dest.y) });
+  }
 
   // ── 자리 ──
   const seatedAt = (t) => Object.entries(state).filter(([, p]) => p.table === t && p.seat !== null && p.seat !== undefined).map(([sid, p]) => ({ ...p, sid }));
+  const seatTaken = (t, s) => seatedAt(t).some(p => p.sid !== SID && p.seat === s);
   function freeSeat(t) {
-    const taken = new Set(seatedAt(t).filter(p => p.sid !== SID).map(p => p.seat));
-    for (let s = 0; s < SEATS; s++) if (!taken.has(s)) return s;
+    for (let s = 0; s < SEATS; s++) if (!seatTaken(t, s)) return s;
     return null;
   }
-  async function sit(t) {
+  // 걸어가서 앉기
+  function goSit(t, s) {
     if (!joined) { showToast('포차에 연결하는 중이에요. 잠시만요!'); return; }
-    const s = freeSeat(t);
-    if (s === null) { showToast('그 테이블은 자리가 꽉 찼어요 😅'); return; }
+    if (seatTaken(t, s)) { showToast('누가 앉아 있는 자리예요'); return; }
+    if (myTable !== null) { myTable = null; mySeat = null; }
+    pendingSeat = { t, s };
+    const [x, y] = seatXY(t, s); walkTo(x, y);
+  }
+  async function sitNow(t, s) {
+    if (seatTaken(t, s)) { const f = freeSeat(t); if (f === null) { showToast('그 테이블은 자리가 꽉 찼어요 😅'); return; } s = f; const [x, y] = seatXY(t, s); pos = { x, y }; }
     myTable = t; mySeat = s; seatAt = Date.now();
     await track(); sys(t, '자리에 앉았어요. 옆 사람에게 인사해 보세요 👋'); render();
   }
+  async function sit(t) { const s = freeSeat(t); if (s === null) { showToast('그 테이블은 자리가 꽉 찼어요 😅'); return; } goSit(t, s); }
   async function sitAny() {
     let best = null, bestN = -1;
     for (let t = 0; t < TABLES; t++) { const n = seatedAt(t).filter(p => p.sid !== SID).length; if (n < SEATS && n > bestN) { best = t; bestN = n; } }
     if (best === null) { showToast('지금은 모든 자리가 꽉 찼어요 😅'); return; }
     sit(best);
   }
-  async function stand() { myTable = null; mySeat = null; await track(); render(); }
+  async function stand() {
+    if (myTable === null) return;
+    const [x, y] = seatXY(myTable, mySeat); myTable = null; mySeat = null; pos = { x, y: y + 34 };
+    await track(); render();
+  }
+
+  // ── 걷기 ──
+  function walkTo(x, y) {
+    x = Math.max(16, Math.min(W - 16, x)); y = Math.max(30, Math.min(H - 10, y));
+    target = { x, y }; follow = true; track(); render();
+    if (!walkRAF) { let last = performance.now(); const step = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      if (!target) { walkRAF = 0; return; }
+      const dx = target.x - pos.x, dy = target.y - pos.y, d = Math.hypot(dx, dy), mv = SPEED * dt;
+      if (d <= mv) {
+        pos = { ...target }; target = null; walkRAF = 0; drawMe(false);
+        if (pendingSeat) { const ps = pendingSeat; pendingSeat = null; sitNow(ps.t, ps.s); } else { track(); render(); }
+        return;
+      }
+      pos = { x: pos.x + dx / d * mv, y: pos.y + dy / d * mv }; me.face_dir = dx < 0 ? -1 : 1;
+      drawMe(true); walkRAF = requestAnimationFrame(step);
+    }; walkRAF = requestAnimationFrame(step); }
+  }
+  function onWorldTap(e) {
+    const world = document.getElementById('pc-world'); if (!world) return;
+    const r = world.getBoundingClientRect(); const x = e.clientX - r.left, y = e.clientY - r.top;
+    // 빈 의자 근처를 눌렀으면 걸어가서 앉기
+    for (let t = 0; t < TABLES; t++) for (let s = 0; s < SEATS; s++) {
+      const [sx, sy] = seatXY(t, s);
+      if (Math.hypot(sx - x, sy - y) < 30 && !(t === myTable && s === mySeat)) { if (!seatTaken(t, s)) { goSit(t, s); return; } }
+    }
+    if (myTable !== null) { const [sx, sy] = seatXY(myTable, mySeat); myTable = null; mySeat = null; pos = { x: sx, y: sy + 34 }; }
+    pendingSeat = null; walkTo(x, y);
+  }
+
   // 같은 자리를 두 명이 잡으면 먼저 앉은 사람이 우선
   function resolveSeatConflict() {
     if (myTable === null) return;
@@ -233,49 +289,126 @@
       <button class="cta-btn crave-btn" style="margin-top:4px" onclick="Pocha.closeDress()">이걸로 할게요</button>`;
   }
 
-  // ── 화면 ──
-  function seatHTML(t, s) {
-    const p = seatedAt(t).find(x => x.seat === s);
-    if (!p) return `<div class="pc-seat empty">${avatarSVG({ color: '#888', acc: 'none', face: 'sleepy' }, 56)}<div class="pc-stool"></div><div class="pc-name" style="color:#8a85a8">빈자리</div></div>`;
-    const b = bubbles[p.sid]; const showB = b && b.until > Date.now();
-    return `<div class="pc-seat ${p.sid === SID ? 'me' : ''} ${showB && b.cheers ? 'cheers' : ''}" onclick="Pocha.mute('${p.sid}')">
-      ${showB ? `<div class="pc-bubble">${esc(b.text)}</div>` : ''}
-      ${avatarSVG(p, 56)}<div class="pc-stool"></div><div class="pc-name">${esc(p.nick)}${p.sid === SID ? ' (나)' : ''}</div></div>`;
+  // ── 화면: 골목 지도 ──
+  function worldSVG() {
+    const tent = (t) => {
+      const [cx, cy] = TABLE_POS[t];
+      if (t === 3) return `<g transform="translate(${cx} ${cy})">
+        <rect x="-120" y="-92" width="240" height="190" rx="14" fill="#3a2a26"/>
+        <rect x="-120" y="-92" width="240" height="26" rx="10" fill="url(#pcAwnO)"/>
+        <rect x="-104" y="-30" width="208" height="40" rx="8" fill="#7a4b2a"/><rect x="-104" y="-30" width="208" height="8" rx="4" fill="#94603a"/>
+        <g fill="#ffd36b"><rect x="-80" y="-58" width="10" height="18" rx="2"/><rect x="-60" y="-58" width="10" height="18" rx="2" fill="#7fd3a0"/><rect x="60" y="-58" width="24" height="20" rx="4" fill="#cfd8e3"/></g>
+        ${BAR_OFF.map(([x, y]) => `<ellipse cx="${x}" cy="${y + 10}" rx="17" ry="8" fill="#1d4ca3"/><ellipse cx="${x}" cy="${y + 6}" rx="17" ry="8" fill="#2d6cdf"/>`).join('')}
+        <text x="0" y="-104" class="pc-tname">${TABLE_NAME[t]}</text></g>`;
+      return `<g transform="translate(${cx} ${cy})">
+        <rect x="-120" y="-100" width="240" height="210" rx="14" fill="#3a2a26"/>
+        <rect x="-120" y="-100" width="240" height="26" rx="10" fill="url(#pcAwnR)"/>
+        ${SEAT_OFF.map(([x, y]) => `<ellipse cx="${x}" cy="${y + 10}" rx="17" ry="8" fill="#1d4ca3"/><ellipse cx="${x}" cy="${y + 6}" rx="17" ry="8" fill="#2d6cdf"/>`).join('')}
+        <ellipse cx="0" cy="16" rx="52" ry="30" fill="#8f1a12"/><ellipse cx="0" cy="10" rx="52" ry="30" fill="#e2564b"/><ellipse cx="0" cy="6" rx="40" ry="20" fill="#ff6b5e" opacity=".35"/>
+        <text x="0" y="-112" class="pc-tname">${TABLE_NAME[t]}</text></g>`;
+    };
+    const lamps = [[60, 470], [240, 470], [480, 470], [660, 470], [300, 640], [420, 640], [300, 830], [420, 830]];
+    return `<svg class="pc-map" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">
+      <defs>
+        <pattern id="pcBrick" width="32" height="32" patternUnits="userSpaceOnUse"><rect width="32" height="32" fill="#231e2b"/><path d="M0 16h32M16 0v16M0 32h32M0 16v16M32 16v16" stroke="#2c2636" stroke-width="1.2"/></pattern>
+        <pattern id="pcAwnR" width="36" height="26" patternUnits="userSpaceOnUse"><rect width="18" height="26" fill="#e2564b"/><rect x="18" width="18" height="26" fill="#fff1e6"/></pattern>
+        <pattern id="pcAwnO" width="36" height="26" patternUnits="userSpaceOnUse"><rect width="18" height="26" fill="#ff8a1c"/><rect x="18" width="18" height="26" fill="#ffd8a8"/></pattern>
+        <radialGradient id="pcGlowG"><stop offset="0" stop-color="#ffcf7a" stop-opacity=".45"/><stop offset="1" stop-color="#ffcf7a" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="${W}" height="${H}" fill="url(#pcBrick)"/>
+      <rect x="0" y="420" width="${W}" height="110" fill="#1b1622"/><path d="M0 475h${W}" stroke="#3a3249" stroke-width="3" stroke-dasharray="16 14"/>
+      <rect x="300" y="530" width="120" height="${H - 530}" fill="#1b1622"/>
+      ${lamps.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="70" fill="url(#pcGlowG)"/>`).join('')}
+      <path d="M0 418 Q90 440 180 418 T360 418 T540 418 T720 418" stroke="#4a4058" stroke-width="1.5" fill="none"/>
+      ${[30, 90, 150, 210, 270, 330, 390, 450, 510, 570, 630, 690].map((x, i) => `<circle class="pc-bulb" style="animation-delay:${(i % 3) * .8}s" cx="${x}" cy="${425 + Math.sin(x / 57) * 8}" r="5" fill="#ffd36b"/>`).join('')}
+      ${[0, 1, 2, 3].map(tent).join('')}
+      <g transform="translate(360 ${H - 30})"><rect x="-58" y="-16" width="116" height="30" rx="10" fill="#c8102e"/><text x="0" y="5" class="pc-sign2">오메추 포차 골목</text></g>
+    </svg>`;
   }
-  function dishHTML(t) {
-    const d = dishes[t];
-    if (!d) return '<span class="pc-dish-emoji">🍢</span>';
-    const img = typeof getMenuImg === 'function' ? getMenuImg(d) : null;
-    return img ? `<img class="pc-dish" src="${img}" alt="${esc(d)}">` : '<span class="pc-dish-emoji">🍽️</span>';
-  }
-  function render() {
-    const root = document.getElementById('pocha-root'); if (!root || document.getElementById('page-pocha').style.display === 'none') return;
-    const total = Object.keys(state).length;
-    const viewT = myTable !== null ? myTable : 0;
-    const scene = `
-      <div class="pc-scene ${rainCtx ? 'raining' : ''}"><div class="pc-rain"></div>
+  function ensureShell(root) {
+    if (document.getElementById('pc-world')) return;
+    root.innerHTML = `
+      <div class="pc-scene ${rainCtx ? 'raining' : ''}">
         <div class="pc-top">
-          <div style="display:flex;align-items:center"><button class="pc-back" aria-label="뒤로 가기" onclick="showPage('fun')">‹</button>
-            <span class="pc-live">${joined ? `🏮 지금 <b>${total}</b>명 포차에 있어요` : '연결 중...'}</span></div>
-          <div><button class="pc-iconbtn" aria-label="빗소리 켜고 끄기" onclick="Pocha.toggleRain()">${rainCtx ? '🔇' : '🌧️'}</button><button class="pc-iconbtn" onclick="Pocha.openDress()">👕 꾸미기</button></div>
+          <div style="display:flex;align-items:center"><button class="pc-back" aria-label="뒤로 가기" onclick="showPage('fun')">‹</button><span class="pc-live" id="pc-live"></span></div>
+          <div><button class="pc-iconbtn" id="pc-rainbtn" aria-label="빗소리 켜고 끄기" onclick="Pocha.toggleRain()"></button><button class="pc-iconbtn" onclick="Pocha.openDress()">👕 꾸미기</button></div>
         </div>
-        <div class="pc-tent"><div class="pc-awning"></div><div class="pc-sign">오메추 포차</div>
-          <div class="pc-lights"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-        <div class="pc-sub">${myTable !== null ? `${myTable + 1}번 테이블` : '빈자리에 앉아서 오늘 뭐 먹을지 같이 골라요'}</div>
-        <div class="pc-table-wrap"><div class="pc-table">
-          ${[0, 1, 2, 3].map(s => seatHTML(viewT, s)).join('')}
-          <div class="pc-board">${dishHTML(viewT)}</div>
-        </div></div>
-      </div>`;
-
+        <div class="pc-viewwrap"><div class="pc-view" id="pc-view">
+          <div class="pc-world" id="pc-world" style="width:${W}px;height:${H}px">${worldSVG()}<div id="pc-dishes"></div><div id="pc-people"></div></div>
+        </div><div class="pc-rain"></div></div>
+        <div class="pc-hint" id="pc-hint"></div>
+      </div>
+      <div class="pc-body" id="pc-panel"></div>`;
+    const world = document.getElementById('pc-world');
+    let down = null;
+    world.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY }; });
+    world.addEventListener('click', (e) => { if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8) return; if (e.target.closest('.pc-person:not(.me)')) return; onWorldTap(e); });
+    centerOn(pos.x, pos.y, false);
+    document.getElementById('pc-view').addEventListener('touchstart', () => { follow = false; }, { passive: true });
+    document.getElementById('pc-view').addEventListener('wheel', () => { follow = false; }, { passive: true });
+  }
+  function centerOn(x, y, smooth) {
+    const v = document.getElementById('pc-view'); if (!v) return;
+    v.scrollTo({ left: x - v.clientWidth / 2, top: y - v.clientHeight / 2, behavior: smooth ? 'smooth' : 'auto' });
+  }
+  function personHTML(p, sid) {
+    const b = bubbles[sid]; const showB = b && b.until > Date.now();
+    return `${showB ? `<div class="pc-bubble">${esc(b.text)}</div>` : ''}<div class="pc-body2">${avatarSVG(p, 46)}</div><div class="pc-name">${esc(p.nick)}${sid === SID ? ' (나)' : ''}</div>`;
+  }
+  function placeEl(el, x, y, seated) { el.style.transform = `translate(${x - 30}px, ${y - (seated ? 42 : 52)}px)`; el.style.zIndex = String(Math.round(y)); }
+  function drawMe(walking) {
+    const el = document.getElementById('pc-p-' + SID); if (!el) return;
+    el.classList.toggle('walking', !!walking);
+    el.querySelector('.pc-body2') && (el.querySelector('.pc-body2').style.transform = `scaleX(${me.face_dir || 1})`);
+    const [x, y] = myTable !== null ? seatXY(myTable, mySeat) : [pos.x, pos.y];
+    placeEl(el, x, y, myTable !== null);
+    if (follow) { const v = document.getElementById('pc-view'); if (v) { const cx = x - v.clientWidth / 2, cy = y - v.clientHeight / 2; v.scrollLeft += (cx - v.scrollLeft) * 0.12; v.scrollTop += (cy - v.scrollTop) * 0.12; } }
+  }
+  function updateWorld() {
+    const layer = document.getElementById('pc-people'); if (!layer) return;
+    const people = { ...state };
+    people[SID] = { nick: nick(), color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, x: pos.x, y: pos.y };
+    const seen = new Set();
+    Object.entries(people).forEach(([sid, p]) => {
+      seen.add(sid);
+      let el = document.getElementById('pc-p-' + sid);
+      if (!el) { el = document.createElement('div'); el.id = 'pc-p-' + sid; el.className = 'pc-person' + (sid === SID ? ' me' : ''); if (sid !== SID) el.addEventListener('click', () => mute(sid)); layer.appendChild(el); }
+      el.innerHTML = personHTML(p, sid);
+      el.classList.toggle('seated', p.table !== null && p.seat !== null);
+      if (sid === SID) { drawMe(!!target); return; }
+      const [x, y] = (p.table !== null && p.seat !== null) ? seatXY(p.table, p.seat) : [p.x, p.y];
+      const prev = lastDrawn[sid];
+      if (prev && (prev.x !== x || prev.y !== y)) {
+        const dur = Math.min(6, Math.hypot(x - prev.x, y - prev.y) / SPEED);
+        el.style.transition = `transform ${dur}s linear`; el.classList.add('walking'); clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('walking'), dur * 1000);
+        el.querySelector('.pc-body2').style.transform = `scaleX(${x < prev.x ? -1 : 1})`;
+      } else if (!prev) el.style.transition = 'none';
+      placeEl(el, x, y, p.table !== null && p.seat !== null); lastDrawn[sid] = { x, y };
+    });
+    [...layer.children].forEach(el => { const sid = el.id.slice(5); if (!seen.has(sid)) { el.remove(); delete lastDrawn[sid]; } });
+    // 투표로 정한 안주를 테이블 위에
+    const dl = document.getElementById('pc-dishes');
+    if (dl) dl.innerHTML = Object.entries(dishes).map(([t, d]) => {
+      const img = typeof getMenuImg === 'function' ? getMenuImg(d) : null; const [cx, cy] = TABLE_POS[+t];
+      return img ? `<img class="pc-dish2" src="${img}" alt="" onerror="this.remove()" style="left:${cx - 26}px;top:${cy + (+t === 3 ? -40 : -12)}px">` : '';
+    }).join('');
+  }
+  function renderPanel() {
+    const panel = document.getElementById('pc-panel'); if (!panel) return;
+    const total = Object.keys(state).length;
+    const live = document.getElementById('pc-live'); if (live) live.innerHTML = joined ? `🏮 지금 <b>${total}</b>명 포차에 있어요` : '연결 중...';
+    const rb = document.getElementById('pc-rainbtn'); if (rb) rb.textContent = rainCtx ? '🔇' : '🌧️';
+    const hint = document.getElementById('pc-hint');
+    if (hint) hint.textContent = myTable !== null ? `${TABLE_NAME[myTable]}에 앉아 있어요 · 다른 곳을 누르면 일어나서 걸어가요` : '빈 곳을 누르면 걸어가고, 파란 의자를 누르면 앉아요';
     let body = '';
     if (myTable === null) {
-      body = `<div class="pc-card"><div style="font-weight:700;margin-bottom:10px">자리 고르기</div><div class="pc-tables">
-        ${[0, 1, 2].map(t => { const ps = seatedAt(t).filter(p => p.sid !== SID); const full = ps.length >= SEATS;
-          return `<div class="pc-trow"><div><div style="font-size:13px;font-weight:700">${t + 1}번 테이블 <span style="color:var(--muted);font-weight:400">${ps.length}/${SEATS}</span></div>
+      body = `<div class="pc-card"><div style="font-weight:700;margin-bottom:10px">자리 현황</div><div class="pc-tables">
+        ${[0, 1, 2, 3].map(t => { const ps = seatedAt(t).filter(p => p.sid !== SID); const full = ps.length >= SEATS;
+          return `<div class="pc-trow"><div><div style="font-size:13px;font-weight:700">${TABLE_NAME[t]} <span style="color:var(--muted);font-weight:400">${ps.length}/${SEATS}</span></div>
             <div class="who">${ps.map(p => avatarSVG(p, 28)).join('') || '<span style="font-size:11px;color:var(--muted)">아직 아무도 없어요</span>'}</div></div>
-            <button ${full || !joined ? 'disabled' : ''} onclick="Pocha.sit(${t})">${full ? '만석' : '앉기'}</button></div>`; }).join('')}
-        </div><button class="cta-btn crave-btn" style="margin-top:12px" ${joined ? '' : 'disabled'} onclick="Pocha.sitAny()">🪑 아무 데나 앉기</button></div>
+            <button ${full || !joined ? 'disabled' : ''} onclick="Pocha.sit(${t})">${full ? '만석' : '가서 앉기'}</button></div>`; }).join('')}
+        </div><button class="cta-btn crave-btn" style="margin-top:12px" ${joined ? '' : 'disabled'} onclick="Pocha.sitAny()">🪑 빈자리 찾아가기</button></div>
         <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6">대화는 저장되지 않아요. 같은 테이블에 앉은 사람끼리만 보여요.<br>불편한 손님은 캐릭터를 눌러 말을 숨길 수 있어요.</div>`;
     } else {
       const v = votes[myTable];
@@ -293,9 +426,15 @@
     }
     const prevVal = document.getElementById('pc-msg')?.value || '';
     const hadFocus = document.activeElement && document.activeElement.id === 'pc-msg';
-    root.innerHTML = scene + `<div class="pc-body">${body}</div>`;
+    panel.innerHTML = body;
     const inp = document.getElementById('pc-msg'); if (inp) { inp.value = prevVal; if (hadFocus) inp.focus(); }
     const log = document.getElementById('pc-log'); if (log) log.scrollTop = log.scrollHeight;
+  }
+  function render() {
+    const root = document.getElementById('pocha-root'); if (!root || document.getElementById('page-pocha').style.display === 'none') return;
+    ensureShell(root);
+    document.querySelector('.pc-scene')?.classList.toggle('raining', !!rainCtx);
+    updateWorld(); renderPanel();
   }
 
   // 투표 남은 시간 표시 갱신
@@ -304,7 +443,7 @@
   window.Pocha = { findWinner,
     open() { connect(); render(); },
     close() { if (myTable !== null) stand(); },
-    sit, sitAny, stand, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
+    sit, sitAny, stand, goSit, walkTo, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
     avatarSVG, count: () => Object.keys(state).length,
   };
 })();

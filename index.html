@@ -8711,7 +8711,7 @@ async function initUserNickname() {
   try {
     for (let i = 0; i < 3; i++) {
       const got = await ownerRpc('init_my_nickname', { p_nick: nick });
-      if (got) { localStorage.setItem('wmjMyNick', got); break; }
+      if (typeof got === 'string' && got) { localStorage.setItem('wmjMyNick', got); break; }
       nick = generateRandomNick() + Math.floor(Math.random() * 90 + 10);   // 겹치면 숫자 붙여 다시
       localStorage.setItem('wmjMyNick', nick.slice(0, 12));
     }

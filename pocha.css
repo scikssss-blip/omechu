@@ -1,7 +1,26 @@
 /* ── 오메추 포차 ── */
 #page-pocha { display:none; max-width:480px; margin:0 auto; padding:0 0 170px; }
-.pc-scene { position:relative; background:linear-gradient(180deg,#0b1026 0%,#1a1838 55%,#2a1d2a 100%); border-radius:0 0 26px 26px; padding:14px 16px 18px; overflow:hidden; }
-.pc-rain { position:absolute; inset:0; pointer-events:none; opacity:.35;
+.pc-scene { position:relative; background:linear-gradient(180deg,#0b1026 0%,#1a1838 100%); border-radius:0 0 26px 26px; padding:12px 12px 14px; }
+.pc-viewwrap { position:relative; margin-top:10px; border-radius:18px; overflow:hidden; border:1px solid #3a3249; }
+.pc-view { height:min(60vh, 520px); overflow:auto; position:relative; scrollbar-width:none; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+.pc-view::-webkit-scrollbar { display:none; }
+.pc-world { position:relative; cursor:pointer; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; }
+.pc-map { position:absolute; left:0; top:0; display:block; }
+.pc-tname { font-family:'Jua',sans-serif; font-size:15px; fill:#ffd7a3; text-anchor:middle; }
+.pc-sign2 { font-family:'Jua',sans-serif; font-size:14px; fill:#fff7e6; text-anchor:middle; }
+.pc-bulb { animation:pcGlow 2.4s ease-in-out infinite; }
+.pc-person { position:absolute; left:0; top:0; width:60px; text-align:center; will-change:transform; }
+.pc-person.me { transition:none !important; }
+.pc-person .pc-body2 { display:flex; justify-content:center; }
+.pc-person .pc-ava { filter:drop-shadow(0 4px 3px rgba(0,0,0,.45)); }
+.pc-person.walking .pc-ava { animation:pcBob .32s ease-in-out infinite alternate; }
+@keyframes pcBob { from { transform:translateY(0) rotate(-3deg); } to { transform:translateY(-5px) rotate(3deg); } }
+.pc-person .pc-name { font-size:10.5px; color:#fff; background:rgba(0,0,0,.45); border-radius:8px; padding:1px 6px; display:inline-block; max-width:80px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:-2px; }
+.pc-person.me .pc-name { color:#ffd36b; font-weight:700; }
+.pc-person .pc-bubble { bottom:calc(100% - 4px); }
+.pc-dish2 { position:absolute; width:52px; height:38px; border-radius:50%; object-fit:cover; border:3px solid rgba(255,255,255,.35); box-shadow:0 4px 10px rgba(0,0,0,.45); z-index:1; pointer-events:none; }
+.pc-hint { color:#cdbfe8; font-size:12px; margin-top:8px; text-align:center; }
+.pc-rain { position:absolute; inset:0; pointer-events:none; opacity:.35; z-index:5000;
   background-image:linear-gradient(transparent 0 70%, rgba(170,190,255,.55) 70% 100%);
   background-size:2px 22px; animation:pcRain .5s linear infinite; display:none; }
 .pc-scene.raining .pc-rain { display:block; }
