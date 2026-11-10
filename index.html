@@ -8219,14 +8219,17 @@ function removeCommImg(idx) {
 }
 
 // 슬라이드 렌더 함수
+// 사진 목록은 화면 속 코드에 직접 넣지 않고 번호로만 넘긴다 (주소에 섞인 문자로 코드가 실행되는 것 방지)
+const _slideReg = [];
 function renderSlide(imgs, postId) {
   if (!imgs || imgs.length === 0) return '';
+  const reg = _slideReg.push(imgs) - 1;
   const id = 'slide-' + postId;
   if (imgs.length === 1) {
-    return `<div class="comm-slide-wrap"><img class="comm-slide-img" src="${imgs[0]}" alt="" onclick="openImgViewer(${JSON.stringify(imgs)},0)" style="cursor:pointer"></div>`;
+    return `<div class="comm-slide-wrap"><img class="comm-slide-img" src="${imgs[0]}" alt="" onclick="openImgViewer(_slideReg[${reg}],0)" style="cursor:pointer"></div>`;
   }
   const dots = imgs.map((_, i) => `<div class="comm-slide-dot${i===0?' active':''}" id="${id}-dot-${i}"></div>`).join('');
-  const slides = imgs.map((src,i) => `<img class="comm-slide-img" src="${src}" alt="" onclick="openImgViewer(${JSON.stringify(imgs)},${i})" style="cursor:pointer">`).join('');
+  const slides = imgs.map((src,i) => `<img class="comm-slide-img" src="${src}" alt="" onclick="openImgViewer(_slideReg[${reg}],${i})" style="cursor:pointer">`).join('');
   return `
     <div class="comm-slide-wrap" id="${id}">
       <div class="comm-slide-track" id="${id}-track">${slides}</div>

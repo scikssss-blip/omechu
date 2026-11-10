@@ -30,6 +30,24 @@
   const esc = (v) => (typeof escHtml === 'function' ? escHtml(String(v ?? '')) : String(v ?? '').replace(/[&<>"']/g, ''));
   const nick = () => (typeof getMyNick === 'function' ? getMyNick() : '손님');
 
+  // ── 다른 손님이 보낸 값은 믿지 않고 정해진 값만 받기 ──
+  const okSid = (v) => typeof v === 'string' && /^[a-z0-9]{1,24}$/i.test(v);
+  const okTable = (v) => Number.isInteger(v) && v >= 0 && v < TABLES;
+  const okSeat = (v) => Number.isInteger(v) && v >= 0 && v < SEATS;
+  const ACC_KEYS = ACCS.map(a => a[0]), FACE_KEYS = FACES.map(f => f[0]);
+  function safePresence(p) {
+    if (!p || typeof p !== 'object') return null;
+    const table = okTable(p.table) ? p.table : null;
+    return {
+      nick: String(p.nick ?? '손님').slice(0, 12),
+      color: COLORS.includes(p.color) ? p.color : COLORS[6],
+      acc: ACC_KEYS.includes(p.acc) ? p.acc : 'none',
+      face: FACE_KEYS.includes(p.face) ? p.face : 'smile',
+      table, seat: table !== null && okSeat(p.seat) ? p.seat : null,
+      at: typeof p.at === 'number' && isFinite(p.at) ? p.at : Date.now(),
+    };
+  }
+
   // ── 캐릭터 그림 (오리지널 '주먹밥' 캐릭터) ──
   function avatarSVG(l, size = 64) {
     const c = l.color || '#f5f0e8';
@@ -59,33 +77,39 @@
     ch = sb.channel('omechu-pocha-v1', { config: { presence: { key: SID }, broadcast: { self: true } } });
     ch.on('presence', { event: 'sync' }, () => {
       const raw = ch.presenceState(); state = {};
-      Object.entries(raw).forEach(([k, arr]) => { if (arr && arr[0]) state[k] = arr[0]; });
+      Object.entries(raw).forEach(([k, arr]) => { const p = okSid(k) && arr && safePresence(arr[0]); if (p) state[k] = p; });
       resolveSeatConflict(); render();
     });
     ch.on('presence', { event: 'join' }, ({ key, newPresences }) => {
-      const p = newPresences && newPresences[0];
+      const p = okSid(key) && newPresences && safePresence(newPresences[0]);
       if (p && myTable !== null && p.table === myTable && key !== SID) sys(myTable, `${esc(p.nick)}님이 자리에 앉았어요`);
     });
     ch.on('broadcast', { event: 'chat' }, ({ payload: m }) => {
-      if (!m || muted.has(m.sid)) return;
+      if (!m || !okSid(m.sid) || !okTable(m.table) || muted.has(m.sid)) return;
+      m.nick = String(m.nick ?? '손님').slice(0, 12);
       const t = clean(m.text);
       logs[m.table] = (logs[m.table] || []).concat([{ nick: m.nick, text: t, sid: m.sid }]).slice(-40);
       bubbles[m.sid] = { text: t, until: Date.now() + 4500 };
       render(); setTimeout(render, 4600);
     });
     ch.on('broadcast', { event: 'cheers' }, ({ payload: m }) => {
-      if (!m) return; bubbles[m.sid] = { text: '짠! 🍻', until: Date.now() + 2500, cheers: true };
+      if (!m || !okSid(m.sid) || !okTable(m.table) || muted.has(m.sid)) return; m.nick = String(m.nick ?? '손님').slice(0, 12); bubbles[m.sid] = { text: '짠! 🍻', until: Date.now() + 2500, cheers: true };
       if (m.table === myTable && m.sid !== SID) sys(myTable, `${esc(m.nick)}님이 짠! 했어요`);
       render(); setTimeout(render, 2600);
     });
     ch.on('broadcast', { event: 'vote_start' }, ({ payload: v }) => {
-      if (!v) return;
+      if (!v || !okTable(v.table) || typeof v.id !== 'string' || !Array.isArray(v.opts)) return;
+      if (votes[v.table] && !votes[v.table].done) return;   // 진행 중인 투표는 덮어쓰지 않음
+      v.opts = v.opts.slice(0, 3).map(o => String(o ?? '').slice(0, 20)); if (!v.opts.length) return;
+      v.nick = String(v.nick ?? '손님').slice(0, 12); v.id = v.id.slice(0, 40);
       votes[v.table] = { id: v.id, opts: v.opts, by: v.nick, picks: {}, until: Date.now() + 25000, done: false };
       if (v.table === myTable) sys(myTable, `${esc(v.nick)}님이 안주 투표를 시작했어요 (25초)`);
       render(); setTimeout(() => finishVote(v.table, v.id), 25500);
     });
     ch.on('broadcast', { event: 'vote' }, ({ payload: v }) => {
-      const cur = votes[v && v.table]; if (!cur || cur.id !== v.id || cur.done) return;
+      if (!v || !okTable(v.table) || !okSid(v.sid)) return;
+      const cur = votes[v.table]; if (!cur || cur.id !== v.id || cur.done) return;
+      if (!Number.isInteger(v.idx) || v.idx < 0 || v.idx >= cur.opts.length) return;
       cur.picks[v.sid] = v.idx; render();
       const seated = seatedAt(v.table).length;
       if (Object.keys(cur.picks).length >= seated) finishVote(v.table, v.id);
@@ -99,7 +123,7 @@
   function track() { if (!ch) return; return ch.track({ nick: nick(), color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, at: seatAt }); }
 
   // ── 자리 ──
-  const seatedAt = (t) => Object.entries(state).filter(([, p]) => p.table === t && p.seat !== null && p.seat !== undefined).map(([sid, p]) => ({ sid, ...p }));
+  const seatedAt = (t) => Object.entries(state).filter(([, p]) => p.table === t && p.seat !== null && p.seat !== undefined).map(([sid, p]) => ({ ...p, sid }));
   function freeSeat(t) {
     const taken = new Set(seatedAt(t).filter(p => p.sid !== SID).map(p => p.seat));
     for (let s = 0; s < SEATS; s++) if (!taken.has(s)) return s;
@@ -165,6 +189,7 @@
     const cur = votes[myTable]; if (!cur || cur.done || cur.picks[SID] !== undefined) return;
     ch.send({ type: 'broadcast', event: 'vote', payload: { table: myTable, id: cur.id, idx, sid: SID } });
   }
+  function findWinner() { const v = votes[myTable]; if (v && v.done && v.winner && typeof openNearbyMap === 'function') openNearbyMap(v.winner); }
   function finishVote(t, id) {
     const cur = votes[t]; if (!cur || cur.id !== id || cur.done) return;
     cur.done = true;
@@ -257,7 +282,7 @@
       const voteHTML = v ? `<div class="pc-card"><div style="font-weight:700">🍢 안주 투표 ${v.done ? `— <span style="color:var(--orange)">${esc(v.winner)}</span> 당첨!` : `<span style="font-size:12px;color:var(--muted)">(${Math.max(0, Math.ceil((v.until - Date.now()) / 1000))}초 남음)</span>`}</div>
         <div class="pc-vote">${v.opts.map((o, i) => { const n = Object.values(v.picks).filter(x => x === i).length; const img = typeof getMenuImg === 'function' ? getMenuImg(o) : null;
           return `<button class="${v.picks[SID] === i ? 'mine' : ''}" ${v.done || v.picks[SID] !== undefined ? 'disabled' : ''} onclick="Pocha.vote(${i})">${img ? `<img src="${img}" alt="">` : ''}<div>${esc(o)}</div><div class="cnt">${n}표</div></button>`; }).join('')}</div>
-        ${v.done ? `<button class="pc-iconbtn" style="width:100%;margin:10px 0 0;background:var(--surface);color:var(--text);border-color:var(--border);padding:9px" onclick="openNearbyMap('${esc(v.winner).replace(/'/g, '')}')">📍 ${esc(v.winner)} 근처에서 찾기</button>` : ''}</div>` : '';
+        ${v.done ? `<button class="pc-iconbtn" style="width:100%;margin:10px 0 0;background:var(--surface);color:var(--text);border-color:var(--border);padding:9px" onclick="Pocha.findWinner()">📍 ${esc(v.winner)} 근처에서 찾기</button>` : ''}</div>` : '';
       body = `<div class="pc-card"><div class="pc-actions">
           <button class="hot" onclick="Pocha.cheers()">🍻 짠!</button>
           <button onclick="Pocha.startVote()">🍢 안주 고르기</button>
@@ -276,7 +301,7 @@
   // 투표 남은 시간 표시 갱신
   setInterval(() => { if (myTable !== null && votes[myTable] && !votes[myTable].done) render(); }, 1000);
 
-  window.Pocha = {
+  window.Pocha = { findWinner,
     open() { connect(); render(); },
     close() { if (myTable !== null) stand(); },
     sit, sitAny, stand, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
