@@ -255,9 +255,9 @@
     const scene = `
       <div class="pc-scene ${rainCtx ? 'raining' : ''}"><div class="pc-rain"></div>
         <div class="pc-top">
-          <div style="display:flex;align-items:center"><button class="pc-back" onclick="showPage('fun')">‹</button>
+          <div style="display:flex;align-items:center"><button class="pc-back" aria-label="뒤로 가기" onclick="showPage('fun')">‹</button>
             <span class="pc-live">${joined ? `🏮 지금 <b>${total}</b>명 포차에 있어요` : '연결 중...'}</span></div>
-          <div><button class="pc-iconbtn" onclick="Pocha.toggleRain()">${rainCtx ? '🔇' : '🌧️'}</button><button class="pc-iconbtn" onclick="Pocha.openDress()">👕 꾸미기</button></div>
+          <div><button class="pc-iconbtn" aria-label="빗소리 켜고 끄기" onclick="Pocha.toggleRain()">${rainCtx ? '🔇' : '🌧️'}</button><button class="pc-iconbtn" onclick="Pocha.openDress()">👕 꾸미기</button></div>
         </div>
         <div class="pc-tent"><div class="pc-awning"></div><div class="pc-sign">오메추 포차</div>
           <div class="pc-lights"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>

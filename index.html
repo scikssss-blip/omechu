@@ -36,20 +36,20 @@
   :root {
     --bg:#0f0e0c; --surface:#1c1a1a; --card:#252020; --border:#3a2e2e;
     --orange:#ff4757; --orange-soft:#ff6b7a; --yellow:#ffd166;
-    --green:#06d6a0; --red:#ff1744; --text:#f5f0e8; --muted:#8a7a7a; --radius:16px;
+    --green:#06d6a0; --red:#ff1744; --text:#f5f0e8; --muted:#a89a9a; --radius:16px;
     --header-bg:rgba(15,14,12,0.92); --modal-bg:rgba(15,14,12,0.96);
   }
   [data-theme="light"] {
     --bg:#fff8f5; --surface:#fff0ec; --card:#ffffff; --border:#f0d8d8;
     --orange:#ff4757; --orange-soft:#ff6b7a; --yellow:#f4a40a;
-    --green:#00a884; --red:#ff1744; --text:#1a1010; --muted:#9a7070; --radius:16px;
+    --green:#00a884; --red:#ff1744; --text:#1a1010; --muted:#875c5c; --radius:16px;
     --header-bg:rgba(255,248,245,0.92); --modal-bg:rgba(255,248,245,0.96);
   }
   .theme-toggle {
-    background:none; border:none; cursor:pointer; font-size:20px; padding:4px; line-height:1;
+    background:none; border:none; cursor:pointer; font-size:20px; padding:8px; min-width:40px; min-height:40px; line-height:1;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body { word-break:keep-all; overflow-wrap:anywhere; background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; overflow-x:hidden; }
 
   header {
     position:sticky; top:0; z-index:100;
@@ -88,7 +88,7 @@
     text-transform:uppercase; letter-spacing:1.5px; margin:24px 0 12px;
     display:flex; align-items:center; gap:8px;
   }
-  .sec-badge { font-size:10px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2px 8px; text-transform:none; letter-spacing:0; color:var(--muted); }
+  .sec-badge { font-size:11px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2px 8px; text-transform:none; letter-spacing:0; color:var(--muted); }
 
   .cat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
   .cat-card {
@@ -130,9 +130,9 @@
   .fg-drop-line { height:3px; background:var(--orange); border-radius:2px; margin:2px 0; pointer-events:none; box-shadow:0 0 6px var(--orange); }
   .accordion-label { font-size:13px; font-weight:700; color:var(--text); }
   .accordion-add-btn { font-size:11px; color:var(--orange); font-weight:700; display:flex; align-items:center; gap:4px; }
-  .accordion-arrow { transition:transform 0.2s; font-size:10px; color:var(--muted); }
+  .accordion-arrow { transition:transform 0.2s; font-size:11px; color:var(--muted); }
   .accordion-header.open .accordion-arrow { transform:rotate(180deg); }
-  .accordion-selected-count { background:var(--orange); color:white; border-radius:20px; padding:1px 7px; font-size:10px; font-weight:700; display:none; }
+  .accordion-selected-count { background:var(--orange); color:white; border-radius:20px; padding:1px 7px; font-size:11px; font-weight:700; display:none; }
   .accordion-selected-count.show { display:inline-block; }
   .accordion-body { display:none; padding:14px 16px; background:rgba(255,71,87,0.04); border:1.5px solid var(--orange); border-top:none; border-radius:0 0 14px 14px; margin-bottom:12px; }
   .accordion-body.open { display:block; animation:fadeIn 0.2s ease; }
@@ -217,9 +217,9 @@
   .fav-star {
     display:inline-flex; align-items:center; justify-content:center;
     background:none; border:none; outline:none; cursor:pointer;
-    font-size:10px; color:var(--muted);
-    width:14px; height:14px;
-    padding:0; margin-left:3px; line-height:1;
+    font-size:13px; color:var(--muted);
+    width:28px; height:28px; border-radius:50%;
+    padding:0; margin:-8px -8px -8px 0; line-height:1;
     transition:color 0.15s, transform 0.15s;
     flex-shrink:0; vertical-align:middle;
   }
@@ -281,7 +281,7 @@
   .cp-title { font-size:13px; font-weight:700; color:white; }
   .cp-sub { font-size:11px; color:rgba(255,255,255,0.8); margin-top:2px; }
   .cp-arrow { font-size:18px; color:rgba(255,255,255,0.8); }
-  .cp-disclaimer { font-size:9px; color:var(--muted); text-align:right; margin-top:6px; }
+  .cp-disclaimer { font-size:11px; color:var(--muted); text-align:right; margin-top:6px; }
 
   /* ── 장보기 페이지 ── */
   .coupang-banner {
@@ -326,6 +326,9 @@
   .my-pchip b { color:var(--orange); font-family:'Jua',sans-serif; font-weight:400; font-size:14px; }
   .my-pchip.taste { justify-content:center; background:linear-gradient(135deg,rgba(255,209,102,0.15),rgba(255,71,87,0.08)); border-color:rgba(255,209,102,0.45); color:var(--yellow); font-weight:700; }
   .my-acc-header { cursor:pointer; user-select:none; }
+  .my-section .my-section-header.my-acc-header { margin:-18px; padding:18px; border-radius:20px; }
+  .my-section .my-acc-body { margin-top:14px; }
+  .my-section > .my-section-header:only-child { margin-bottom:0; min-height:24px; }
   .my-acc-arrow { font-size:12px; color:var(--muted); transition:transform 0.2s; }
   .my-avatar { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--orange),#cc1a2e); display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; box-shadow:0 4px 16px rgba(255,71,87,0.35); }
   .my-profile-info { flex:1; }
@@ -408,7 +411,7 @@
   .comm-user-info { flex:1; }
   .comm-username { font-size:14px; font-weight:700; color:var(--text); }
   .comm-time { font-size:11px; color:var(--muted); margin-top:2px; }
-  .comm-badge { font-size:10px; background:rgba(255,71,87,0.15); color:var(--orange); border:1px solid rgba(255,71,87,0.3); border-radius:20px; padding:3px 8px; font-weight:700; }
+  .comm-badge { font-size:11px; background:rgba(255,71,87,0.15); color:var(--orange); border:1px solid rgba(255,71,87,0.3); border-radius:20px; padding:3px 8px; font-weight:700; }
 
   .comm-text { font-size:14px; line-height:1.75; color:var(--text); margin-bottom:10px; }
   .comm-text.clamped { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
@@ -432,7 +435,7 @@
   .comm-question-text { font-size:13px; color:var(--text); line-height:1.6; }
 
   .comm-type-badge {
-    font-size:10px; font-weight:700; border-radius:20px;
+    font-size:11px; font-weight:700; border-radius:20px;
     padding:3px 10px; flex-shrink:0;
   }
   .comm-type-menu   { background:rgba(255,71,87,0.12); color:var(--orange); }
@@ -575,7 +578,7 @@
   .result-card.hate-result { border-color:var(--red); }
   .result-card::before { content:''; position:absolute; top:-20px; right:-20px; width:100px; height:100px; background:radial-gradient(circle,rgba(255,71,87,0.08),transparent 70%); pointer-events:none; }
   .result-rank { position:absolute; top:10px; right:14px; font-family:'Jua',sans-serif; font-size:20px; color:rgba(255,71,87,0.1); }
-  .result-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(255,71,87,0.15); color:var(--orange); font-size:9px; font-weight:700; padding:3px 10px; border-radius:20px; margin-bottom:8px; border:1px solid rgba(255,71,87,0.3); }
+  .result-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(255,71,87,0.15); color:var(--orange); font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; margin-bottom:8px; border:1px solid rgba(255,71,87,0.3); }
   .result-badge.hate-badge { background:rgba(255,71,87,0.15); color:var(--red); border-color:rgba(255,71,87,0.3); }
   .result-main { display:flex; gap:12px; align-items:flex-start; }
   .result-left { width:150px; flex-shrink:0; display:flex; flex-direction:column; gap:8px; }
@@ -597,7 +600,7 @@
   .similar-wrap.open { display:flex; }
   .similar-chip { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:11px; color:var(--text); cursor:pointer; transition:all 0.15s; }
   .similar-chip:hover { border-color:var(--orange); color:var(--orange); }
-  .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:7px 3px; font-size:9px; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:2px; white-space:nowrap; font-weight:600; }
+  .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:6px 4px; min-height:40px; font-size:11.5px; line-height:1.25; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:3px; text-align:center; font-weight:600; }
   .result-btn:hover { border-color:var(--orange-soft); color:var(--orange-soft); }
   .result-btn.like-btn { border-color:var(--red) !important; color:var(--red); }
   .result-btn.like-btn.active { background:rgba(255,71,87,0.1); color:var(--red); border-color:var(--red) !important; }
@@ -606,9 +609,9 @@
   .result-btn.reject-btn:hover { border-color:var(--muted); color:var(--text); }
   .card-nutrition { display:flex; align-items:center; gap:6px; background:var(--surface); border-radius:10px; padding:6px 10px; margin-top:8px; border:1px solid var(--border); }
   .card-kcal { font-size:11px; font-weight:700; color:var(--orange); }
-  .card-kcal span { font-size:9px; font-weight:400; color:var(--muted); }
+  .card-kcal span { font-size:11px; font-weight:400; color:var(--muted); }
   .card-macros { display:flex; gap:5px; margin-left:auto; }
-  .card-macro { font-size:9px; }
+  .card-macro { font-size:11px; }
   .card-macro.c { color:#ffd166; }
   .card-macro.p { color:#06d6a0; }
   .card-macro.f { color:#ff6b6b; }
@@ -674,7 +677,7 @@
   .macro-grid { display:flex; gap:12px; flex:1; justify-content:flex-end; }
   .macro-item { text-align:center; }
   .macro-val { font-size:16px; font-weight:700; color:var(--text); }
-  .macro-name { font-size:10px; color:var(--muted); margin-top:2px; }
+  .macro-name { font-size:11px; color:var(--muted); margin-top:2px; }
   .macro-item.carb .macro-val { color:#ffd166; }
   .macro-item.prot .macro-val { color:#06d6a0; }
   .macro-item.fat .macro-val  { color:#ff6b6b; }
@@ -755,7 +758,7 @@
     margin-top:12px; border:1px solid var(--border);
   }
   .card-kcal { font-size:13px; font-weight:700; color:var(--orange); }
-  .card-kcal span { font-size:10px; font-weight:400; color:var(--muted); }
+  .card-kcal span { font-size:11px; font-weight:400; color:var(--muted); }
   .card-macros { display:flex; gap:8px; margin-left:auto; }
   .card-macro { font-size:11px; }
   .card-macro.c { color:#ffd166; }
@@ -842,7 +845,7 @@
   .nav-item {
     flex:1; padding:10px 4px 12px; display:flex; flex-direction:column;
     align-items:center; gap:3px; cursor:pointer; color:var(--muted);
-    font-size:10px; font-weight:600; transition:all 0.2s; border:none;
+    font-size:11px; font-weight:600; transition:all 0.2s; border:none;
     background:none; font-family:'Noto Sans KR',sans-serif;
     border-radius:16px; position:relative;
   }
@@ -901,7 +904,7 @@
 <header>
   <div class="logo">오<span>메</span>추</div>
   <div style="display:flex;align-items:center;gap:10px">
-    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="다크/라이트 모드">🌙</button>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="다크/라이트 모드" aria-label="다크/라이트 모드 전환">🌙</button>
   </div>
 </header>
 
@@ -998,7 +1001,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>⚠️</span>
               <span class="accordion-label" style="color:var(--red)">알러지 / 컨디션</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-h-allergy">0</span><span class="accordion-preview" id="preview-h-allergy" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1029,7 +1032,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🥩</span>
               <span class="accordion-label">주재료</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-h-ingredient">0</span><span class="accordion-preview" id="preview-h-ingredient" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1060,7 +1063,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🌍</span>
               <span class="accordion-label">국가 / 종류</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-h-nation">0</span><span class="accordion-preview" id="preview-h-nation" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1086,7 +1089,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>👅</span>
               <span class="accordion-label">맛</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-h-taste">0</span><span class="accordion-preview" id="preview-h-taste" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1108,7 +1111,7 @@
         </div><!-- /hc-reject-wrap -->
         <div id="hc-crave-wrap">
         <div style="border-top:1px dashed var(--border);margin:10px 0 6px;"></div>
-        <div style="font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">이런 조건은 꼭 맞춰드려요 ↓</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">이런 조건은 꼭 맞춰드려요 ↓</div>
 
         <!-- 취향 더하기: 난이도&시간 -->
         <div class="filter-group" id="h-cook-method-group" data-fg-id="fg-h-difficulty">
@@ -1117,7 +1120,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>⏱️</span>
               <span class="accordion-label">난이도 &amp; 소요시간</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-h-difficulty">0</span><span class="accordion-preview" id="preview-h-difficulty" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1145,7 +1148,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🍳</span>
               <span class="accordion-label">조리방법</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-h-cooking">0</span><span class="accordion-preview" id="preview-h-cooking" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1174,7 +1177,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>💚</span>
               <span class="accordion-label">건강 / 식단</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-h-health">0</span><span class="accordion-preview" id="preview-h-health" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1200,7 +1203,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🎯</span>
               <span class="accordion-label">상황 / 날씨</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-h-situation">0</span><span class="accordion-preview" id="preview-h-situation" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1233,7 +1236,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
             <span>🥩</span>
             <span class="accordion-label">주재료</span>
-            <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+            <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
             <span class="accordion-selected-count" id="count-ingredient">0</span><span class="accordion-preview" id="preview-ingredient" style="display:none"></span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1265,7 +1268,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
             <span>⏱️</span>
             <span class="accordion-label">난이도 &amp; 소요시간</span>
-            <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+            <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
             <span class="accordion-selected-count" id="count-difficulty">0</span><span class="accordion-preview" id="preview-difficulty" style="display:none"></span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1293,7 +1296,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
             <span>🍳</span>
             <span class="accordion-label">조리방법</span>
-            <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+            <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
             <span class="accordion-selected-count" id="count-cooking">0</span><span class="accordion-preview" id="preview-cooking" style="display:none"></span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1322,7 +1325,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
             <span>🍳</span>
             <span class="accordion-label">조리방법</span>
-            <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+            <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
             <span class="accordion-selected-count" id="count-cooking-dine">0</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1355,7 +1358,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🗑️</span>
               <span class="accordion-label" style="color:var(--red)">뒷처리 / 컨디션</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-hd-delivery-cond">0</span><span class="accordion-preview" id="preview-hd-delivery-cond" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1381,7 +1384,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>👃</span>
               <span class="accordion-label" style="color:var(--red)">냄새 / 위생 / 컨디션</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-hd-dine-cond">0</span><span class="accordion-preview" id="preview-hd-dine-cond" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1407,7 +1410,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🥩</span>
               <span class="accordion-label">주재료</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-hd-ingredient">0</span><span class="accordion-preview" id="preview-hd-ingredient" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1440,7 +1443,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🌍</span>
               <span class="accordion-label">국가 / 종류</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-hd-nation">0</span><span class="accordion-preview" id="preview-hd-nation" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1467,7 +1470,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>👅</span>
               <span class="accordion-label">맛</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-hd-taste">0</span><span class="accordion-preview" id="preview-hd-taste" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1489,7 +1492,7 @@
       </div><!-- /hd-reject-wrap -->
       <div id="hd-crave-wrap">
         <div style="border-top:1px dashed var(--border);margin:10px 0 6px;"></div>
-        <div style="font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">이런 조건은 꼭 맞춰드려요 ↓</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">이런 조건은 꼭 맞춰드려요 ↓</div>
 
         <!-- 취향 더하기: 조리방법 -->
         <div class="filter-group" data-fg-id="fg-hd-cooking">
@@ -1498,7 +1501,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🍳</span>
               <span class="accordion-label">조리방법</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-hd-cooking">0</span><span class="accordion-preview" id="preview-hd-cooking" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1526,7 +1529,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>💚</span>
               <span class="accordion-label">건강 / 식단</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-hd-health">0</span><span class="accordion-preview" id="preview-hd-health" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1552,7 +1555,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
               <span>🎯</span>
               <span class="accordion-label">상황 / 날씨</span>
-              <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+              <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
               <span class="accordion-selected-count" id="count-hd-situation">0</span><span class="accordion-preview" id="preview-hd-situation" style="display:none"></span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -1584,7 +1587,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
             <span>🌍</span>
             <span class="accordion-label">국가 / 종류</span>
-            <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+            <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
             <span class="accordion-selected-count" id="count-nation">0</span><span class="accordion-preview" id="preview-nation" style="display:none"></span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1611,7 +1614,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
             <span>👅</span>
             <span class="accordion-label">맛</span>
-            <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+            <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
             <span class="accordion-selected-count" id="count-taste">0</span><span class="accordion-preview" id="preview-taste" style="display:none"></span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1638,7 +1641,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
             <span>💚</span>
             <span class="accordion-label">건강 / 식단</span>
-            <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+            <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
             <span class="accordion-selected-count" id="count-health">0</span><span class="accordion-preview" id="preview-health" style="display:none"></span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1664,7 +1667,7 @@
               <span class="drag-handle" title="드래그로 순서 변경">⠿</span>
             <span>🎯</span>
             <span class="accordion-label">상황 / 날씨</span>
-            <span class="g-hint" style="font-size:10px;color:var(--muted)">복수선택 가능</span>
+            <span class="g-hint" style="font-size:11px;color:var(--muted)">복수선택 가능</span>
             <span class="accordion-selected-count" id="count-situation">0</span><span class="accordion-preview" id="preview-situation" style="display:none"></span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1710,7 +1713,7 @@
   <div id="comm-hot-wrap" style="margin:14px 0 4px;display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <span style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:0.5px" id="comm-hot-title">🔥 오늘의 TOP 5</span>
-      <button onclick="generateWeeklySummary()" style="background:none;border:none;font-size:10px;color:var(--muted);cursor:pointer;padding:0;font-family:'Noto Sans KR',sans-serif;text-decoration:underline">주간 결산</button>
+      <button onclick="generateWeeklySummary()" style="background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;padding:0;font-family:'Noto Sans KR',sans-serif;text-decoration:underline">주간 결산</button>
     </div>
     <div style="position:relative;overflow:hidden;border-radius:14px" id="comm-hot-slide-wrap">
       <div id="comm-hot-track" style="display:flex;transition:transform 0.3s ease"></div>
@@ -1740,11 +1743,11 @@
     </div>
     <div style="display:flex;gap:5px;flex-shrink:0">
       <button id="vote-open-btn" onclick="setVoteFilter('open')"
-        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:5px 8px;font-size:11px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s">🗳️ 진행중</button>
+        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s">🗳️ 진행중</button>
       <button id="vote-closed-btn" onclick="setVoteFilter('closed')"
-        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:5px 8px;font-size:11px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s">⏰ 마감</button>
+        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s">⏰ 마감</button>
       <button onclick="openMenuPickSheet()"
-        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:5px 10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s"
+        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s"
         onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'"
         onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">음식 골라 보기</button>
     </div>
@@ -1899,7 +1902,7 @@
       <button class="comm-type-btn" data-type="cook" onclick="selectCommType(this)">👨‍🍳 오늘 요리</button>
     </div>
     <textarea class="comm-write-textarea" id="comm-write-text" placeholder="오늘 뭐 드셨어요? 자유롭게 써주세요 😊" maxlength="100" oninput="document.getElementById('comm-char-count').textContent=this.value.length+'/'+this.maxLength"></textarea>
-    <div style="text-align:right;font-size:10px;color:var(--muted);margin-top:3px"><span id="comm-char-count">0/100</span></div>
+    <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:3px"><span id="comm-char-count">0/100</span></div>
     <div id="comm-pick-options" style="display:none;margin-top:10px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <div style="font-size:11px;color:var(--muted)">투표 선택지 (최소 2개, 최대 4개)</div>
@@ -1916,7 +1919,7 @@
           </div>
           <div id="vote-img-preview-0" style="display:none;position:relative;width:60px;height:60px">
             <img id="vote-img-0" style="width:60px;height:60px;object-fit:cover;border-radius:8px" src="" alt="">
-            <button onclick="removeVoteImg(0)" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:10px;cursor:pointer;line-height:1">×</button>
+            <button onclick="removeVoteImg(0)" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:11px;cursor:pointer;line-height:1">×</button>
           </div>
         </div>
         <div class="comm-vote-option-row" style="display:flex;flex-direction:column;gap:4px">
@@ -1929,7 +1932,7 @@
           </div>
           <div id="vote-img-preview-1" style="display:none;position:relative;width:60px;height:60px">
             <img id="vote-img-1" style="width:60px;height:60px;object-fit:cover;border-radius:8px" src="" alt="">
-            <button onclick="removeVoteImg(1)" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:10px;cursor:pointer;line-height:1">×</button>
+            <button onclick="removeVoteImg(1)" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:11px;cursor:pointer;line-height:1">×</button>
           </div>
         </div>
       </div>
@@ -1987,7 +1990,7 @@
   <button class="cta-btn crave-btn" id="cta-btn" onclick="getRecommendation()" style="flex:1">
     <span id="cta-text"><span id="cta-count" style="display:none;font-size:inherit"></span><span id="cta-label">이 느낌으로 추천받기</span></span>
   </button>
-  <button id="preset-save-btn" onclick="saveCurrentPreset()" title="나만의 세트 만들기" style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--muted);font-size:11px;font-weight:700;padding:0 10px;height:52px;cursor:pointer;flex-shrink:0;transition:all 0.15s;white-space:normal;word-break:keep-all;text-align:center;line-height:1.4;width:64px" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">나만의<br>세트 만들기</button>
+  <button id="preset-save-btn" onclick="saveCurrentPreset()" title="나만의 세트 만들기" style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--muted);font-size:11px;font-weight:700;padding:0 10px;height:52px;cursor:pointer;flex-shrink:0;transition:all 0.15s;white-space:normal;word-break:keep-all;text-align:center;line-height:1.4;width:72px" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">나만의<br>세트</button>
 </div>
 
 <!-- 질문으로 추천받기 모달 -->
@@ -2386,7 +2389,7 @@
     </div>
     <div style="font-size:11px;color:var(--muted);background:var(--surface);border-radius:8px;padding:4px 8px">바로가기 →</div>
   </div>
-  <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:16px;line-height:1.4">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>
+  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:16px;line-height:1.4">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>
 
   <!-- 장보기 목록 -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -2521,7 +2524,7 @@
   <!-- 앱 정보 -->
   <div style="text-align:center;padding:20px 0 10px;color:var(--muted);font-size:11px">
     오메추 v0.4<br>
-    <span style="font-size:10px">Made with ❤️</span>
+    <span style="font-size:11px">Made with ❤️</span>
   </div>
 </div>
 <div class="recipe-modal-backdrop" id="recipe-modal" onclick="closeRecipe()">
@@ -2633,9 +2636,10 @@ function initFavStars() {
     star.className = 'fav-star' + (favTags.includes(text) ? ' starred' : '');
     star.textContent = favTags.includes(text) ? '★' : '☆';
     star.title = '즐겨찾기';
+    star.setAttribute('aria-label', text + ' 즐겨찾기 ' + (favTags.includes(text) ? '해제' : '추가'));
     // 밥, 면처럼 글자 짧은 특정 태그만 별 간격 넓힘
     const shortTags = ['🍚 밥', '🍜 면'];
-    if (shortTags.includes(text)) star.style.marginLeft = '10px';
+    if (shortTags.includes(text)) star.style.marginLeft = '4px';
     star.onclick = (e) => {
       e.stopPropagation();
       toggleFavTag(text, star);
@@ -2966,7 +2970,7 @@ function renderTasteAnalysis() {
     ${a.like.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">좋아하는 편</div><div>${a.like.map(t => chip(t, 'var(--orange)')).join('')}</div>` : ''}
     ${a.avoid.length ? `<div style="font-size:11px;color:var(--muted);margin:6px 0">잘 안 고르는 편</div><div>${a.avoid.map(t => chip(t, 'var(--border)')).join('')}</div>` : ''}
     ${(a.time || a.cat) ? `<div style="font-size:12px;color:var(--text);margin-top:8px;line-height:1.7">${a.time ? `주로 <b>${a.time}</b>에 메뉴를 고르고` : ''}${a.time && a.cat ? ', ' : ''}${a.cat ? `<b>${a.cat}</b>를 가장 많이 찾아요` : ''}</div>` : ''}
-    <div style="font-size:10px;color:var(--muted);margin-top:8px">기록 ${a.signals}개로 분석 · 추천할 때 자동으로 반영돼요</div>`;
+    <div style="font-size:11px;color:var(--muted);margin-top:8px">기록 ${a.signals}개로 분석 · 추천할 때 자동으로 반영돼요</div>`;
 }
 
 function getCandidates() {
@@ -4505,7 +4509,7 @@ const SHOP_AFFILIATE = {
 function shopButtons(menuName) {
   return Object.values(SHOP_AFFILIATE).filter(s => s.enabled).map(s => `
     <a href="${s.url(menuName)}" target="_blank" rel="noopener"
-       style="display:inline-flex;align-items:center;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 9px;font-size:11px;font-weight:700;color:${s.color};text-decoration:none;white-space:nowrap">
+       style="display:inline-flex;align-items:center;gap:3px;background:var(--surface);border:1.5px solid ${s.color};border-radius:8px;padding:9px 12px;min-height:38px;box-sizing:border-box;font-size:12px;font-weight:700;color:var(--text);text-decoration:none;white-space:nowrap">
       ${s.emoji} ${s.name}</a>`).join('');
 }
 
@@ -4581,7 +4585,7 @@ function renderResults(rejectPattern, flipIndex) {
       </div></div>` : '';
     const review = menuReviews[item.name] ? `<div class="card-review">"${menuReviews[item.name]}"</div>` : '';
     const whyList = (pickReasons[item.name] || []);
-    const why = whyList.length ? `<div style="font-size:10px;color:var(--orange);margin:2px 0 4px;line-height:1.4">${whyList.join(' · ')}</div>` : '';
+    const why = whyList.length ? `<div style="font-size:11px;color:var(--orange);margin:2px 0 4px;line-height:1.4">${whyList.join(' · ')}</div>` : '';
     const label = i === 0 ? '추천' : i === 1 ? '또는' : '아니면';
     const cachedImg = getMenuImg(item.name);
     return `
@@ -4640,7 +4644,7 @@ function renderResults(rejectPattern, flipIndex) {
         <span style="flex:1 0 70px;font-size:13px;min-width:70px">${m.emoji} ${m.name}</span>
         <span style="display:flex;gap:6px;flex-wrap:wrap">${shopButtons(m.name)}</span>
       </div>`).join('')}
-    ${SHOP_AFFILIATE.coupang.tracked ? '<div style="font-size:10px;color:var(--muted);text-align:right;margin-top:2px">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : ''}
+    ${SHOP_AFFILIATE.coupang.tracked ? '<div style="font-size:11px;color:var(--muted);text-align:right;margin-top:2px">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : ''}
   </div>` : '';
 
   document.getElementById('result-area').innerHTML = `<div class="result-grid">${cards}</div>${feedbackHtml}${rerollBtn}
@@ -5160,7 +5164,7 @@ function renderMyPage() {
   const likedCountLabel = document.getElementById('liked-count-label');
   if (likedCountLabel) likedCountLabel.textContent = likedMenus.length > 0 ? `${likedMenus.length}개` : '';
   if (likedMenus.length === 0) {
-    likedEl.innerHTML = `<div class="my-saved-empty">❤️ 추천 카드에서 좋아요하면 여기에 쌓여요<br><span style="font-size:10px;color:var(--muted)">추천 결과 → ❤️ 좋아요 버튼</span></div>`;
+    likedEl.innerHTML = `<div class="my-saved-empty">❤️ 추천 카드에서 좋아요하면 여기에 쌓여요<br><span style="font-size:11px;color:var(--muted)">추천 결과 → ❤️ 좋아요 버튼</span></div>`;
   } else {
     likedEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:4px;padding:4px 0">' +
       likedMenus.map(m => `
@@ -5216,7 +5220,7 @@ function renderMyPage() {
       badgeWrap.innerHTML = earned.map(b =>
         `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 12px">
           <span style="font-size:24px">${b.icon}</span>
-          <span style="font-size:10px;color:var(--text);font-weight:700">${b.label}</span>
+          <span style="font-size:11px;color:var(--text);font-weight:700">${b.label}</span>
         </div>`
       ).join('') +
       `<div style="font-size:11px;color:var(--muted);align-self:center">총 ${voteCount}회 참여</div>`;
@@ -5370,7 +5374,7 @@ function renderMyPresets() {
       onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
       <span>${catEmoji[p.cat]||''}</span>
       <span style="font-weight:700;color:var(--text)">${p.name}</span>
-      <span style="color:var(--muted);font-size:10px">${p.tags.length}개 태그</span>
+      <span style="color:var(--muted);font-size:11px">${p.tags.length}개 태그</span>
       <button onclick="deleteMyPreset(${i}, event)" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:0 0 0 2px;line-height:1" title="삭제">×</button>
     </div>
   `).join('');
@@ -5466,7 +5470,7 @@ function renderHistoryPage() {
       const globalIdx = globalStart + i;
       return `<div style="padding:12px 0;border-bottom:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:10px;color:var(--muted)">${fmtDate(h.date)} · ${catLabel[h.cat]||''} · ${modeLabel[h.mode]||''}</span>
+          <span style="font-size:11px;color:var(--muted)">${fmtDate(h.date)} · ${catLabel[h.cat]||''} · ${modeLabel[h.mode]||''}</span>
           <button onclick="deleteHistItem(${globalIdx})" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;line-height:1" title="삭제">×</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:5px">
@@ -5740,7 +5744,7 @@ function renderWriteTagList(q) {
       <span style="font-size:13px;color:var(--text)">${item.emoji} ${item.name}</span>
       ${item.cnt > 0
         ? `<span style="font-size:11px;color:var(--orange)">후기 ${item.cnt}개</span>`
-        : `<span style="font-size:10px;color:var(--muted)">첫 후기 남기기</span>`}
+        : `<span style="font-size:11px;color:var(--muted)">첫 후기 남기기</span>`}
     </div>`).join('');
 }
 
@@ -5755,13 +5759,13 @@ function renderMyPostItem(p) {
       ${imgHtml}
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px">
-          <span style="font-size:10px;color:var(--muted)">${TYPE_LABEL[p.type]||''} ${fmtCommDate(p.date)}</span>
-          ${p.star ? `<span style="font-size:10px;color:var(--yellow)">${'★'.repeat(p.star)}</span>` : ''}
+          <span style="font-size:11px;color:var(--muted)">${TYPE_LABEL[p.type]||''} ${fmtCommDate(p.date)}</span>
+          ${p.star ? `<span style="font-size:11px;color:var(--yellow)">${'★'.repeat(p.star)}</span>` : ''}
         </div>
         <div style="font-size:12px;color:var(--text);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.text}</div>
-        ${p.menuTag ? `<div style="font-size:10px;color:var(--orange);margin-top:2px">${p.menuTag}</div>` : ''}
+        ${p.menuTag ? `<div style="font-size:11px;color:var(--orange);margin-top:2px">${p.menuTag}</div>` : ''}
       </div>
-      <div style="font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">
+      <div style="font-size:11px;color:var(--muted);text-align:right;flex-shrink:0">
         ❤️ ${(p.likes||0)+(likedPosts.has(p.id)?1:0)}<br>💬 ${(commComments[p.id]||[]).length}
       </div>
     </div>`;
@@ -5868,7 +5872,7 @@ function renderTasteStats() {
       <div style="display:flex;gap:6px">
         ${top3.map((m,i) => `
           <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center">
-            <div style="font-size:10px;color:var(--orange);font-weight:700;margin-bottom:4px">${['🥇','🥈','🥉'][i]}</div>
+            <div style="font-size:11px;color:var(--orange);font-weight:700;margin-bottom:4px">${['🥇','🥈','🥉'][i]}</div>
             <div style="font-size:20px;margin-bottom:4px">${m.emoji}</div>
             <div style="font-size:11px;color:var(--text);word-break:keep-all;line-height:1.3">${m.name}</div>
           </div>`).join('')}
@@ -5993,13 +5997,13 @@ function renderCalendarDetail(dateKey) {
     </div>
     ${items.length === 0
       ? `<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0">
-          기록이 없어요${isToday ? '' : '<br><span style="font-size:10px">오늘 날짜를 눌러 기록해 보세요!</span>'}
+          기록이 없어요${isToday ? '' : '<br><span style="font-size:11px">오늘 날짜를 눌러 기록해 보세요!</span>'}
          </div>`
       : items.map(item => `
         <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
           <span style="font-size:22px">${item.emoji}</span>
           <span style="font-size:13px;color:var(--text);flex:1">${item.name}</span>
-          <span style="font-size:10px;color:var(--muted);background:var(--surface);border-radius:6px;padding:2px 6px">${item.type==='menu'?'오늘의메뉴':'오늘식단'}</span>
+          <span style="font-size:11px;color:var(--muted);background:var(--surface);border-radius:6px;padding:2px 6px">${item.type==='menu'?'오늘의메뉴':'오늘식단'}</span>
         </div>`).join('')
     }`;
 }
@@ -6089,13 +6093,13 @@ function renderFoodCalendar() {
         style="min-height:56px;background:${isSelected?'rgba(255,71,87,0.12)':hasMeal?'var(--card)':'var(--surface)'};border:1.5px solid ${isSelected?'var(--orange)':isToday?'var(--orange)':'var(--border)'};border-radius:10px;padding:5px 4px;cursor:pointer;transition:all 0.15s;position:relative">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
           <span style="font-size:11px;font-weight:700;color:${isToday?'var(--orange)':dayColor}">${d}</span>
-          ${hasDiet ? `<span style="font-size:9px">🔥</span>` : ''}
+          ${hasDiet ? `<span style="font-size:11px">🔥</span>` : ''}
         </div>
         ${items.slice(0,2).map(item => `
-          <div style="font-size:9px;color:var(--muted);line-height:1.3;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
+          <div style="font-size:11px;color:var(--muted);line-height:1.3;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
             ${item.emoji} ${item.name}
           </div>`).join('')}
-        ${items.length > 2 ? `<div style="font-size:9px;color:var(--orange)">+${items.length-2}</div>` : ''}
+        ${items.length > 2 ? `<div style="font-size:11px;color:var(--orange)">+${items.length-2}</div>` : ''}
       </div>`;
   }
   grid.innerHTML = cells;
@@ -6313,7 +6317,7 @@ function renderNotifyPage() {
       <!-- 아바타 + 타입 아이콘 -->
       <div style="position:relative;flex-shrink:0">
         <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#cc1a2e);display:flex;align-items:center;justify-content:center;font-size:20px">${n.avatar}</div>
-        <span style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:${TYPE_COLOR[n.type]};display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid var(--card)">${TYPE_ICON[n.type]}</span>
+        <span style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:${TYPE_COLOR[n.type]};display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid var(--card)">${TYPE_ICON[n.type]}</span>
       </div>
       <!-- 내용 -->
       <div style="flex:1;min-width:0">
@@ -6321,7 +6325,7 @@ function renderNotifyPage() {
           ${n.nick ? `<strong>${n.nick}</strong>님이 ` : ''}${n.text}
         </div>
         <div style="font-size:11px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${n.sub}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:3px">${fmtCommDate(n.date)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">${fmtCommDate(n.date)}</div>
       </div>
       <!-- 읽음 표시 -->
       ${!n.read ? '<div style="width:8px;height:8px;border-radius:50%;background:#ff4d6d;flex-shrink:0;margin-top:4px"></div>' : ''}
@@ -6388,14 +6392,14 @@ function openUserProfile(nick) {
           ${imgHtml}
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
-              <span style="font-size:10px;color:var(--muted)">${TYPE_LABEL[p.type]||''}</span>
-              <span style="font-size:10px;color:var(--muted)">· ${fmtCommDate(p.date)}</span>
+              <span style="font-size:11px;color:var(--muted)">${TYPE_LABEL[p.type]||''}</span>
+              <span style="font-size:11px;color:var(--muted)">· ${fmtCommDate(p.date)}</span>
               ${starHtml}
             </div>
             <div style="font-size:12px;color:var(--text);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.text}</div>
-            ${p.menuTag ? `<div style="font-size:10px;color:var(--orange);margin-top:2px">${p.menuTag}</div>` : ''}
+            ${p.menuTag ? `<div style="font-size:11px;color:var(--orange);margin-top:2px">${p.menuTag}</div>` : ''}
           </div>
-          <div style="font-size:10px;color:var(--muted);text-align:right;flex-shrink:0;white-space:nowrap">
+          <div style="font-size:11px;color:var(--muted);text-align:right;flex-shrink:0;white-space:nowrap">
             ❤️ ${likeCount}<br>💬 ${(commComments[p.id]||[]).length}
           </div>
         </div>`;
@@ -6565,7 +6569,7 @@ function toggleTickerList() {
       onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">
       <span>${t.rank}</span>
       <span>${t.emoji} ${t.name}</span>
-      ${t.cnt ? `<span style="margin-left:auto;font-size:10px;color:var(--orange)">${t.cnt}번</span>` : ''}
+      ${t.cnt ? `<span style="margin-left:auto;font-size:11px;color:var(--orange)">${t.cnt}번</span>` : ''}
     </div>`).join('');
   dd.style.display = 'block';
 
@@ -6686,7 +6690,7 @@ function openMenuReviewModal(menuName, emoji) {
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
             <span style="font-size:12px;font-weight:700;color:var(--text)">${p.avatar} ${p.nick}</span>
-            <span style="font-size:10px;color:var(--muted)">${fmtCommDate(p.date)}</span>
+            <span style="font-size:11px;color:var(--muted)">${fmtCommDate(p.date)}</span>
             ${starHtml}
           </div>
           <div style="font-size:13px;color:var(--text);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.text}</div>
@@ -6785,7 +6789,7 @@ function renderMenuPickList(q) {
       <span style="font-size:13px;color:var(--text)">${item.emoji} ${item.name}</span>
       ${item.cnt > 0
         ? `<span style="font-size:11px;color:var(--orange);font-weight:700">후기 ${item.cnt}개</span>`
-        : `<span style="font-size:10px;color:var(--muted)">첫 후기 남기기</span>`}
+        : `<span style="font-size:11px;color:var(--muted)">첫 후기 남기기</span>`}
     </div>`).join('');
 }
 
@@ -6991,7 +6995,7 @@ function renderCommentListHTML(postId) {
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px">
           <span style="font-size:11px;font-weight:700;color:var(--text)">${c.nick}</span>
-          <span style="font-size:10px;color:var(--muted)">${fmtCommDate(c.date)}</span>
+          <span style="font-size:11px;color:var(--muted)">${fmtCommDate(c.date)}</span>
           <button onclick="likeCommentInModal('${postId}','${c.id}')" style="margin-left:auto;background:none;border:none;color:${liked?'#ff4d6d':'var(--muted)'};font-size:11px;cursor:pointer;padding:0">
             ${liked?'❤️':'🤍'}${cnt>0?' '+cnt:''}
           </button>
@@ -7152,7 +7156,7 @@ function renderCommentList(postId) {
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px">
           <span style="font-size:12px;font-weight:700;color:var(--text)">${c.nick}</span>
-          <span style="font-size:10px;color:var(--muted)">${fmtCommDate(c.date)}</span>
+          <span style="font-size:11px;color:var(--muted)">${fmtCommDate(c.date)}</span>
           <button onclick="likeComment('${postId}','${c.id}')" style="margin-left:auto;background:none;border:none;color:${liked?'#ff4d6d':'var(--muted)'};font-size:11px;cursor:pointer;padding:0;font-family:'Noto Sans KR',sans-serif">
             ${liked?'❤️':'🤍'} ${likeCount > 0 ? likeCount : ''}
           </button>
@@ -7281,7 +7285,7 @@ function renderDailyMeal() {
         <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
           <div style="background:var(--yellow);height:100%;border-radius:4px;width:${cnt > 0 ? pct : 0}%;transition:width 0.5s ease"></div>
         </div>
-        <div style="font-size:10px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어 보세요'}</div>
+        <div style="font-size:11px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어 보세요'}</div>
       </div>
       <button onclick="certifyDailyMeal('${m.name}')"
         style="background:var(--yellow);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#1a1400;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%">
@@ -7433,7 +7437,7 @@ function renderDailyQ() {
             </div>
           </div>`;
         }).join('')}
-        <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">${total > 0 ? `총 ${total}명 참여` : '첫 투표를 남겨주세요'}</div>
+        <div style="font-size:11px;color:var(--muted);text-align:right;margin-top:4px">${total > 0 ? `총 ${total}명 참여` : '첫 투표를 남겨주세요'}</div>
       ` : `
         <!-- 투표 버튼 -->
         <div style="display:flex;gap:8px">
@@ -7631,9 +7635,9 @@ function updateTournamentTabs() {
     const unlocked = i <= availableRound;
     b.disabled = !unlocked;
     b.classList.toggle('active', i === currentTournamentRound);
-    if (!unlocked) b.innerHTML = '<span style="font-size:9px">🔒</span><br><span>' + ROUND_NAMES[i] + '</span>';
-    else if (i < availableRound) b.innerHTML = '<span style="font-size:9px">✅</span><br><span>' + ROUND_NAMES[i] + '</span>';
-    else b.innerHTML = '<span style="font-size:9px;color:' + (i===currentTournamentRound?'white':'var(--orange)') + '">진행중</span><br><span>' + ROUND_NAMES[i] + '</span>';
+    if (!unlocked) b.innerHTML = '<span style="font-size:11px">🔒</span><br><span>' + ROUND_NAMES[i] + '</span>';
+    else if (i < availableRound) b.innerHTML = '<span style="font-size:11px">✅</span><br><span>' + ROUND_NAMES[i] + '</span>';
+    else b.innerHTML = '<span style="font-size:11px;color:' + (i===currentTournamentRound?'white':'var(--orange)') + '">진행중</span><br><span>' + ROUND_NAMES[i] + '</span>';
   });
 }
 
@@ -7700,8 +7704,8 @@ function renderTournamentMatches() {
     const bColor = bActive ? 'var(--orange)' : 'var(--text)';
     const cursor = canVote ? 'pointer' : 'default';
 
-    const aBar = confirmed ? '<div style="margin-top:6px"><div style="background:var(--surface);border-radius:4px;height:5px;overflow:hidden;margin-bottom:2px"><div style="background:' + (vd.myVote==='a'?'var(--orange)':'var(--border)') + ';height:100%;border-radius:4px;width:' + aPct + '%"></div></div><div style="font-size:10px;color:' + (vd.myVote==='a'?'var(--orange)':'var(--muted)') + '">' + aPct + '%' + (vd.myVote==='a'?' ✓':'') + '</div></div>' : (temp==='a' ? '<div style="font-size:10px;color:var(--orange);margin-top:4px">선택중</div>' : '');
-    const bBar = confirmed ? '<div style="margin-top:6px"><div style="background:var(--surface);border-radius:4px;height:5px;overflow:hidden;margin-bottom:2px"><div style="background:' + (vd.myVote==='b'?'var(--orange)':'var(--border)') + ';height:100%;border-radius:4px;width:' + bPct + '%"></div></div><div style="font-size:10px;color:' + (vd.myVote==='b'?'var(--orange)':'var(--muted)') + '">' + bPct + '%' + (vd.myVote==='b'?' ✓':'') + '</div></div>' : (temp==='b' ? '<div style="font-size:10px;color:var(--orange);margin-top:4px">선택중</div>' : '');
+    const aBar = confirmed ? '<div style="margin-top:6px"><div style="background:var(--surface);border-radius:4px;height:5px;overflow:hidden;margin-bottom:2px"><div style="background:' + (vd.myVote==='a'?'var(--orange)':'var(--border)') + ';height:100%;border-radius:4px;width:' + aPct + '%"></div></div><div style="font-size:11px;color:' + (vd.myVote==='a'?'var(--orange)':'var(--muted)') + '">' + aPct + '%' + (vd.myVote==='a'?' ✓':'') + '</div></div>' : (temp==='a' ? '<div style="font-size:11px;color:var(--orange);margin-top:4px">선택중</div>' : '');
+    const bBar = confirmed ? '<div style="margin-top:6px"><div style="background:var(--surface);border-radius:4px;height:5px;overflow:hidden;margin-bottom:2px"><div style="background:' + (vd.myVote==='b'?'var(--orange)':'var(--border)') + ';height:100%;border-radius:4px;width:' + bPct + '%"></div></div><div style="font-size:11px;color:' + (vd.myVote==='b'?'var(--orange)':'var(--muted)') + '">' + bPct + '%' + (vd.myVote==='b'?' ✓':'') + '</div></div>' : (temp==='b' ? '<div style="font-size:11px;color:var(--orange);margin-top:4px">선택중</div>' : '');
 
     html += '<div style="background:var(--card);border:1.5px solid ' + ((aActive||bActive)&&!confirmed?'var(--orange)':'var(--border)') + ';border-radius:14px;padding:14px;margin-bottom:10px">'
       + '<div style="font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:10px">' + (i+1) + '매치 &nbsp;·&nbsp; ' + (total > 0 ? '<span style="color:var(--orange)">' + total + '명 참여중</span>' : '<span style="color:var(--orange)">첫 투표를 기다려요</span>') + '</div>'
@@ -7729,9 +7733,9 @@ function updateTournamentTabs() {
     const unlocked = i <= availableRound;
     b.disabled = !unlocked;
     b.classList.toggle('active', i === currentTournamentRound);
-    if (!unlocked) b.innerHTML = `<span style="font-size:9px">🔒</span><br><span>${ROUND_NAMES[i]}</span>`;
-    else if (i < availableRound) b.innerHTML = `<span style="font-size:9px">✅</span><br><span>${ROUND_NAMES[i]}</span>`;
-    else b.innerHTML = `<span style="font-size:9px;color:${i===currentTournamentRound?'white':'var(--orange)'}">진행중</span><br><span>${ROUND_NAMES[i]}</span>`;
+    if (!unlocked) b.innerHTML = `<span style="font-size:11px">🔒</span><br><span>${ROUND_NAMES[i]}</span>`;
+    else if (i < availableRound) b.innerHTML = `<span style="font-size:11px">✅</span><br><span>${ROUND_NAMES[i]}</span>`;
+    else b.innerHTML = `<span style="font-size:11px;color:${i===currentTournamentRound?'white':'var(--orange)'}">진행중</span><br><span>${ROUND_NAMES[i]}</span>`;
   });
 }
 
@@ -7950,7 +7954,7 @@ function renderFunPage() {
           <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
             <div style="background:var(--yellow);height:100%;border-radius:4px;width:${cnt>0?pct:0}%;transition:width 0.5s ease"></div>
           </div>
-          <div style="font-size:10px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어 보세요'}</div>
+          <div style="font-size:11px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어 보세요'}</div>
         </div>
         <button onclick="certifyDailyMeal('${m.name}')"
           style="background:var(--yellow);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#1a1400;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%">
@@ -7993,7 +7997,7 @@ function renderFunPage() {
                   </div>
                 </div>`;
               }).join('')}
-              <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">${total > 0 ? `총 ${total}명 참여` : '첫 투표를 남겨주세요'}</div>
+              <div style="font-size:11px;color:var(--muted);text-align:right;margin-top:4px">${total > 0 ? `총 ${total}명 참여` : '첫 투표를 남겨주세요'}</div>
             ` : `
               <div style="display:flex;gap:8px">
                 ${q.opts.map((opt,i)=>`
@@ -8043,12 +8047,12 @@ function renderNotifySection() {
     <div onclick="readNotif('${n.id}')" style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
       <div style="position:relative;flex-shrink:0">
         <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#cc1a2e);display:flex;align-items:center;justify-content:center;font-size:17px">${n.avatar}</div>
-        <span style="position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:${TYPE_COLOR[n.type]};display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid var(--card)">${TYPE_ICON[n.type]}</span>
+        <span style="position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:${TYPE_COLOR[n.type]};display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid var(--card)">${TYPE_ICON[n.type]}</span>
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;color:var(--text);margin-bottom:1px">${n.nick ? `<strong>${n.nick}</strong>님이 ` : ''}${n.text}</div>
         <div style="font-size:11px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${n.sub}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">${fmtCommDate(n.date)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${fmtCommDate(n.date)}</div>
       </div>
       ${!n.read?'<div style="width:6px;height:6px;border-radius:50%;background:#ff4d6d;flex-shrink:0;margin-top:4px"></div>':''}
     </div>`).join('');
@@ -8095,7 +8099,7 @@ function renderHotBanner(tab) {
       ${imgHtml}
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;color:var(--text);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.text}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:3px">${p.nick} · ❤️ ${likeCount}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">${p.nick} · ❤️ ${likeCount}</div>
       </div>
     </div>`;
   }).join('');
@@ -8136,7 +8140,7 @@ function openCommPostModal(postId) {
         const pct = total ? Math.round(counts[i]/total*100) : Math.round(100/options.length);
         return `<div style="flex:1;min-width:80px">
           <button class="comm-vote-btn ${voted===String(i)?'voted':''}" onclick="voteComm('${p.id}',${i});openCommPostModal('${p.id}')">${opt}</button>
-          ${voted!==undefined?`<div class="comm-vote-bar"><div class="comm-vote-bar-fill" style="width:${pct}%"></div></div><div style="font-size:10px;color:var(--muted);text-align:center;margin-top:2px">${pct}%</div>`:''}
+          ${voted!==undefined?`<div class="comm-vote-bar"><div class="comm-vote-bar-fill" style="width:${pct}%"></div></div><div style="font-size:11px;color:var(--muted);text-align:center;margin-top:2px">${pct}%</div>`:''}
         </div>`;
       }).join('') + `</div>`;
   })();
@@ -8145,7 +8149,7 @@ function openCommPostModal(postId) {
       <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#cc1a2e);display:flex;align-items:center;justify-content:center;font-size:18px">${p.avatar}</div>
       <div style="flex:1">
         <div style="font-size:13px;font-weight:700;color:var(--text)">${p.nick}</div>
-        <div style="font-size:10px;color:var(--muted)">${TYPE_LABEL[p.type]||''} · ${fmtCommDate(p.date)}</div>
+        <div style="font-size:11px;color:var(--muted)">${TYPE_LABEL[p.type]||''} · ${fmtCommDate(p.date)}</div>
       </div>
     </div>
     ${imgHtml}
@@ -8993,8 +8997,8 @@ function renderCommFeed(tab) {
         const isClosed = p.voteClosed || (Date.now() - p.date > VOTE_DURATION);
         const remaining = Math.max(0, Math.round((p.date + VOTE_DURATION - Date.now()) / 60000));
         const timeLabel = isClosed
-          ? `<span style="font-size:10px;color:var(--muted)">⏰ 투표 마감</span>`
-          : `<span style="font-size:10px;color:var(--orange)">⏱ ${remaining < 60 ? remaining+'분' : Math.floor(remaining/60)+'시간'} 남음</span>`;
+          ? `<span style="font-size:11px;color:var(--muted)">⏰ 투표 마감</span>`
+          : `<span style="font-size:11px;color:var(--orange)">⏱ ${remaining < 60 ? remaining+'분' : Math.floor(remaining/60)+'시간'} 남음</span>`;
         voteHtml = `<div style="margin-bottom:4px">${timeLabel}</div>` +
           `<div class="comm-vote-wrap" style="flex-wrap:wrap">` +
           options.map((opt, i) => {
@@ -9004,7 +9008,7 @@ function renderCommFeed(tab) {
             return `<div style="flex:1;min-width:80px">
               ${vImg}
               <button class="comm-vote-btn ${voted===String(i)?'voted':''}" ${isClosed?'disabled style="opacity:0.7;cursor:default"':''} onclick="voteComm('${p.id}',${i})">${opt}</button>
-              ${showResult ? `<div class="comm-vote-bar"><div class="comm-vote-bar-fill" style="width:${pct}%"></div></div><div style="font-size:10px;color:var(--muted);text-align:center;margin-top:2px">${pct}%</div>` : ''}
+              ${showResult ? `<div class="comm-vote-bar"><div class="comm-vote-bar-fill" style="width:${pct}%"></div></div><div style="font-size:11px;color:var(--muted);text-align:center;margin-top:2px">${pct}%</div>` : ''}
             </div>`;
           }).join('') +
         `</div>` +
@@ -9017,7 +9021,7 @@ function renderCommFeed(tab) {
 
     const dailyMeals = getDailyMeals();
     const isDailyMeal = p.menuTag && dailyMeals.some(m => m.name === p.menuTag);
-    const dailyBadge = isDailyMeal ? `<span style="display:inline-block;background:rgba(255,209,102,0.15);border:1px solid var(--yellow);border-radius:10px;padding:2px 7px;font-size:10px;color:var(--yellow);font-weight:700;margin-left:4px">🍱 오늘의 급식</span>` : '';
+    const dailyBadge = isDailyMeal ? `<span style="display:inline-block;background:rgba(255,209,102,0.15);border:1px solid var(--yellow);border-radius:10px;padding:2px 7px;font-size:11px;color:var(--yellow);font-weight:700;margin-left:4px">🍱 오늘의 급식</span>` : '';
 
     const imgHtml = (p.imgs && p.imgs.length > 0) ? renderSlide(p.imgs, p.id) : '';
 
@@ -9230,7 +9234,7 @@ function openCommWrite() {
       </div>
       <div id="vote-img-preview-${n-1}" style="display:none;position:relative;width:60px;height:60px">
         <img id="vote-img-${n-1}" style="width:60px;height:60px;object-fit:cover;border-radius:8px" src="" alt="">
-        <button onclick="removeVoteImg(${n-1})" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:10px;cursor:pointer;line-height:1">×</button>
+        <button onclick="removeVoteImg(${n-1})" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:11px;cursor:pointer;line-height:1">×</button>
       </div>
     </div>`
   ).join('');  const addBtn = document.getElementById('comm-vote-add-btn');
@@ -9319,7 +9323,7 @@ function addVoteOption() {
     </div>
     <div id="vote-img-preview-${n}" style="display:none;position:relative;width:60px;height:60px">
       <img id="vote-img-${n}" style="width:60px;height:60px;object-fit:cover;border-radius:8px" src="" alt="">
-      <button onclick="removeVoteImg(${n})" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:10px;cursor:pointer;line-height:1">×</button>
+      <button onclick="removeVoteImg(${n})" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:11px;cursor:pointer;line-height:1">×</button>
     </div>`;
   wrap.appendChild(div);
   if (wrap.querySelectorAll('.comm-vote-option-row').length >= 4) {
