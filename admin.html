@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>오메추 운영자</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+<style>
+  :root { --bg:#0f0e0c; --card:#1c1a17; --surface:#26231f; --border:#36322c; --text:#f5f0e8; --muted:#9a9085; --orange:#ff4757; --green:#2ed573; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,'Noto Sans KR',sans-serif; }
+  .wrap { max-width:720px; margin:0 auto; padding:20px 16px 60px; }
+  h1 { font-size:20px; margin:0 0 16px; }
+  h1 span { color:var(--orange); }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px; }
+  input { width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; }
+  button { padding:9px 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; cursor:pointer; }
+  button.primary { background:var(--orange); border-color:var(--orange); color:#fff; font-weight:700; }
+  button.danger { color:#ff6b81; border-color:#5a2a30; }
+  .tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .tabs button.on { background:var(--orange); border-color:var(--orange); color:#fff; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+  .stat { background:var(--surface); border-radius:12px; padding:14px; }
+  .stat b { display:block; font-size:24px; margin-top:4px; }
+  .stat small { color:var(--muted); font-size:12px; }
+  .row { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--border); }
+  .row:last-child { border-bottom:none; }
+  .meta { color:var(--muted); font-size:12px; margin-top:4px; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; background:#5a2a30; color:#ff9aa8; margin-left:6px; }
+  .empty { color:var(--muted); text-align:center; padding:30px 0; font-size:14px; }
+  .actions { display:flex; gap:6px; flex-shrink:0; }
+  .text { white-space:pre-wrap; word-break:break-all; font-size:14px; line-height:1.5; }
+  .bar { height:8px; background:var(--orange); border-radius:4px; margin-top:4px; }
+  #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#000c; padding:10px 16px; border-radius:10px; display:none; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>오<span>메</span>추 운영자</h1>
+
+  <div id="login" class="card">
+    <div style="font-size:14px;margin-bottom:10px">관리자 비밀번호를 입력하세요</div>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()">
+    <button class="primary" style="width:100%;margin-top:10px" onclick="login()">로그인</button>
+    <div id="login-msg" class="meta"></div>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="tabs">
+      <button data-tab="stats" class="on" onclick="go('stats')">📊 현황</button>
+      <button data-tab="reports" onclick="go('reports')">🚨 신고</button>
+      <button data-tab="requests" onclick="go('requests')">📮 메뉴 건의</button>
+      <button data-tab="top" onclick="go('top')">🔥 인기 메뉴</button>
+      <button data-tab="posts" onclick="go('posts')">📝 최근 글</button>
+      <button data-tab="settings" onclick="go('settings')">⚙️ 설정</button>
+      <button onclick="logout()" style="margin-left:auto">로그아웃</button>
+    </div>
+    <div id="view" class="card"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const sb = supabase.createClient('https://arodifxcwdehcezybhrh.supabase.co', 'sb_publishable_fHCAe5O2yY_EPtZhdGPyJg_cHPkjgiB');
+let PASS = sessionStorage.getItem('omechuAdmin') || '';
+let tab = 'stats';
+
+const esc = v => String(v ?? '').replace(/[&<>"'`]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+const when = d => { const t = new Date(d); return isNaN(t) ? '' : t.toLocaleString('ko-KR', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }); };
+const typeName = { free:'자유', pick:'투표', diet:'오늘 식단', review:'후기', recipe:'요리' };
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 2200); }
+async function call(fn, args = {}) {
+  const { data, error } = await sb.rpc(fn, { p_pass: PASS, ...args });
+  if (error) { toast('오류: ' + error.message); throw error; }
+  if (data === null) { toast('비밀번호가 맞지 않아요'); logout(); throw new Error('auth'); }
+  return data;
+}
+
+async function login() {
+  const pw = document.getElementById('pw').value;
+  document.getElementById('login-msg').textContent = '확인 중...';
+  const { data } = await sb.rpc('admin_login', { p_pass: pw });
+  if (data === true) { PASS = pw; sessionStorage.setItem('omechuAdmin', pw); show(); }
+  else document.getElementById('login-msg').textContent = '비밀번호가 맞지 않아요';
+}
+function logout() { PASS = ''; sessionStorage.removeItem('omechuAdmin'); document.getElementById('app').style.display = 'none'; document.getElementById('login').style.display = 'block'; }
+function show() { document.getElementById('login').style.display = 'none'; document.getElementById('app').style.display = 'block'; go(tab); }
+function go(t) {
+  tab = t;
+  document.querySelectorAll('.tabs button[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  ({ stats, reports, requests, top, posts, settings })[t]();
+}
+const V = html => document.getElementById('view').innerHTML = html;
+
+async function stats() {
+  V('<div class="empty">불러오는 중...</div>');
+  const s = await call('admin_stats');
+  const item = (label, v, sub) => `<div class="stat"><small>${label}</small><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+  V(`<div class="grid">
+    ${item('사용 기기', s.devices, `최근 7일 신규 ${s.devices_7d}`)}
+    ${item('커뮤니티 글', s.posts, `최근 7일 ${s.posts_7d}`)}
+    ${item('댓글', s.comments)}
+    ${item('글 좋아요', s.likes)}
+    ${item('처리할 신고', s.reports_open, s.reports_open ? '🚨 신고 탭 확인' : '')}
+    ${item('메뉴 건의', s.menu_requests)}
+    ${item('최근 7일 추천', s.recs_7d, '추천된 메뉴 수')}
+  </div>`);
+}
+
+async function reports() {
+  V('<div class="empty">불러오는 중...</div>');
+  const list = await call('admin_reported_posts');
+  if (!list.length) return V('<div class="empty">처리할 신고가 없어요 👍</div>');
+  V(list.map(p => `<div class="row">
+      <div style="flex:1;min-width:0">
+        <div><b>${esc(p.nick)}</b><span class="badge">신고 ${p.reports}건</span></div>
+        <div class="text" style="margin-top:6px">${esc(p.text)}</div>
+        <div class="meta">${typeName[p.type] || esc(p.type)} · 작성 ${when(p.created_at)} · 마지막 신고 ${when(p.last_report)}${p.reports >= 3 ? ' · 앱에서 자동으로 가려진 상태' : ''}</div>
+      </div>
+      <div class="actions">
+        <button class="danger" onclick="delPost('${esc(p.id)}')">삭제</button>
+        <button onclick="clearRep('${esc(p.id)}')">문제없음</button>
+      </div></div>`).join(''));
+}
+async function delPost(id) { if (!confirm('이 글을 삭제할까요? 댓글·좋아요도 같이 지워지고 되돌릴 수 없어요.')) return; await call('admin_delete_post', { p_id: id }); toast('삭제했어요'); go(tab); }
+async function clearRep(id) { await call('admin_clear_reports', { p_post_id: id }); toast('신고를 정리했어요. 글은 다시 보여요'); go(tab); }
+
+async function requests() {
+  V('<div class="empty">불러오는 중...</div>');
+  const list = await call('admin_menu_requests');
+  if (!list.length) return V('<div class="empty">아직 메뉴 건의가 없어요</div>');
+  const catName = { all:'전체', cook:'직접요리', delivery:'배달', dine:'외식' };
+  V(`<div class="meta" style="margin-bottom:6px">많이 요청된 순서예요. 메뉴에 추가했으면 '반영 완료'로 지워주세요.</div>` + list.map(r => `<div class="row">
+      <div><b>${esc(r.name)}</b> <span class="meta">× ${r.count}명</span>
+        <div class="meta">${(r.cats || []).map(c => catName[c] || esc(c)).join(', ')} · 마지막 ${when(r.last)}</div></div>
+      <div class="actions"><button onclick="delReq(this)" data-name="${esc(r.name)}">반영 완료</button></div></div>`).join(''));
+}
+async function delReq(btn) { await call('admin_delete_menu_request', { p_name: btn.dataset.name }); toast('정리했어요'); go(tab); }
+
+async function top() {
+  V('<div class="empty">불러오는 중...</div>');
+  const list = await call('admin_top_menus', { p_days: 30 });
+  if (!list.length) return V('<div class="empty">아직 추천 기록이 없어요</div>');
+  const max = list[0].count;
+  V(`<div class="meta" style="margin-bottom:6px">최근 30일 동안 추천 카드에 많이 나온 메뉴 TOP 20</div>` + list.map((m, i) => `<div class="row" style="display:block">
+      <div style="display:flex;justify-content:space-between"><span>${i + 1}. ${esc(m.menu)}</span><span class="meta">${m.count}회</span></div>
+      <div class="bar" style="width:${Math.max(4, m.count / max * 100)}%"></div></div>`).join(''));
+}
+
+async function posts() {
+  V('<div class="empty">불러오는 중...</div>');
+  const list = await call('admin_recent_posts');
+  if (!list.length) return V('<div class="empty">아직 글이 없어요</div>');
+  V(list.map(p => `<div class="row">
+      <div style="flex:1;min-width:0"><div><b>${esc(p.nick)}</b> <span class="meta">${typeName[p.type] || esc(p.type)}</span></div>
+        <div class="text" style="margin-top:4px">${esc(p.text)}</div>
+        <div class="meta">${when(p.created_at)} · ❤️ ${p.likes || 0} · 💬 ${p.comments || 0}</div></div>
+      <div class="actions"><button class="danger" onclick="delPost('${esc(p.id)}')">삭제</button></div></div>`).join(''));
+}
+
+function settings() {
+  V(`<div style="font-size:14px;margin-bottom:10px">관리자 비밀번호 바꾸기</div>
+     <input id="np1" type="password" placeholder="새 비밀번호 (10자 이상)" autocomplete="new-password">
+     <input id="np2" type="password" placeholder="새 비밀번호 다시" autocomplete="new-password" style="margin-top:8px">
+     <button class="primary" style="margin-top:10px" onclick="changePw()">바꾸기</button>`);
+}
+async function changePw() {
+  const a = document.getElementById('np1').value, b = document.getElementById('np2').value;
+  if (a.length < 10) return toast('10자 이상으로 정해주세요');
+  if (a !== b) return toast('두 번 입력한 비밀번호가 달라요');
+  const ok = await call('admin_change_password', { p_new: a });
+  if (ok) { PASS = a; sessionStorage.setItem('omechuAdmin', a); toast('비밀번호를 바꿨어요'); settings(); }
+}
+
+if (PASS) sb.rpc('admin_login', { p_pass: PASS }).then(({ data }) => data === true ? show() : logout());
+</script>
+</body>
+</html>

@@ -6,8 +6,7 @@
 <title>오메추 — 오늘 메뉴 추천</title>
 
 <!-- PWA -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+<link rel="icon" type="image/png" href="icon-192.png">
   <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ff4757">
 <meta name="mobile-web-app-capable" content="yes">
@@ -2904,6 +2903,14 @@ function pickWeighted(candidates, count, exclude = []) {
 }
 let pickReasons = {};
 
+// 어떤 메뉴가 많이 추천되는지 익명 집계 (메뉴 이름·방식만, 개인 정보 없음)
+function logRecEvents(items) {
+  try {
+    const rows = items.map(m => ({ menu: m.name, cat: selectedCat || null }));
+    if (rows.length) sb.from('rec_events').insert(rows).then(() => {}, () => {});
+  } catch(e) {}
+}
+
 // 마이페이지용 입맛 분석
 function analyzeMyTaste() {
   const prof = buildTasteProfile();
@@ -3711,6 +3718,7 @@ function getRecommendation() {
   currentCandidates = candidates;
   pickReasons = {};
   currentPicked = pickWeighted(candidates, Math.min(3, candidates.length));
+  logRecEvents(currentPicked);
 
   renderResults();
 }
@@ -5634,10 +5642,10 @@ function clearBlockedUsers() {
 // 신고 누적 수 불러오기 (reports 테이블)
 async function fetchReportCounts() {
   try {
-    const { data, error } = await sb.from('reports').select('post_id').limit(5000);
+    const { data, error } = await sb.rpc('report_counts');
     if (error) throw error;
     reportCounts = {};
-    (data || []).forEach(r => { reportCounts[r.post_id] = (reportCounts[r.post_id] || 0) + 1; });
+    (data || []).forEach(r => { reportCounts[r.post_id] = Number(r.cnt) || 0; });
   } catch (e) { reportCounts = {}; }
 }
 
@@ -6819,13 +6827,34 @@ function updateCustomTag(val) {
   selectedMenuTag = val.trim() ? '✏️ ' + val.trim() : '';
 }
 
-function saveCustomMenuRequest(menuName) {
+function saveCustomMenuRequest(menuName, cat = 'all') {
   if (!menuName) return;
   const requests = JSON.parse(localStorage.getItem('wmjMenuRequests') || '[]');
   if (!requests.find(r => r.name === menuName)) {
     requests.push({ name: menuName, date: new Date().toISOString() });
     localStorage.setItem('wmjMenuRequests', JSON.stringify(requests));
+    // 운영자가 볼 수 있게 서버에도 저장
+    try { sb.from('menu_requests').insert({ name: menuName.slice(0, 30), cat, user_key: MY_USER_KEY }).then(() => {}, () => {}); } catch(e) {}
   }
+}
+
+// ── 메뉴 건의 모달 ──
+function openSuggest() {
+  const m = document.getElementById('suggest-modal');
+  if (!m) return;
+  document.getElementById('suggest-input').value = '';
+  m.classList.add('show');
+  setTimeout(() => document.getElementById('suggest-input').focus(), 100);
+}
+function closeSuggest() { document.getElementById('suggest-modal')?.classList.remove('show'); }
+function submitSuggest() {
+  const name = (document.getElementById('suggest-input').value || '').trim();
+  const cat = document.getElementById('suggest-cat').value || 'all';
+  if (name.length < 1) { showToast('메뉴 이름을 적어주세요'); return; }
+  if (menuDB.some(m => m.name === name)) { showToast(`'${name}'은(는) 이미 있는 메뉴예요 😊`); return; }
+  saveCustomMenuRequest(name, cat);
+  closeSuggest();
+  showToast('📮 건의를 보냈어요! 업데이트 때 반영할게요');
 }
 
 
