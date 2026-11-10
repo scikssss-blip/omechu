@@ -900,7 +900,7 @@
   .modal-input:focus { border-color:var(--orange); }
   .modal-input option { background:var(--card); }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@twemoji/api@17.0.3/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
 <body>
 
@@ -6285,7 +6285,7 @@ function postWeeklySummary() {
   };
 
   commPosts.unshift(post);
-  localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+  saveCommLocal();
   localStorage.setItem(todayKey, '1');
 
   closeWeeklySummary();
@@ -6616,7 +6616,7 @@ function revoteComm(postId) {
   };
 
   commPosts.unshift(newPost);
-  localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+  saveCommLocal();
   localStorage.setItem(revoteKey, String(Date.now()));
 
   currentCommTab = 'all';
@@ -6648,7 +6648,7 @@ function createVotePost() {
   };
 
   commPosts.unshift(post);
-  localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+  saveCommLocal();
 
   // 커뮤니티 탭으로 이동
   showPage('community');
@@ -7051,7 +7051,7 @@ function submitModalComment(postId) {
   commComments[postId].push(comment);
   localStorage.setItem('wmjComments', JSON.stringify(commComments));
   const post = commPosts.find(p=>p.id===postId);
-  if (post) { post.comments = commComments[postId].length; localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts)); }
+  if (post) { post.comments = commComments[postId].length; saveCommLocal(); }
   // Supabase 저장
   saveCommentToSupabase(postId, comment);
   input.value = '';
@@ -7207,7 +7207,7 @@ function submitComment() {
   const post = commPosts.find(p => p.id === currentCommentPostId);
   if (post) {
     post.comments = commComments[currentCommentPostId].length;
-    localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+    saveCommLocal();
   }
 
   // Supabase 저장
@@ -8606,6 +8606,20 @@ function unescHtml(v) {
   if (typeof v !== 'string') return v;
   const t = document.createElement('textarea'); t.innerHTML = v; return t.value;
 }
+// 커뮤니티 글을 폰에 임시 저장 (폰 저장 공간이 약 5MB라 사진은 빼고 최근 60개만, 실패해도 앱은 계속)
+function saveCommLocal() {
+  try {
+    const slim = (typeof commPosts !== 'undefined' ? commPosts : []).slice(0, 60).map(p => {
+      const o = Object.assign({}, p);
+      if (Array.isArray(o.imgs) && o.imgs.some(x => typeof x === 'string' && x.startsWith('data:'))) o.imgs = [];
+      if (Array.isArray(o.voteImgs) && o.voteImgs.some(x => typeof x === 'string' && x.startsWith('data:'))) o.voteImgs = o.voteImgs.map(() => '');
+      return o;
+    });
+    localStorage.setItem('wmjCommPosts', JSON.stringify(slim));
+  } catch (e) {
+    try { localStorage.removeItem('wmjCommPosts'); } catch (_) {}
+  }
+}
 const SUPABASE_KEY = 'sb_publishable_fHCAe5O2yY_EPtZhdGPyJg_cHPkjgiB';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -9148,7 +9162,7 @@ async function voteComm(id, choiceIdx) {
   const voteCount = (parseInt(localStorage.getItem('wmjVoteCount')||'0')) + 1;
   localStorage.setItem('wmjVoteCount', String(voteCount));
 
-  localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+  saveCommLocal();
 
   // Supabase에 투표 수 + 중복방지 기록 저장
   if (post.voteCounts) saveVoteToSupabase(id, choiceIdx);
@@ -9202,7 +9216,7 @@ function checkVoteExpiry() {
   });
 
   if (changed) {
-    localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+    saveCommLocal();
     renderCommFeed();
   }
 }
@@ -9407,7 +9421,7 @@ function submitCommPost(editId) {
       post.text = text;
       post.menuTag = menuTag;
       post.edited = true;
-      localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+      saveCommLocal();
       // Supabase 수정
       ownerRpc('update_my_post', { p_id: editId, p_text: text, p_menu_tag: menuTag || null })
         .catch(e => console.warn('글 수정 저장 실패:', e?.message || String(e)));
@@ -9454,7 +9468,7 @@ function submitCommPost(editId) {
   }
 
   commPosts.unshift(post);
-  localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+  saveCommLocal();
   // Supabase 저장
   savePostToSupabase(post);
   document.getElementById('comm-write-modal').classList.remove('open');
@@ -9521,7 +9535,7 @@ function confirmDeletePost(postId) {
   const idx = commPosts.findIndex(p => p.id === postId);
   if (idx !== -1) {
     commPosts.splice(idx, 1);
-    localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
+    saveCommLocal();
     deletePostFromSupabase(postId);
     renderCommFeed();
     renderHotBanner(currentCommTab);
@@ -9895,7 +9909,7 @@ window.addEventListener('load', function() {
   const opts = {
     folder: 'svg',
     ext: '.svg',
-    base: 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/',
+    base: 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/',
     className: 'twemoji',
   };
 
