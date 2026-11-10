@@ -2314,6 +2314,15 @@
     <div class="my-setting-row" onclick="openSuggest()">
       <span>📮 메뉴 건의•추천하기</span><span class="my-setting-arrow">›</span>
     </div>
+    <div class="my-setting-row" onclick="clearBlockedUsers()">
+      <span>🚫 차단한 사용자 해제</span><span class="my-setting-arrow">›</span>
+    </div>
+    <div class="my-setting-row" onclick="window.open('/terms.html','_blank')">
+      <span>📄 이용약관</span><span class="my-setting-arrow">›</span>
+    </div>
+    <div class="my-setting-row" onclick="window.open('/privacy.html','_blank')">
+      <span>🔒 개인정보처리방침</span><span class="my-setting-arrow">›</span>
+    </div>
   </div>
 </div>
 
@@ -5258,16 +5267,67 @@ function reportCommPost(postId) {
   setTimeout(() => { if (bar.parentNode) bar.remove(); }, 5000);
 }
 
-function confirmReportPost(postId) {
+// ── 신고·차단 ──
+const REPORT_HIDE_THRESHOLD = 3; // 신고 3건 이상이면 모두에게 숨김
+let myReportedPosts = JSON.parse(localStorage.getItem('wmjMyReported') || '[]');
+let blockedUserKeys = JSON.parse(localStorage.getItem('wmjBlockedUsers') || '[]');
+let reportCounts = {};
+
+async function confirmReportPost(postId) {
   const bar = document.getElementById('comm-report-confirm');
   if (bar) bar.remove();
-  // 신고 목록 저장 (운영자 확인용)
-  const reports = JSON.parse(localStorage.getItem('wmjReports') || '[]');
-  if (!reports.find(r => r.postId === postId)) {
-    reports.push({ postId, date: new Date().toISOString() });
-    localStorage.setItem('wmjReports', JSON.stringify(reports));
+  if (!myReportedPosts.includes(postId)) {
+    myReportedPosts.push(postId);
+    localStorage.setItem('wmjMyReported', JSON.stringify(myReportedPosts));
   }
-  showToast('🚨 신고가 접수됐어요. 검토 후 처리할게요.');
+  try {
+    const { error } = await sb.from('reports').insert({ post_id: postId, user_key: MY_USER_KEY, reason: 'user_report' });
+    if (error) throw error;
+    showToast('🚨 신고가 접수됐어요. 이 글은 더 이상 보이지 않아요.');
+  } catch (e) {
+    console.warn('신고 저장 실패:', e?.message || String(e));
+    showToast('🚨 신고했어요. 이 글은 더 이상 보이지 않아요.');
+  }
+  renderCommFeed(currentCommTab);
+}
+
+function blockCommUser(postId) {
+  document.querySelectorAll('[id^="post-menu-"]').forEach(m => m.style.display = 'none');
+  const post = commPosts.find(p => String(p.id) === String(postId));
+  if (!post || !post.user_key) { showToast('이 글은 차단할 수 없어요'); return; }
+  if (!confirm('이 작성자의 글을 앞으로 보지 않을까요?\n설정에서 언제든 풀 수 있어요.')) return;
+  if (!blockedUserKeys.includes(post.user_key)) {
+    blockedUserKeys.push(post.user_key);
+    localStorage.setItem('wmjBlockedUsers', JSON.stringify(blockedUserKeys));
+  }
+  showToast('🚫 차단했어요');
+  renderCommFeed(currentCommTab);
+}
+
+function clearBlockedUsers() {
+  if (blockedUserKeys.length === 0) { showToast('차단한 사용자가 없어요'); return; }
+  if (!confirm(`차단한 ${blockedUserKeys.length}명을 모두 해제할까요?`)) return;
+  blockedUserKeys = []; localStorage.setItem('wmjBlockedUsers', '[]');
+  showToast('차단을 모두 해제했어요');
+  renderCommFeed(currentCommTab);
+}
+
+// 신고 누적 수 불러오기 (reports 테이블)
+async function fetchReportCounts() {
+  try {
+    const { data, error } = await sb.from('reports').select('post_id').limit(5000);
+    if (error) throw error;
+    reportCounts = {};
+    (data || []).forEach(r => { reportCounts[r.post_id] = (reportCounts[r.post_id] || 0) + 1; });
+  } catch (e) { reportCounts = {}; }
+}
+
+// 화면에 보여도 되는 글인지 (내 신고·차단·누적 신고)
+function isPostVisible(p) {
+  if (myReportedPosts.includes(String(p.id))) return false;
+  if (p.user_key && blockedUserKeys.includes(p.user_key)) return false;
+  if ((reportCounts[p.id] || 0) >= REPORT_HIDE_THRESHOLD && p.user_key !== MY_USER_KEY) return false;
+  return true;
 }
 
 function togglePostMenu(postId) {
@@ -5734,7 +5794,7 @@ function generateWeeklySummary() {
   weekStart.setHours(0,0,0,0);
   const weekStartTs = weekStart.getTime();
 
-  const weekPosts = commPosts.filter(p => p.date >= weekStartTs && !p.isResult);
+  const weekPosts = commPosts.filter(p => isPostVisible(p) && p.date >= weekStartTs && !p.isResult);
   if (weekPosts.length === 0) { showToast('이번 주 게시글이 없어요!'); return; }
 
   // 1. 가장 많이 언급된 메뉴 TOP3
@@ -6245,7 +6305,7 @@ function createVotePost() {
 
 // ── 메뉴 후기 모달 ──
 function openMenuReviewModal(menuName, emoji) {
-  const posts = commPosts.filter(p =>
+  const posts = commPosts.filter(isPostVisible).filter(p =>
     p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === menuName
   ).sort((a, b) => {
     const la = (a.likes||0) + (likedPosts.has(a.id)?1:0);
@@ -7648,7 +7708,7 @@ function renderHotBanner(tab) {
 
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
-  let pool = commPosts.filter(p => p.date >= todayStart.getTime());
+  let pool = commPosts.filter(p => isPostVisible(p) && p.date >= todayStart.getTime());
   if (pool.length === 0) pool = [...commPosts];
   if (tab !== 'all') pool = pool.filter(p => p.type === tab);
 
@@ -8141,6 +8201,17 @@ async function fetchMenuImg(name) {
 }
 
 const SUPABASE_URL = 'https://arodifxcwdehcezybhrh.supabase.co';
+// ── 사용자 입력 안전 처리 (HTML로 해석되지 않게) ──
+function escHtml(v) {
+  if (v === null || v === undefined) return v;
+  if (Array.isArray(v)) return v.map(escHtml);
+  if (typeof v !== 'string') return v;
+  return v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
+}
+function unescHtml(v) {
+  if (typeof v !== 'string') return v;
+  const t = document.createElement('textarea'); t.innerHTML = v; return t.value;
+}
 const SUPABASE_KEY = 'sb_publishable_fHCAe5O2yY_EPtZhdGPyJg_cHPkjgiB';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -8161,7 +8232,7 @@ async function loadRealNotifications() {
     const { data: myPosts } = await sb.from('posts').select('id,text').eq('user_key', MY_USER_KEY).limit(100);
     if (!myPosts || myPosts.length === 0) { notifications = []; updateNotifyBadge(); return; }
     const ids = myPosts.map(p => p.id);
-    const textOf = id => ((myPosts.find(p => p.id === id) || {}).text || '').slice(0, 30);
+    const textOf = id => escHtml(((myPosts.find(p => p.id === id) || {}).text || '').slice(0, 30));
     const myNick = getMyNick();
     const [{ data: cmts }, { data: lks }] = await Promise.all([
       sb.from('comments').select('*').in('post_id', ids).order('created_at', { ascending: false }).limit(30),
@@ -8170,8 +8241,8 @@ async function loadRealNotifications() {
     const read = getReadNotifIds();
     const list = [];
     (cmts || []).filter(c => c.nick !== myNick).forEach(c => list.push({
-      id: 'c_' + c.id, type: 'comment', avatar: c.avatar || '💬', nick: c.nick || '익명',
-      text: '댓글을 남겼어요', sub: '"' + (c.text || '').slice(0, 40) + '"', date: new Date(c.created_at).getTime(),
+      id: 'c_' + c.id, type: 'comment', avatar: escHtml(c.avatar) || '💬', nick: escHtml(c.nick) || '익명',
+      text: '댓글을 남겼어요', sub: '"' + escHtml((c.text || '').slice(0, 40)) + '"', date: new Date(c.created_at).getTime(),
     }));
     (lks || []).filter(l => l.user_key !== MY_USER_KEY).forEach(l => list.push({
       id: 'l_' + l.target_id + '_' + l.user_key, type: 'like', avatar: '❤️', nick: '누군가',
@@ -8323,17 +8394,18 @@ async function fetchPostsFromSupabase() {
     if (!Array.isArray(data)) throw new Error('Invalid response');
 
     const posts = data.map(p => ({
-      id: p.id, type: p.type, nick: p.nick, avatar: p.avatar,
-      text: p.text, menuTag: p.menu_tag || '', imgs: p.imgs || [],
+      id: escHtml(String(p.id)), type: p.type, nick: escHtml(p.nick), avatar: escHtml(p.avatar),
+      text: escHtml(p.text), menuTag: escHtml(p.menu_tag || ''), imgs: escHtml(p.imgs || []),
       star: p.star || 0, likes: p.likes || 0, comments: p.comments || 0,
-      voteOptions: p.vote_options || null, voteCounts: p.vote_counts || null,
-      voteImgs: p.vote_imgs || null, voteDeadline: p.vote_deadline || null,
+      voteOptions: escHtml(p.vote_options || null), voteCounts: p.vote_counts || null,
+      voteImgs: escHtml(p.vote_imgs || null), voteDeadline: p.vote_deadline || null,
       voteClosed: p.vote_deadline ? Date.now() > p.vote_deadline : false,
       isAnonymous: p.is_anonymous || false, user_key: p.user_key || null,
       date: new Date(p.created_at).getTime(),
     }));
 
     commPosts = posts;
+    await fetchReportCounts();
     await fetchMyLikes();
     try {
       const likeUrl = `${SUPABASE_URL}/rest/v1/likes?select=target_id&target_type=eq.vote&user_key=eq.${MY_USER_KEY}`;
@@ -8422,10 +8494,10 @@ async function fetchCommentsFromSupabase(postId) {
       .order('created_at', { ascending: true });
     if (error) throw error;
     return data.map(c => ({
-      id: c.id,
-      nick: c.nick,
-      avatar: c.avatar,
-      text: c.text,
+      id: escHtml(String(c.id)),
+      nick: escHtml(c.nick),
+      avatar: escHtml(c.avatar),
+      text: escHtml(c.text),
       likes: c.likes || 0,
       date: new Date(c.created_at).getTime(),
     }));
@@ -8504,9 +8576,10 @@ function renderCommFeed(tab) {
   const feed = document.getElementById('comm-feed');
   if (!feed) return;
 
+  const visiblePosts = commPosts.filter(isPostVisible);
   const filtered = currentCommTab === 'all'
-    ? commPosts
-    : commPosts.filter(p => p.type === currentCommTab);
+    ? visiblePosts
+    : visiblePosts.filter(p => p.type === currentCommTab);
 
   // 메뉴 필터 + 투표 필터 적용
   const VOTE_DURATION = 3 * 60 * 60 * 1000;
@@ -8591,6 +8664,7 @@ function renderCommFeed(tab) {
           <button onclick="togglePostMenu('${p.id}')" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 2px;line-height:1">⋯</button>
           <div id="post-menu-${p.id}" style="display:none;position:absolute;right:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;z-index:10;min-width:80px;box-shadow:0 4px 12px rgba(0,0,0,0.3)">
             <div onclick="reportCommPost('${p.id}')" style="padding:10px 14px;font-size:13px;cursor:pointer;color:var(--muted)" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">🚨 신고</div>
+            <div onclick="blockCommUser('${p.id}')" style="padding:10px 14px;font-size:13px;cursor:pointer;color:var(--muted);white-space:nowrap" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">🚫 이 작성자 차단</div>
           </div>
         </div>`}
       </div>
@@ -9013,7 +9087,7 @@ function editCommPost(postId) {
     document.getElementById('comm-pick-options').style.display = post.type === 'pick' ? 'block' : 'none';
     document.getElementById('comm-write-text').placeholder = PLACEHOLDER_BY_TYPE[post.type] || '';
     // 내용 채우기
-    document.getElementById('comm-write-text').value = post.text;
+    document.getElementById('comm-write-text').value = unescHtml(post.text);
     // 메뉴태그 복원
     if (post.menuTag) {
       selectedMenuTag = post.menuTag;
