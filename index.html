@@ -36,13 +36,13 @@
   :root {
     --bg:#0f0e0c; --surface:#1c1a1a; --card:#252020; --border:#3a2e2e;
     --orange:#ff4757; --orange-soft:#ff6b7a; --yellow:#ffd166;
-    --green:#06d6a0; --red:#ff1744; --text:#f5f0e8; --muted:#a89a9a; --radius:16px;
+    --green:#06d6a0; --red:#ff1744; --text:#f5f0e8; --muted:#a89a9a; --radius:20px;
     --header-bg:rgba(15,14,12,0.92); --modal-bg:rgba(15,14,12,0.96);
   }
   [data-theme="light"] {
     --bg:#fff8f5; --surface:#fff0ec; --card:#ffffff; --border:#f0d8d8;
     --orange:#ff4757; --orange-soft:#ff6b7a; --yellow:#f4a40a;
-    --green:#00a884; --red:#ff1744; --text:#1a1010; --muted:#875c5c; --radius:16px;
+    --green:#00a884; --red:#ff1744; --text:#1a1010; --muted:#875c5c; --radius:20px;
     --header-bg:rgba(255,248,245,0.92); --modal-bg:rgba(255,248,245,0.96);
   }
   .theme-toggle {
@@ -71,7 +71,7 @@
   .hero p { color:var(--muted); font-size:13px; line-height:1.8; }
 
   .mode-wrap { margin:20px 0 0; }
-  .mode-label { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
+  .mode-label { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:0; text-transform:uppercase; margin-bottom:10px; }
   .mode-toggle { display:flex; gap:10px; }
   .mode-btn {
     flex:1; padding:16px 10px; border:2px solid var(--border); border-radius:18px;
@@ -80,12 +80,12 @@
     display:flex; flex-direction:column; align-items:center; gap:6px;
   }
   .mode-btn .mode-icon { font-size:26px; }
-  .mode-btn.crave.active { border-color:var(--orange); background:rgba(255,71,87,0.1); color:var(--orange); box-shadow:0 4px 16px rgba(255,71,87,0.2); }
-  .mode-btn.hate.active  { border-color:var(--red); background:rgba(255,71,87,0.1); color:var(--red); box-shadow:0 4px 16px rgba(255,71,87,0.2); }
+  .mode-btn.crave.active { border-color:var(--orange); background:rgba(255,71,87,0.1); color:var(--orange); }
+  .mode-btn.hate.active  { border-color:var(--red); background:rgba(255,71,87,0.1); color:var(--red); }
 
   .section-title {
     font-size:12px; font-weight:700; color:var(--muted);
-    text-transform:uppercase; letter-spacing:1.5px; margin:24px 0 12px;
+    text-transform:uppercase; letter-spacing:0; margin:24px 0 12px;
     display:flex; align-items:center; gap:8px;
   }
   .sec-badge { font-size:11px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2px 8px; text-transform:none; letter-spacing:0; color:var(--muted); }
@@ -97,7 +97,7 @@
     position:relative; overflow:hidden;
   }
   .cat-card::after { content:''; position:absolute; inset:0; background:var(--orange); opacity:0; transition:opacity 0.2s; }
-  .cat-card.active { border-color:var(--orange); background:rgba(255,71,87,0.08); transform:translateY(-2px); box-shadow:0 6px 20px rgba(255,71,87,0.2); }
+  .cat-card.active { border-color:var(--orange); background:rgba(255,71,87,0.08); }
   .cat-card:hover:not(.active) { border-color:var(--orange-soft); transform:translateY(-2px); }
   .cat-icon { font-size:30px; margin-bottom:8px; display:block; }
   .cat-label { font-size:13px; font-weight:700; }
@@ -114,10 +114,10 @@
   .accordion-header {
     display:flex; align-items:center; justify-content:space-between;
     padding:12px 16px; background:var(--surface); border:1.5px solid var(--border);
-    border-radius:14px; cursor:pointer; transition:all 0.15s; margin-bottom:0;
+    border-radius:12px; cursor:pointer; transition:all 0.15s; margin-bottom:0;
   }
   .accordion-header:hover { border-color:var(--orange-soft); }
-  .accordion-header.open { border-color:var(--orange); background:rgba(255,71,87,0.06); border-radius:14px 14px 0 0; }
+  .accordion-header.open { border-color:var(--orange); background:rgba(255,71,87,0.06); border-radius:12px 14px 0 0; }
   .accordion-header-left { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
   .drag-handle {
     cursor:grab; font-size:15px; color:var(--muted); flex-shrink:0;
@@ -139,7 +139,7 @@
 
   /* 프리셋 */
   .preset-section { margin-bottom:16px; }
-  .preset-label { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+  .preset-label { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:0; text-transform:uppercase; margin-bottom:8px; }
   .preset-wrap { display:flex; flex-wrap:wrap; gap:7px; }
   .preset-btn {
     padding:8px 16px; border-radius:20px; font-size:12px; font-weight:700;
@@ -158,14 +158,14 @@
     cursor:pointer; transition:all 0.15s; user-select:none;
     border:1.5px solid var(--border); background:var(--surface); color:var(--muted);
   }
-  .crave-mode .tag.active { background:var(--orange); border-color:var(--orange); color:white; box-shadow:0 2px 8px rgba(255,71,87,0.3); }
+  .crave-mode .tag.active { background:var(--orange); border-color:var(--orange); color:white; }
   .crave-mode .tag:hover:not(.active) { border-color:var(--orange-soft); color:var(--text); }
-  .hate-mode .tag.active { background:var(--red); border-color:var(--red); color:white; text-decoration:line-through; box-shadow:0 2px 8px rgba(255,71,87,0.3); }
+  .hate-mode .tag.active { background:var(--red); border-color:var(--red); color:white; text-decoration:line-through; }
   .hate-mode .tag:hover:not(.active) { border-color:var(--red); color:var(--text); }
   .hate-mode .tag-include.active { background:var(--orange); border-color:var(--orange); color:white; text-decoration:none; }
   .hate-mode .tag-include:hover:not(.active) { border-color:var(--orange-soft); color:var(--text); }
 
-  .summary-bar { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 16px; margin-top:8px; display:none; }
+  .summary-bar { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 16px; margin-top:8px; display:none; }
   .summary-bar.show { display:block; }
   .sum-title { font-size:11px; color:var(--muted); margin-bottom:6px; }
   .summary-chips { display:flex; flex-wrap:wrap; gap:6px; }
@@ -176,12 +176,12 @@
   .cta-wrap { margin-top:24px; }
   .cta-btn {
     width:100%; border:none; border-radius:20px;
-    padding:20px; font-size:19px; font-family:'Jua',sans-serif; letter-spacing:1px;
+    padding:20px; font-size:19px; font-family:'Jua',sans-serif; letter-spacing:0;
     cursor:pointer; transition:all 0.2s;
   }
-  .crave-btn { background:linear-gradient(135deg,var(--orange),#cc1a2e); color:white; box-shadow:0 8px 28px rgba(255,71,87,0.4); }
-  .hate-btn  { background:linear-gradient(135deg,#ff4757,#c0392b); color:white; box-shadow:0 8px 28px rgba(255,71,87,0.4); }
-  .cta-btn:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(255,71,87,0.5); }
+  .crave-btn { background:linear-gradient(135deg,var(--orange),#cc1a2e); color:white; box-shadow:0 8px 28px rgba(0,0,0,0.22); }
+  .hate-btn  { background:linear-gradient(135deg,#ff4757,#c0392b); color:white; box-shadow:0 8px 28px rgba(0,0,0,0.22); }
+  .cta-btn:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.22); }
   .cta-btn:active { transform:translateY(0); }
 
   .result-area { margin-top:24px; }
@@ -253,7 +253,7 @@
   .pwa-banner {
     display:none; position:fixed; bottom:130px; left:50%; transform:translateX(-50%);
     width:calc(100% - 32px); max-width:448px; z-index:160;
-    background:var(--card); border:1.5px solid var(--orange); border-radius:16px;
+    background:var(--card); border:1.5px solid var(--orange); border-radius:20px;
     padding:14px 16px; box-shadow:0 8px 32px rgba(0,0,0,0.5);
     animation:slideUp 0.4s cubic-bezier(0.34,1.2,0.64,1);
   }
@@ -263,13 +263,13 @@
   .pwa-banner-title { font-size:13px; font-weight:700; color:var(--text); }
   .pwa-banner-sub { font-size:11px; color:var(--muted); margin-top:2px; }
   .pwa-banner-btns { display:flex; gap:6px; flex-shrink:0; }
-  .pwa-install-btn { background:var(--orange); color:white; border:none; border-radius:10px; padding:7px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; }
-  .pwa-dismiss-btn { background:var(--surface); color:var(--muted); border:1px solid var(--border); border-radius:10px; padding:7px 10px; font-size:12px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+  .pwa-install-btn { background:var(--orange); color:white; border:none; border-radius:12px; padding:7px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; }
+  .pwa-dismiss-btn { background:var(--surface); color:var(--muted); border:1px solid var(--border); border-radius:12px; padding:7px 10px; font-size:12px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
 
   /* ── 쿠팡 파트너스 배너 (레시피) ── */
   .coupang-partners-banner {
     background:linear-gradient(135deg,#e62e14,#c0200f);
-    border-radius:16px; padding:14px 16px; margin-top:16px;
+    border-radius:20px; padding:14px 16px; margin-top:16px;
     display:flex; align-items:center; gap:12px; cursor:pointer;
     text-decoration:none; box-shadow:0 4px 16px rgba(230,46,20,0.3);
     transition:all 0.2s;
@@ -297,7 +297,7 @@
   .coupang-desc { flex:1; }
   .page-cart-item {
     display:flex; align-items:center; gap:14px;
-    background:var(--card); border:1.5px solid var(--border); border-radius:16px;
+    background:var(--card); border:1.5px solid var(--border); border-radius:20px;
     padding:14px 16px; margin-bottom:10px; transition:all 0.2s;
     box-shadow:0 2px 8px rgba(0,0,0,0.06);
   }
@@ -307,9 +307,9 @@
   .page-cart-item-name { font-size:14px; font-weight:700; color:var(--text); }
   .page-cart-item-meta { font-size:11px; color:var(--muted); margin-top:3px; }
   .page-cart-item-btns { display:flex; gap:6px; }
-  .page-cart-buy { background:linear-gradient(135deg,#e62e14,#c0200f); color:white; border:none; border-radius:10px; padding:8px 12px; font-size:11px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; box-shadow:0 2px 8px rgba(230,46,20,0.3); transition:all 0.2s; }
+  .page-cart-buy { background:linear-gradient(135deg,#e62e14,#c0200f); color:white; border:none; border-radius:12px; padding:8px 12px; font-size:11px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; box-shadow:0 2px 8px rgba(230,46,20,0.3); transition:all 0.2s; }
   .page-cart-buy:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(230,46,20,0.4); }
-  .page-cart-del { background:var(--surface); color:var(--muted); border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:11px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all 0.15s; }
+  .page-cart-del { background:var(--surface); color:var(--muted); border:1px solid var(--border); border-radius:12px; padding:8px 10px; font-size:11px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all 0.15s; }
   .page-cart-del:hover { border-color:var(--red); color:var(--red); }
 
   /* ── 마이페이지 ── */
@@ -318,7 +318,7 @@
     background:linear-gradient(135deg,rgba(255,71,87,0.1),rgba(204,26,46,0.05));
     border:1.5px solid rgba(255,71,87,0.2); border-radius:24px;
     padding:20px; margin-bottom:16px;
-    box-shadow:0 4px 20px rgba(255,71,87,0.1);
+    box-shadow:0 4px 20px rgba(0,0,0,0.22);
   }
   .my-profile-top { display:flex; align-items:center; gap:16px; }
   .my-profile-stats { display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,71,87,0.18); }
@@ -330,7 +330,7 @@
   .my-section .my-acc-body { margin-top:14px; }
   .my-section > .my-section-header:only-child { margin-bottom:0; min-height:24px; }
   .my-acc-arrow { font-size:12px; color:var(--muted); transition:transform 0.2s; }
-  .my-avatar { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--orange),#cc1a2e); display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; box-shadow:0 4px 16px rgba(255,71,87,0.35); }
+  .my-avatar { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--orange),#cc1a2e); display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; box-shadow:0 4px 16px rgba(0,0,0,0.22); }
   .my-profile-info { flex:1; }
   .my-nickname { font-family:'Jua',sans-serif; font-size:20px; }
   .my-join { font-size:11px; color:var(--muted); margin-top:3px; }
@@ -364,10 +364,10 @@
     padding:14px 16px; margin-bottom:16px; cursor:pointer; transition:all 0.2s;
     box-shadow:0 2px 8px rgba(0,0,0,0.1);
   }
-  .comm-write-box:hover { border-color:var(--orange); box-shadow:0 4px 16px rgba(255,71,87,0.15); transform:translateY(-1px); }
+  .comm-write-box:hover { border-color:var(--orange); transform:translateY(-1px); }
   .comm-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--orange),#cc1a2e); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
   .comm-write-placeholder { flex:1; font-size:13px; color:var(--muted); }
-  .comm-write-btn { background:var(--orange); color:white; border:none; border-radius:20px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; flex-shrink:0; box-shadow:0 2px 8px rgba(255,71,87,0.3); }
+  .comm-write-btn { background:var(--orange); color:white; border:none; border-radius:20px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.22); }
 
   .comm-tabs {
     display:flex; gap:6px; margin-bottom:16px;
@@ -382,7 +382,7 @@
     text-align:center; white-space:nowrap;
   }
   .comm-tab:hover { border-color:var(--orange-soft); color:var(--text); }
-  .comm-tab.active { background:var(--orange); border-color:var(--orange); color:white; box-shadow:0 2px 10px rgba(255,71,87,0.3); }
+  .comm-tab.active { background:var(--orange); border-color:var(--orange); color:white; }
 
   .t-round-tab {
     flex:1; padding:8px 4px; border-radius:12px;
@@ -391,7 +391,7 @@
     font-family:'Noto Sans KR',sans-serif; transition:all 0.2s;
     line-height:1.3; text-align:center;
   }
-  .t-round-tab.active { background:var(--orange); border-color:var(--orange); color:white; box-shadow:0 2px 8px rgba(255,71,87,0.3); }
+  .t-round-tab.active { background:var(--orange); border-color:var(--orange); color:white; }
   .t-round-tab:disabled { opacity:0.4; cursor:default; }
 
   .cal-cell { transition:all 0.15s; }
@@ -407,7 +407,7 @@
   }
   .comm-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.12); }
   .comm-card-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
-  .comm-user-avatar { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--orange),#cc1a2e); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; box-shadow:0 2px 8px rgba(255,71,87,0.3); }
+  .comm-user-avatar { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--orange),#cc1a2e); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.22); }
   .comm-user-info { flex:1; }
   .comm-username { font-size:14px; font-weight:700; color:var(--text); }
   .comm-time { font-size:11px; color:var(--muted); margin-top:2px; }
@@ -418,8 +418,8 @@
   .comm-more-btn { font-size:12px; color:var(--orange); background:none; border:none; cursor:pointer; padding:0; margin-bottom:10px; font-family:'Noto Sans KR',sans-serif; font-weight:700; }
   .comm-menu-tag { display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:6px 14px; font-size:12px; color:var(--text); margin-bottom:12px; }
 
-  .comm-img { width:100%; border-radius:16px; background:var(--surface); aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; font-size:48px; margin-bottom:12px; overflow:hidden; }
-  .comm-img img { width:100%; height:100%; object-fit:cover; border-radius:16px; }
+  .comm-img { width:100%; border-radius:20px; background:var(--surface); aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; font-size:48px; margin-bottom:12px; overflow:hidden; }
+  .comm-img img { width:100%; height:100%; object-fit:cover; border-radius:20px; }
 
   .comm-actions { display:flex; gap:6px; padding-top:12px; border-top:1px solid var(--border); }
   .comm-action-btn { display:flex; align-items:center; gap:5px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:7px 12px; color:var(--muted); font-size:12px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all 0.15s; font-weight:600; }
@@ -430,8 +430,8 @@
   .comm-comment-preview { background:var(--surface); border-radius:12px; padding:10px 14px; margin-top:10px; font-size:12px; color:var(--muted); border:1px solid var(--border); }
   .comm-comment-preview strong { color:var(--text); }
 
-  .comm-question-box { background:rgba(255,71,87,0.06); border:1.5px solid rgba(255,71,87,0.3); border-radius:14px; padding:12px 16px; margin-bottom:12px; }
-  .comm-question-label { font-size:11px; color:var(--orange); font-weight:700; margin-bottom:4px; letter-spacing:0.5px; }
+  .comm-question-box { background:rgba(255,71,87,0.06); border:1.5px solid rgba(255,71,87,0.3); border-radius:12px; padding:12px 16px; margin-bottom:12px; }
+  .comm-question-label { font-size:11px; color:var(--orange); font-weight:700; margin-bottom:4px; letter-spacing:0; }
   .comm-question-text { font-size:13px; color:var(--text); line-height:1.6; }
 
   .comm-type-badge {
@@ -465,7 +465,7 @@
     display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;
   }
   .comm-img-preview-item {
-    position:relative; width:72px; height:72px; border-radius:10px;
+    position:relative; width:72px; height:72px; border-radius:12px;
     overflow:hidden; flex-shrink:0;
   }
   .comm-img-preview-item img { width:100%; height:100%; object-fit:cover; }
@@ -519,7 +519,7 @@
   .comm-tag-option:hover { background:var(--surface); }
   .comm-tag-wrap-pos { position:relative; }
   .comm-type-btn {
-    padding:14px 8px; border-radius:14px; border:1.5px solid var(--border);
+    padding:14px 8px; border-radius:12px; border:1.5px solid var(--border);
     background:var(--surface); color:var(--muted); font-size:13px;
     font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif;
     transition:all 0.15s; text-align:center; line-height:1.4;
@@ -536,7 +536,7 @@
     position:fixed; bottom:80px; right:20px; z-index:200;
     width:48px; height:48px; border-radius:50%;
     background:var(--orange); border:none; color:white;
-    font-size:22px; cursor:pointer; box-shadow:0 4px 16px rgba(255,71,87,0.4);
+    font-size:22px; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.22);
     display:none; align-items:center; justify-content:center;
     transition:transform 0.15s;
   }
@@ -573,7 +573,7 @@
   .result-card {
     background:var(--card); border:1.5px solid var(--orange); border-radius:18px;
     padding:14px 16px; position:relative; overflow:hidden;
-    box-sizing:border-box; box-shadow:0 4px 16px rgba(255,71,87,0.1);
+    box-sizing:border-box; box-shadow:0 4px 16px rgba(0,0,0,0.22);
   }
   .result-card.hate-result { border-color:var(--red); }
   .result-card::before { content:''; position:absolute; top:-20px; right:-20px; width:100px; height:100px; background:radial-gradient(circle,rgba(255,71,87,0.08),transparent 70%); pointer-events:none; }
@@ -584,7 +584,7 @@
   .result-left { width:150px; flex-shrink:0; display:flex; flex-direction:column; gap:8px; }
   .result-img {
     width:100%; aspect-ratio:1/1;
-    border-radius:14px; overflow:hidden; background:var(--surface);
+    border-radius:12px; overflow:hidden; background:var(--surface);
     display:flex; align-items:center; justify-content:center; font-size:46px;
   }
   .result-img img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -594,20 +594,20 @@
   .result-emoji { font-size:32px; flex-shrink:0; }
   .result-name { font-family:'Jua',sans-serif; font-size:17px; line-height:1.15; text-align:center; word-break:keep-all; }
   .result-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:10px; }
-  .similar-toggle-btn { width:100%; margin-top:10px; padding:8px; background:none; border:1px dashed var(--border); border-radius:10px; color:var(--muted); font-size:11px; cursor:pointer; transition:all 0.15s; }
+  .similar-toggle-btn { width:100%; margin-top:10px; padding:8px; background:none; border:1px dashed var(--border); border-radius:12px; color:var(--muted); font-size:11px; cursor:pointer; transition:all 0.15s; }
   .similar-toggle-btn:hover { border-color:var(--orange); color:var(--orange); }
   .similar-wrap { display:none; flex-wrap:wrap; gap:6px; margin-top:8px; }
   .similar-wrap.open { display:flex; }
   .similar-chip { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:11px; color:var(--text); cursor:pointer; transition:all 0.15s; }
   .similar-chip:hover { border-color:var(--orange); color:var(--orange); }
-  .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:6px 4px; min-height:40px; font-size:11.5px; line-height:1.25; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:3px; text-align:center; font-weight:600; }
+  .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:6px 4px; min-height:40px; font-size:11.5px; line-height:1.25; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:3px; text-align:center; font-weight:600; }
   .result-btn:hover { border-color:var(--orange-soft); color:var(--orange-soft); }
   .result-btn.like-btn { border-color:var(--red) !important; color:var(--red); }
   .result-btn.like-btn.active { background:rgba(255,71,87,0.1); color:var(--red); border-color:var(--red) !important; }
   .result-btn.like-btn:hover { border-color:#ff4d6d !important; color:#ff4d6d; }
   .result-btn.save-btn:hover { border-color:var(--yellow); color:var(--yellow); }
   .result-btn.reject-btn:hover { border-color:var(--muted); color:var(--text); }
-  .card-nutrition { display:flex; align-items:center; gap:6px; background:var(--surface); border-radius:10px; padding:6px 10px; margin-top:8px; border:1px solid var(--border); }
+  .card-nutrition { display:flex; align-items:center; gap:6px; background:var(--surface); border-radius:12px; padding:6px 10px; margin-top:8px; border:1px solid var(--border); }
   .card-kcal { font-size:11px; font-weight:700; color:var(--orange); }
   .card-kcal span { font-size:11px; font-weight:400; color:var(--muted); }
   .card-macros { display:flex; gap:5px; margin-left:auto; }
@@ -686,12 +686,12 @@
   .recipe-section { padding:0 20px; margin-top:18px; }
   .recipe-section-title {
     font-size:12px; font-weight:700; color:var(--muted);
-    letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px;
+    letter-spacing:0; text-transform:uppercase; margin-bottom:12px;
   }
   .ingredient-list { display:flex; flex-direction:column; gap:8px; }
   .ingredient-item {
     display:flex; align-items:center; justify-content:space-between;
-    background:var(--surface); border-radius:14px; padding:12px 16px;
+    background:var(--surface); border-radius:12px; padding:12px 16px;
     border:1.5px solid var(--border); transition:all 0.15s;
   }
   .ingredient-item:hover { border-color:var(--orange-soft); }
@@ -699,25 +699,25 @@
   .ingredient-name { font-size:14px; font-weight:600; }
   .ingredient-amount { font-size:12px; color:var(--muted); }
   .buy-btn {
-    background:var(--orange); color:white; border:none; border-radius:10px;
+    background:var(--orange); color:white; border:none; border-radius:12px;
     padding:7px 14px; font-size:11px; font-weight:700; cursor:pointer;
     font-family:'Noto Sans KR',sans-serif; white-space:nowrap;
-    transition:all 0.2s; box-shadow:0 2px 8px rgba(255,71,87,0.25);
+    transition:all 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.22);
   }
   .buy-btn:hover { opacity:0.85; transform:translateY(-1px); }
   .buy-all-btn {
     width:100%; margin-top:14px; background:linear-gradient(135deg,var(--orange),#cc1a2e);
-    color:white; border:none; border-radius:16px; padding:16px;
+    color:white; border:none; border-radius:20px; padding:16px;
     font-size:16px; font-family:'Jua',sans-serif; cursor:pointer;
-    box-shadow:0 4px 20px rgba(255,71,87,0.35); transition:all 0.2s;
+    box-shadow:0 4px 20px rgba(0,0,0,0.22); transition:all 0.2s;
   }
-  .buy-all-btn:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,71,87,0.45); }
+  .buy-all-btn:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,0,0,0.22); }
 
   /* 유튜브 버튼 */
   .youtube-btn {
     display:flex; align-items:center; justify-content:center; gap:8px;
     width:100%; margin-top:10px; background:#ff0000;
-    color:white; border:none; border-radius:16px; padding:16px;
+    color:white; border:none; border-radius:20px; padding:16px;
     font-size:15px; font-family:'Jua',sans-serif; cursor:pointer;
     transition:all 0.2s; box-shadow:0 4px 16px rgba(255,0,0,0.25);
   }
@@ -727,14 +727,14 @@
   .steps-list { display:flex; flex-direction:column; gap:10px; }
   .step-item {
     display:flex; gap:14px; align-items:flex-start;
-    background:var(--surface); border-radius:14px; padding:14px 16px;
+    background:var(--surface); border-radius:12px; padding:14px 16px;
     border:1px solid var(--border);
   }
   .step-num {
     width:26px; height:26px; border-radius:50%; flex-shrink:0;
     background:var(--orange); color:white;
     display:flex; align-items:center; justify-content:center;
-    font-size:12px; font-weight:700; box-shadow:0 2px 8px rgba(255,71,87,0.3);
+    font-size:12px; font-weight:700; box-shadow:0 2px 8px rgba(0,0,0,0.22);
   }
   .step-text { font-size:13px; line-height:1.7; color:var(--text); padding-top:2px; }
 
@@ -770,7 +770,7 @@
   .buy-btn-wrap { display:flex; gap:6px; align-items:center; }
   .cart-btn {
     background:var(--surface); color:var(--muted); border:1.5px solid var(--border);
-    border-radius:10px; padding:7px 12px; font-size:11px; font-weight:700;
+    border-radius:12px; padding:7px 12px; font-size:11px; font-weight:700;
     cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap;
     transition:all 0.2s;
   }
@@ -796,13 +796,13 @@
     display:flex; align-items:center; justify-content:space-between;
   }
   .cart-title { font-family:'Jua',sans-serif; font-size:22px; }
-  .cart-count { background:var(--orange); color:white; border-radius:20px; padding:3px 12px; font-size:12px; font-weight:700; box-shadow:0 2px 8px rgba(255,71,87,0.3); }
+  .cart-count { background:var(--orange); color:white; border-radius:20px; padding:3px 12px; font-size:12px; font-weight:700; box-shadow:0 2px 8px rgba(0,0,0,0.22); }
   .cart-close { background:var(--surface); border:1px solid var(--border); border-radius:50%; width:36px; height:36px; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
   .cart-close:hover { border-color:var(--orange); color:var(--orange); }
   .cart-list { padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
   .cart-item {
     display:flex; align-items:center; justify-content:space-between;
-    background:var(--surface); border-radius:14px; padding:12px 16px;
+    background:var(--surface); border-radius:12px; padding:12px 16px;
     border:1.5px solid var(--border); transition:all 0.15s;
   }
   .cart-item:hover { border-color:var(--orange-soft); }
@@ -814,12 +814,12 @@
   .cart-empty { text-align:center; padding:48px 20px; color:var(--muted); font-size:14px; line-height:1.8; }
   .cart-buy-all {
     margin:10px 20px 0; background:linear-gradient(135deg,var(--orange),#cc1a2e);
-    color:white; border:none; border-radius:16px; padding:16px;
+    color:white; border:none; border-radius:20px; padding:16px;
     font-size:16px; font-family:'Jua',sans-serif; cursor:pointer;
-    width:calc(100% - 40px); transition:all 0.2s; box-shadow:0 4px 20px rgba(255,71,87,0.35);
+    width:calc(100% - 40px); transition:all 0.2s; box-shadow:0 4px 20px rgba(0,0,0,0.22);
   }
-  .cart-buy-all:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,71,87,0.45); }
-  .cart-clear { margin:8px 20px 0; background:var(--surface); color:var(--muted); border:1.5px solid var(--border); border-radius:14px; padding:12px; font-size:13px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; width:calc(100% - 40px); transition:all 0.15s; }
+  .cart-buy-all:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,0,0,0.22); }
+  .cart-clear { margin:8px 20px 0; background:var(--surface); color:var(--muted); border:1.5px solid var(--border); border-radius:12px; padding:12px; font-size:13px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; width:calc(100% - 40px); transition:all 0.15s; }
   .cart-clear:hover { border-color:var(--red); color:var(--red); }
 
   .coming-soon-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
@@ -847,7 +847,7 @@
     align-items:center; gap:3px; cursor:pointer; color:var(--muted);
     font-size:11px; font-weight:600; transition:all 0.2s; border:none;
     background:none; font-family:'Noto Sans KR',sans-serif;
-    border-radius:16px; position:relative;
+    border-radius:20px; position:relative;
   }
   .nav-item:hover { color:var(--text); background:var(--surface); }
   .nav-item.active { color:var(--orange); }
@@ -888,7 +888,7 @@
   .modal-title { font-family:'Jua',sans-serif; font-size:20px; color:var(--text); }
   .modal-close { background:var(--surface); border:1px solid var(--border); border-radius:50%; width:30px; height:30px; cursor:pointer; color:var(--muted); font-size:13px; display:flex; align-items:center; justify-content:center; }
   .modal-field { margin-bottom:14px; }
-  .modal-label { font-size:12px; color:var(--muted); font-weight:700; display:block; margin-bottom:6px; letter-spacing:0.5px; }
+  .modal-label { font-size:12px; color:var(--muted); font-weight:700; display:block; margin-bottom:6px; letter-spacing:0; }
   .modal-input {
     width:100%; background:var(--surface); border:1.5px solid var(--border);
     border-radius:12px; padding:12px 14px; font-size:14px; color:var(--text);
@@ -1111,7 +1111,7 @@
         </div><!-- /hc-reject-wrap -->
         <div id="hc-crave-wrap">
         <div style="border-top:1px dashed var(--border);margin:10px 0 6px;"></div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">이런 조건은 꼭 맞춰드려요 ↓</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:0">이런 조건은 꼭 맞춰드려요 ↓</div>
 
         <!-- 취향 더하기: 난이도&시간 -->
         <div class="filter-group" id="h-cook-method-group" data-fg-id="fg-h-difficulty">
@@ -1492,7 +1492,7 @@
       </div><!-- /hd-reject-wrap -->
       <div id="hd-crave-wrap">
         <div style="border-top:1px dashed var(--border);margin:10px 0 6px;"></div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">이런 조건은 꼭 맞춰드려요 ↓</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:0">이런 조건은 꼭 맞춰드려요 ↓</div>
 
         <!-- 취향 더하기: 조리방법 -->
         <div class="filter-group" data-fg-id="fg-hd-cooking">
@@ -1712,10 +1712,10 @@
   <!-- 인기글 배너 -->
   <div id="comm-hot-wrap" style="margin:14px 0 4px;display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:0.5px" id="comm-hot-title">🔥 오늘의 TOP 5</span>
+      <span style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:0" id="comm-hot-title">🔥 오늘의 TOP 5</span>
       <button onclick="generateWeeklySummary()" style="background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;padding:0;font-family:'Noto Sans KR',sans-serif;text-decoration:underline">주간 결산</button>
     </div>
-    <div style="position:relative;overflow:hidden;border-radius:14px" id="comm-hot-slide-wrap">
+    <div style="position:relative;overflow:hidden;border-radius:12px" id="comm-hot-slide-wrap">
       <div id="comm-hot-track" style="display:flex;transition:transform 0.3s ease"></div>
       <button onclick="hotSlideMove(-1)" style="position:absolute;top:50%;left:6px;transform:translateY(-50%);background:rgba(0,0,0,0.4);border:none;border-radius:50%;color:white;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">‹</button>
       <button onclick="hotSlideMove(1)" style="position:absolute;top:50%;right:6px;transform:translateY(-50%);background:rgba(0,0,0,0.4);border:none;border-radius:50%;color:white;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">›</button>
@@ -1743,11 +1743,11 @@
     </div>
     <div style="display:flex;gap:5px;flex-shrink:0">
       <button id="vote-open-btn" onclick="setVoteFilter('open')"
-        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s">🗳️ 진행중</button>
+        style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s">🗳️ 진행중</button>
       <button id="vote-closed-btn" onclick="setVoteFilter('closed')"
-        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s">⏰ 마감</button>
+        style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s">⏰ 마감</button>
       <button onclick="openMenuPickSheet()"
-        style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s"
+        style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s"
         onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'"
         onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">음식 골라 보기</button>
     </div>
@@ -1776,7 +1776,7 @@
     <div style="padding:4px 20px 12px;flex-shrink:0">
       <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">🔍 메뉴 태그 추가</div>
       <input id="write-tag-search" type="text" placeholder="메뉴 검색..." maxlength="20" autocomplete="off"
-        style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
+        style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
         onfocus="this.style.borderColor='var(--orange)'"
         onblur="this.style.borderColor='var(--border)'"
         oninput="searchWriteTag(this.value)">
@@ -1787,17 +1787,17 @@
     <!-- 직접 신청 버튼 -->
     <div style="padding:12px 20px 80px;flex-shrink:0;border-top:1px solid var(--border)">
       <button onclick="openWriteCustomTag()"
-        style="width:100%;background:rgba(255,71,87,0.08);border:1.5px solid var(--orange);border-radius:10px;padding:11px;font-size:13px;color:var(--orange);font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">
+        style="width:100%;background:rgba(255,71,87,0.08);border:1.5px solid var(--orange);border-radius:12px;padding:11px;font-size:13px;color:var(--orange);font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">
         ✏️ 찾는 메뉴가 없어요 → 직접 신청하기
       </button>
       <div id="write-custom-tag-wrap" style="display:none;margin-top:8px">
-        <div style="background:rgba(255,209,102,0.08);border:1.5px solid var(--yellow);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:11px;color:var(--muted);line-height:1.6">
+        <div style="background:rgba(255,209,102,0.08);border:1.5px solid var(--yellow);border-radius:12px;padding:10px 12px;margin-bottom:6px;font-size:11px;color:var(--muted);line-height:1.6">
           📋 직접 입력한 메뉴는 후기 집계에는 포함되지 않아요.<br>운영자가 확인 후 DB에 추가될 수 있어요! 🙌
         </div>
         <input id="write-custom-tag-input" type="text" placeholder="메뉴명 직접 입력" maxlength="20"
-          style="width:100%;background:var(--surface);border:1.5px solid var(--yellow);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
+          style="width:100%;background:var(--surface);border:1.5px solid var(--yellow);border-radius:12px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
           onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--yellow)'">
-        <button onclick="confirmCustomWriteTag()" style="width:100%;margin-top:6px;padding:10px;border:none;border-radius:10px;background:var(--yellow);color:#1a1400;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">이 메뉴로 신청하기</button>
+        <button onclick="confirmCustomWriteTag()" style="width:100%;margin-top:6px;padding:10px;border:none;border-radius:12px;background:var(--yellow);color:#1a1400;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">이 메뉴로 신청하기</button>
       </div>
     </div>
   </div>
@@ -1818,7 +1818,7 @@
     <div style="padding:8px 20px 12px;flex-shrink:0">
       <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">🍽️ 음식 골라 보기</div>
       <input id="comm-menu-search" type="text" placeholder="메뉴 검색..." maxlength="20" autocomplete="off"
-        style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
+        style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
         onfocus="this.style.borderColor='var(--orange)'"
         onblur="this.style.borderColor='var(--border)'"
         oninput="searchCommMenuSheet(this.value)">
@@ -1912,7 +1912,7 @@
         <div class="comm-vote-option-row" style="display:flex;flex-direction:column;gap:4px">
           <div style="display:flex;gap:6px;align-items:center">
             <input type="text" placeholder="선택지 1" maxlength="12" class="comm-vote-input"
-              style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+              style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
             <label style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;cursor:pointer;flex-shrink:0;font-size:14px" title="이미지 첨부">
               📷<input type="file" accept="image/*" style="display:none" onchange="attachVoteImg(this,0)">
             </label>
@@ -1925,7 +1925,7 @@
         <div class="comm-vote-option-row" style="display:flex;flex-direction:column;gap:4px">
           <div style="display:flex;gap:6px;align-items:center">
             <input type="text" placeholder="선택지 2" maxlength="12" class="comm-vote-input"
-              style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+              style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
             <label style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;cursor:pointer;flex-shrink:0;font-size:14px" title="이미지 첨부">
               📷<input type="file" accept="image/*" style="display:none" onchange="attachVoteImg(this,1)">
             </label>
@@ -1942,13 +1942,13 @@
     <input type="file" id="comm-img-input" accept="image/*" multiple style="display:none" onchange="handleCommImgUpload(event)">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
       <button id="comm-tag-pick-btn2" onclick="openWriteTagSheet()"
-        style="background:var(--surface);border:1.5px dashed var(--border);border-radius:10px;padding:9px 8px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:all 0.15s"
+        style="background:var(--surface);border:1.5px dashed var(--border);border-radius:12px;padding:9px 8px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:all 0.15s"
         onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'"
         onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
         🔍 메뉴 태그
       </button>
       <button id="comm-img-btn" onclick="document.getElementById('comm-img-input').click()"
-        style="background:var(--surface);border:1.5px dashed var(--border);border-radius:10px;padding:9px 8px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:all 0.15s"
+        style="background:var(--surface);border:1.5px dashed var(--border);border-radius:12px;padding:9px 8px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:all 0.15s"
         onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'"
         onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
         📷 사진 추가
@@ -2033,8 +2033,8 @@
     <div style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text);margin-bottom:4px">어떤 지도로 열까요?</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">한 번 고르면 다음부터 바로 열려요. 설정에서 언제든 바꿀 수 있어요.<br>📍 위치를 허용하면 지금 있는 곳 근처 가게를 찾아드려요.</div>
     <div style="display:flex;gap:10px">
-      <button onclick="chooseMapApp('kakao')" style="flex:1;padding:16px 8px;border-radius:14px;border:1.5px solid var(--border);background:#FEE500;color:#191919;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">카카오맵</button>
-      <button onclick="chooseMapApp('naver')" style="flex:1;padding:16px 8px;border-radius:14px;border:1.5px solid var(--border);background:#03C75A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">네이버지도</button>
+      <button onclick="chooseMapApp('kakao')" style="flex:1;padding:16px 8px;border-radius:12px;border:1.5px solid var(--border);background:#FEE500;color:#191919;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">카카오맵</button>
+      <button onclick="chooseMapApp('naver')" style="flex:1;padding:16px 8px;border-radius:12px;border:1.5px solid var(--border);background:#03C75A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">네이버지도</button>
     </div>
   </div>
 </div>
@@ -2051,7 +2051,7 @@
           <div style="font-size:64px;margin-bottom:16px">🍽️</div>
           <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">오늘 <em style="color:var(--orange);font-style:normal">뭐 먹지?</em></div>
           <div style="font-size:13px;color:var(--muted);line-height:1.8">직접 요리 · 배달 · 외식 중 고르고<br>조건 태그 선택하면<br><strong style="color:var(--text)">딱 맞는 메뉴 3개</strong>를 추천해드려요</div>
-          <div style="margin-top:24px;background:var(--surface);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;text-align:left">
+          <div style="margin-top:24px;background:var(--surface);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;text-align:left">
             <span style="font-size:28px">🎯</span>
             <div style="font-size:12px;color:var(--muted);line-height:1.6">질문으로 추천받기도 있어요!<br>몇 가지 질문에 답하면 자동으로 추려줘요</div>
           </div>
@@ -2075,7 +2075,7 @@
           <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">먹은 거 <em style="color:var(--orange);font-style:normal">기록해요</em></div>
           <div style="font-size:13px;color:var(--muted);line-height:1.8">오늘 식단을 올리면<br><strong style="color:var(--text)">먹방 달력</strong>에 자동으로 쌓여요<br>🔥 연속 기록 스트릭도 도전해봐요!</div>
           <button onclick="closeOnboarding()"
-            style="width:100%;margin-top:28px;padding:16px;background:var(--orange);border:none;border-radius:14px;color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:'Jua',sans-serif;letter-spacing:0.5px">
+            style="width:100%;margin-top:28px;padding:16px;background:var(--orange);border:none;border-radius:12px;color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:'Jua',sans-serif;letter-spacing:0">
             시작하기 🚀
           </button>
         </div>
@@ -2137,12 +2137,12 @@
   <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:340px">
     <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px">나만의 세트</div>
     <input id="preset-name-input" type="text" maxlength="10" placeholder="세트 이름 (최대 10자)"
-      style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;box-sizing:border-box"
+      style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;box-sizing:border-box"
       onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'"
       onkeydown="if(event.key==='Enter')confirmPresetName()">
     <div style="display:flex;gap:8px;margin-top:14px">
-      <button onclick="closePresetModal()" style="flex:1;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:none;color:var(--muted);font-size:14px;cursor:pointer">취소</button>
-      <button onclick="confirmPresetName()" style="flex:1;padding:12px;border:none;border-radius:10px;background:var(--orange);color:white;font-size:14px;font-weight:700;cursor:pointer">저장</button>
+      <button onclick="closePresetModal()" style="flex:1;padding:12px;border:1.5px solid var(--border);border-radius:12px;background:none;color:var(--muted);font-size:14px;cursor:pointer">취소</button>
+      <button onclick="confirmPresetName()" style="flex:1;padding:12px;border:none;border-radius:12px;background:var(--orange);color:white;font-size:14px;font-weight:700;cursor:pointer">저장</button>
     </div>
   </div>
 </div>
@@ -2208,6 +2208,7 @@
       </div>
       <span id="fun-daily-meal-date" style="font-size:11px;color:var(--muted);background:var(--surface);padding:3px 10px;border-radius:20px;border:1px solid var(--border)"></span>
     </div>
+    <div id="fun-daily-meal-hint" style="font-size:12px;color:var(--muted);margin:-4px 0 10px"></div>
     <div id="fun-daily-meal-cards" style="display:flex;gap:8px"></div>
   </div>
 
@@ -2239,7 +2240,7 @@
       <button class="t-round-tab" data-round="3" onclick="selectTournamentRound(3)">결승</button>
     </div>
     <button id="tournament-toggle-btn" onclick="toggleTournamentAccordion()"
-      style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:12px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s"
+      style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s"
       onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'"
       onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
       <span id="tournament-toggle-label">🗳️ 투표 참여하기</span>
@@ -2291,7 +2292,7 @@
   <!-- 달력 그리드 -->
   <div id="calendar-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px"></div>
   <!-- 선택된 날 상세 -->
-  <div id="calendar-detail" style="display:none;margin-top:14px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px"></div>
+  <div id="calendar-detail" style="display:none;margin-top:14px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px"></div>
 </div>
 
 <!-- 저장한 글 페이지 -->
@@ -2965,7 +2966,7 @@ function renderTasteAnalysis() {
     el.innerHTML = `<div style="font-size:12px;color:var(--muted);line-height:1.7">아직 분석할 기록이 부족해요 (${a.signals}/5)<br>추천 카드에서 ❤️ 좋아요나 😅 안 땡겨를 누를수록 정확해져요.</div>`;
     return;
   }
-  const chip = (t, c) => `<span style="display:inline-block;padding:4px 10px;border-radius:14px;font-size:12px;margin:0 4px 6px 0;background:var(--surface);border:1px solid ${c};color:var(--text)">${t}</span>`;
+  const chip = (t, c) => `<span style="display:inline-block;padding:4px 10px;border-radius:12px;font-size:12px;margin:0 4px 6px 0;background:var(--surface);border:1px solid ${c};color:var(--text)">${t}</span>`;
   el.innerHTML = `
     ${a.like.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">좋아하는 편</div><div>${a.like.map(t => chip(t, 'var(--orange)')).join('')}</div>` : ''}
     ${a.avoid.length ? `<div style="font-size:11px;color:var(--muted);margin:6px 0">잘 안 고르는 편</div><div>${a.avoid.map(t => chip(t, 'var(--border)')).join('')}</div>` : ''}
@@ -4637,7 +4638,7 @@ function renderResults(rejectPattern, flipIndex) {
   </div>` : '';
 
   const shopSection = !isHate ? `
-  <div style="margin-top:10px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px">
+  <div style="margin-top:10px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px">
     <div style="font-size:13px;font-weight:700;margin-bottom:10px">🛒 재료·밀키트 사러가기</div>
     ${currentPicked.map(m => `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
@@ -5524,7 +5525,7 @@ function reportCommPost(postId) {
 
   const bar = document.createElement('div');
   bar.id = 'comm-report-confirm';
-  bar.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:400;box-shadow:0 4px 20px rgba(0,0,0,0.4);font-size:13px;color:var(--text);white-space:nowrap';
+  bar.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:400;box-shadow:0 4px 20px rgba(0,0,0,0.4);font-size:13px;color:var(--text);white-space:nowrap';
   bar.innerHTML = `
     <span>이 글을 신고할까요?</span>
     <button onclick="confirmReportPost('${postId}')" style="background:#ff4d6d;border:none;border-radius:8px;color:white;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">신고</button>
@@ -5868,10 +5869,10 @@ function renderTasteStats() {
   const top3 = likedMenus.slice(0, 3);
   el.innerHTML = top3.length > 0 ? `
     <div>
-      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px">❤️ 최애 메뉴 TOP${top3.length}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0">❤️ 최애 메뉴 TOP${top3.length}</div>
       <div style="display:flex;gap:6px">
         ${top3.map((m,i) => `
-          <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center">
+          <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center">
             <div style="font-size:11px;color:var(--orange);font-weight:700;margin-bottom:4px">${['🥇','🥈','🥉'][i]}</div>
             <div style="font-size:20px;margin-bottom:4px">${m.emoji}</div>
             <div style="font-size:11px;color:var(--text);word-break:keep-all;line-height:1.3">${m.name}</div>
@@ -6090,7 +6091,7 @@ function renderFoodCalendar() {
 
     cells += `
       <div class="cal-cell${isSelected?' selected':''}" onclick="calendarSelectDay('${dateKey}', this)"
-        style="min-height:56px;background:${isSelected?'rgba(255,71,87,0.12)':hasMeal?'var(--card)':'var(--surface)'};border:1.5px solid ${isSelected?'var(--orange)':isToday?'var(--orange)':'var(--border)'};border-radius:10px;padding:5px 4px;cursor:pointer;transition:all 0.15s;position:relative">
+        style="min-height:56px;background:${isSelected?'rgba(255,71,87,0.12)':hasMeal?'var(--card)':'var(--surface)'};border:1.5px solid ${isSelected?'var(--orange)':isToday?'var(--orange)':'var(--border)'};border-radius:12px;padding:5px 4px;cursor:pointer;transition:all 0.15s;position:relative">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
           <span style="font-size:11px;font-weight:700;color:${isToday?'var(--orange)':dayColor}">${d}</span>
           ${hasDiet ? `<span style="font-size:11px">🔥</span>` : ''}
@@ -7276,7 +7277,7 @@ function renderDailyMeal() {
     const pct = Math.round(cnt / maxCount * 100);
     const top = isTop(m.name);
     return `
-    <div style="flex:1;background:var(--card);border:1.5px solid ${top ? 'var(--yellow)' : 'var(--border)'};border-radius:14px;padding:12px 8px;text-align:center;transition:border-color 0.15s"
+    <div style="flex:1;background:var(--card);border:1.5px solid ${top ? 'var(--yellow)' : 'var(--border)'};border-radius:12px;padding:12px 8px;text-align:center;transition:border-color 0.15s"
       onmouseover="this.style.borderColor='var(--yellow)'" onmouseout="this.style.borderColor='${top ? 'var(--yellow)' : 'var(--border)'}'">
       <div style="font-size:11px;height:16px;margin-bottom:2px;color:var(--yellow);font-weight:700">${top ? '👑' : ''}</div>
       ${wcFoodVisual(m, 50)}
@@ -7285,7 +7286,7 @@ function renderDailyMeal() {
         <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
           <div style="background:var(--yellow);height:100%;border-radius:4px;width:${cnt > 0 ? pct : 0}%;transition:width 0.5s ease"></div>
         </div>
-        <div style="font-size:11px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어 보세요'}</div>
+        <div style="font-size:11px;color:var(--muted)">인증 ${cnt}명</div>
       </div>
       <button onclick="certifyDailyMeal('${m.name}')"
         style="background:var(--yellow);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#1a1400;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%">
@@ -7419,7 +7420,7 @@ function renderDailyQ() {
   const total = counts.reduce((a,b) => a+b, 0);
 
   card.innerHTML = `
-    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px">
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px">
       <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4">${q.q}</div>
       ${voted ? `
         <!-- 결과 표시 -->
@@ -7443,7 +7444,7 @@ function renderDailyQ() {
         <div style="display:flex;gap:8px">
           ${q.opts.map((opt, i) => `
             <button onclick="voteDailyQ(${i})"
-              style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 6px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;text-align:center"
+              style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 6px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;text-align:center"
               onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'"
               onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
               ${wcFoodVisual({name: opt.menu || opt.label, emoji: opt.emoji}, 52)}
@@ -7652,7 +7653,7 @@ function renderTournamentMatches() {
 
   // 잠긴 라운드
   if (round > availableRound) {
-    wrap.innerHTML = '<div style="background:var(--card);border:1.5px dashed var(--border);border-radius:14px;padding:30px;text-align:center;color:var(--muted)">'
+    wrap.innerHTML = '<div style="background:var(--card);border:1.5px dashed var(--border);border-radius:12px;padding:30px;text-align:center;color:var(--muted)">'
       + '<div style="font-size:28px;margin-bottom:8px">🔒</div>'
       + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">' + ROUND_NAMES[round] + '</div>'
       + '<div style="font-size:11px">' + ROUND_UNLOCK_DAY[round] + '에 열려요</div></div>';
@@ -7667,7 +7668,7 @@ function renderTournamentMatches() {
       const fm = computeRoundMenus(3)[0];
       const winner = finalV.a >= finalV.b ? fm.a : fm.b;
       winnerEl.style.display = 'block';
-      winnerEl.innerHTML = '<div style="background:linear-gradient(135deg,rgba(255,209,102,0.15),rgba(255,71,87,0.1));border:2px solid var(--yellow);border-radius:16px;padding:24px;text-align:center;margin-top:12px">'
+      winnerEl.innerHTML = '<div style="background:linear-gradient(135deg,rgba(255,209,102,0.15),rgba(255,71,87,0.1));border:2px solid var(--yellow);border-radius:20px;padding:24px;text-align:center;margin-top:12px">'
         + '<div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:8px">🏆 이번 주 최강 메뉴 (현재 기준)</div>'
         + wcFoodVisual(winner, 96)
         + '<div style="font-size:20px;font-weight:700;color:var(--text)">' + winner.name + '</div></div>';
@@ -7707,7 +7708,7 @@ function renderTournamentMatches() {
     const aBar = confirmed ? '<div style="margin-top:6px"><div style="background:var(--surface);border-radius:4px;height:5px;overflow:hidden;margin-bottom:2px"><div style="background:' + (vd.myVote==='a'?'var(--orange)':'var(--border)') + ';height:100%;border-radius:4px;width:' + aPct + '%"></div></div><div style="font-size:11px;color:' + (vd.myVote==='a'?'var(--orange)':'var(--muted)') + '">' + aPct + '%' + (vd.myVote==='a'?' ✓':'') + '</div></div>' : (temp==='a' ? '<div style="font-size:11px;color:var(--orange);margin-top:4px">선택중</div>' : '');
     const bBar = confirmed ? '<div style="margin-top:6px"><div style="background:var(--surface);border-radius:4px;height:5px;overflow:hidden;margin-bottom:2px"><div style="background:' + (vd.myVote==='b'?'var(--orange)':'var(--border)') + ';height:100%;border-radius:4px;width:' + bPct + '%"></div></div><div style="font-size:11px;color:' + (vd.myVote==='b'?'var(--orange)':'var(--muted)') + '">' + bPct + '%' + (vd.myVote==='b'?' ✓':'') + '</div></div>' : (temp==='b' ? '<div style="font-size:11px;color:var(--orange);margin-top:4px">선택중</div>' : '');
 
-    html += '<div style="background:var(--card);border:1.5px solid ' + ((aActive||bActive)&&!confirmed?'var(--orange)':'var(--border)') + ';border-radius:14px;padding:14px;margin-bottom:10px">'
+    html += '<div style="background:var(--card);border:1.5px solid ' + ((aActive||bActive)&&!confirmed?'var(--orange)':'var(--border)') + ';border-radius:12px;padding:14px;margin-bottom:10px">'
       + '<div style="font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:10px">' + (i+1) + '매치 &nbsp;·&nbsp; ' + (total > 0 ? '<span style="color:var(--orange)">' + total + '명 참여중</span>' : '<span style="color:var(--orange)">첫 투표를 기다려요</span>') + '</div>'
       + '<div style="display:flex;gap:10px;align-items:center">'
       + '<button onclick="voteTournament(' + i + ',\'a\')" ' + (!canVote?'disabled ':'') + 'style="flex:1;background:' + aBg + ';border:2px solid ' + aBorder + ';border-radius:12px;padding:12px 6px;text-align:center;cursor:' + cursor + ';transition:all 0.15s;font-family:\'Noto Sans KR\',sans-serif">'
@@ -7720,7 +7721,7 @@ function renderTournamentMatches() {
       + '<div style="font-size:11px;font-weight:700;color:' + bColor + ';word-break:keep-all;line-height:1.3">' + m.b.name + '</div>'
       + bBar + '</button>'
       + '</div>'
-      + (temp !== undefined && !confirmed ? '<button onclick="confirmTournamentVotes(' + i + ')" style="width:100%;margin-top:10px;padding:11px;background:var(--orange);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Black Han Sans\',sans-serif">✅ 확정하기</button>' : '')
+      + (temp !== undefined && !confirmed ? '<button onclick="confirmTournamentVotes(' + i + ')" style="width:100%;margin-top:10px;padding:11px;background:var(--orange);border:none;border-radius:12px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Black Han Sans\',sans-serif">✅ 확정하기</button>' : '')
       + '</div>';
   });
 
@@ -7851,7 +7852,7 @@ function wcFoodVisual(item, size) {
   const fontSize = Math.round(size * 0.62);
   const img = getMenuImg(item.name);
   if (img) {
-    return `<div style="width:${size}px;height:${size}px;margin:0 auto 8px;border-radius:14px;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:${fontSize}px">
+    return `<div style="width:${size}px;height:${size}px;margin:0 auto 8px;border-radius:12px;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:${fontSize}px">
       <img src="${img}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.innerHTML='${item.emoji}'"></div>`;
   }
   return `<div style="height:${size}px;display:flex;align-items:center;justify-content:center;font-size:${fontSize}px;margin-bottom:8px">${item.emoji}</div>`;
@@ -7863,13 +7864,13 @@ function renderWorldcup() {
 
   if (wcState === 'idle') {
     el.innerHTML = `
-      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px;text-align:center">
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px;text-align:center">
         <div style="font-size:36px;margin-bottom:10px">🌍</div>
         <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">나만의 음식 월드컵</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">랜덤으로 뽑힌 메뉴 중<br>내 최애를 골라봐요!</div>
         <div style="display:flex;gap:8px;justify-content:center">
-          <button onclick="startWorldcup(16)" style="flex:1;max-width:80px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">16강</button>
-          <button onclick="startWorldcup(32)" style="flex:1;max-width:80px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">32강</button>
+          <button onclick="startWorldcup(16)" style="flex:1;max-width:80px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 6px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">16강</button>
+          <button onclick="startWorldcup(32)" style="flex:1;max-width:80px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 6px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">32강</button>
         </div>
       </div>`;
     return;
@@ -7878,11 +7879,11 @@ function renderWorldcup() {
   if (wcState === 'result') {
     const winner = wcHistory[wcHistory.length-1].winners[0];
     el.innerHTML = `
-      <div style="background:linear-gradient(135deg,rgba(6,214,160,0.1),rgba(255,71,87,0.08));border:2px solid var(--green);border-radius:16px;padding:24px;text-align:center">
+      <div style="background:linear-gradient(135deg,rgba(6,214,160,0.1),rgba(255,71,87,0.08));border:2px solid var(--green);border-radius:20px;padding:24px;text-align:center">
         <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">🏆 나의 최애 메뉴!</div>
         ${wcFoodVisual(winner, 110)}
         <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:16px">${winner.name}</div>
-        <button onclick="resetWorldcup()" style="background:var(--green);border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:700;color:white;cursor:pointer;font-family:'Noto Sans KR',sans-serif">다시 하기</button>
+        <button onclick="resetWorldcup()" style="background:var(--green);border:none;border-radius:12px;padding:10px 24px;font-size:13px;font-weight:700;color:white;cursor:pointer;font-family:'Noto Sans KR',sans-serif">다시 하기</button>
       </div>`;
     return;
   }
@@ -7895,7 +7896,7 @@ function renderWorldcup() {
   const progress = Math.round((wcRoundIdx / totalInRound) * 100);
 
   el.innerHTML = `
-    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px">
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px">
       <!-- 헤더 -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <span style="font-size:12px;font-weight:700;color:var(--green)">${roundName}</span>
@@ -7940,12 +7941,14 @@ function renderFunPage() {
     const maxCount = Math.max(...Object.values(counts), 1);
     const topMenu = Object.entries(counts).sort((a,b) => b[1]-a[1])[0];
     const isTop = (name) => topMenu && topMenu[1] > 0 && topMenu[0] === name;
+    const mealHint = document.getElementById('fun-daily-meal-hint');
+    if (mealHint) mealHint.textContent = meals.some(m => counts[m.name]) ? '오늘 먹은 메뉴를 인증해 보세요' : '아직 아무도 인증하지 않았어요. 첫 인증의 주인공이 되어 보세요!';
     mealWrap.innerHTML = meals.map(m => {
       const cnt = counts[m.name] || 0;
       const pct = Math.round(cnt / maxCount * 100);
       const top = isTop(m.name);
       return `
-      <div style="flex:1;background:var(--card);border:1.5px solid ${top?'var(--yellow)':'var(--border)'};border-radius:14px;padding:12px 8px;text-align:center;transition:border-color 0.15s"
+      <div style="flex:1;background:var(--card);border:1.5px solid ${top?'var(--yellow)':'var(--border)'};border-radius:12px;padding:12px 8px;text-align:center;transition:border-color 0.15s"
         onmouseover="this.style.borderColor='var(--yellow)'" onmouseout="this.style.borderColor='${top?'var(--yellow)':'var(--border)'}'">
         <div style="font-size:11px;height:16px;margin-bottom:2px;color:var(--yellow);font-weight:700">${top?'👑':''}</div>
         ${wcFoodVisual(m, 50)}
@@ -7954,7 +7957,7 @@ function renderFunPage() {
           <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
             <div style="background:var(--yellow);height:100%;border-radius:4px;width:${cnt>0?pct:0}%;transition:width 0.5s ease"></div>
           </div>
-          <div style="font-size:11px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어 보세요'}</div>
+          <div style="font-size:11px;color:var(--muted)">인증 ${cnt}명</div>
         </div>
         <button onclick="certifyDailyMeal('${m.name}')"
           style="background:var(--yellow);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#1a1400;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%">
@@ -7981,7 +7984,7 @@ function renderFunPage() {
       const renderQCard = (counts, votedIdx) => {
         const total = counts.reduce((a,b)=>a+b,0);
         qCard.innerHTML = `
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px">
+          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px">
             <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4">${q.q}</div>
             ${votedIdx !== null ? `
               ${q.opts.map((opt,i)=>{
@@ -8002,7 +8005,7 @@ function renderFunPage() {
               <div style="display:flex;gap:8px">
                 ${q.opts.map((opt,i)=>`
                   <button onclick="voteDailyQ(${i}).then(()=>renderFunPage())"
-                    style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 6px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;text-align:center"
+                    style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 6px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;text-align:center"
                     onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'"
                     onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
                     ${wcFoodVisual({name: opt.menu || opt.label, emoji: opt.emoji}, 52)}
@@ -8095,7 +8098,7 @@ function renderHotBanner(tab) {
       : `<div style="width:44px;height:44px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${p.avatar}</div>`;
     const likeCount = (p.likes||0) + (likedPosts.has(p.id)?1:0);
     return `
-    <div onclick="openCommPostModal('${p.id}')" style="min-width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-sizing:border-box;display:flex;align-items:center;gap:10px;cursor:pointer">
+    <div onclick="openCommPostModal('${p.id}')" style="min-width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;box-sizing:border-box;display:flex;align-items:center;gap:10px;cursor:pointer">
       ${imgHtml}
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;color:var(--text);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.text}</div>
@@ -8743,14 +8746,14 @@ function openNicknameModal() {
       <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px">닉네임 변경</div>
       <div id="nick-change-count-label" style="font-size:11px;color:var(--muted);margin-bottom:16px">3일에 한 번 바꿀 수 있어요</div>
       <input id="nick-input" type="text" value="${escHtml(current)}" maxlength="12" placeholder="닉네임 (2~12자)"
-        style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
+        style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif"
         onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
       <div style="font-size:11px;color:var(--muted);margin-top:6px">현재: ${escHtml(current)}</div>
       <div style="display:flex;gap:8px;margin-top:14px">
         <button onclick="document.getElementById('nickname-modal').remove()"
-          style="flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">취소</button>
+          style="flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">취소</button>
         <button onclick="changeNickname(document.getElementById('nick-input').value).then(()=>document.getElementById('nickname-modal')?.remove())"
-          style="flex:1;padding:12px;background:var(--orange);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">변경</button>
+          style="flex:1;padding:12px;background:var(--orange);border:none;border-radius:12px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">변경</button>
       </div>
     </div>`;
   backdrop.onclick = () => backdrop.remove();
@@ -9012,7 +9015,7 @@ function renderCommFeed(tab) {
             </div>`;
           }).join('') +
         `</div>` +
-        (isClosed ? `<button onclick="revoteComm('${p.id}')" style="width:100%;margin-top:8px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif">🔄 다시 투표하기</button>` : '');
+        (isClosed ? `<button onclick="revoteComm('${p.id}')" style="width:100%;margin-top:8px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif">🔄 다시 투표하기</button>` : '');
       }
     }
 
@@ -9021,7 +9024,7 @@ function renderCommFeed(tab) {
 
     const dailyMeals = getDailyMeals();
     const isDailyMeal = p.menuTag && dailyMeals.some(m => m.name === p.menuTag);
-    const dailyBadge = isDailyMeal ? `<span style="display:inline-block;background:rgba(255,209,102,0.15);border:1px solid var(--yellow);border-radius:10px;padding:2px 7px;font-size:11px;color:var(--yellow);font-weight:700;margin-left:4px">🍱 오늘의 급식</span>` : '';
+    const dailyBadge = isDailyMeal ? `<span style="display:inline-block;background:rgba(255,209,102,0.15);border:1px solid var(--yellow);border-radius:12px;padding:2px 7px;font-size:11px;color:var(--yellow);font-weight:700;margin-left:4px">🍱 오늘의 급식</span>` : '';
 
     const imgHtml = (p.imgs && p.imgs.length > 0) ? renderSlide(p.imgs, p.id) : '';
 
@@ -9037,14 +9040,14 @@ function renderCommFeed(tab) {
         ${isMyPost(p) ? `
         <div style="position:relative">
           <button onclick="togglePostMenu('${p.id}')" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 2px;line-height:1">⋯</button>
-          <div id="post-menu-${p.id}" style="display:none;position:absolute;right:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;z-index:10;min-width:80px;box-shadow:0 4px 12px rgba(0,0,0,0.3)">
+          <div id="post-menu-${p.id}" style="display:none;position:absolute;right:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;z-index:10;min-width:80px;box-shadow:0 4px 12px rgba(0,0,0,0.3)">
             <div onclick="editCommPost('${p.id}')" style="padding:10px 14px;font-size:13px;cursor:pointer;color:var(--text)" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">✏️ 수정</div>
             <div onclick="deleteCommPost('${p.id}')" style="padding:10px 14px;font-size:13px;cursor:pointer;color:var(--red)" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">🗑️ 삭제</div>
           </div>
         </div>` : `
         <div style="position:relative">
           <button onclick="togglePostMenu('${p.id}')" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 2px;line-height:1">⋯</button>
-          <div id="post-menu-${p.id}" style="display:none;position:absolute;right:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;z-index:10;min-width:80px;box-shadow:0 4px 12px rgba(0,0,0,0.3)">
+          <div id="post-menu-${p.id}" style="display:none;position:absolute;right:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;z-index:10;min-width:80px;box-shadow:0 4px 12px rgba(0,0,0,0.3)">
             <div onclick="reportCommPost('${p.id}')" style="padding:10px 14px;font-size:13px;cursor:pointer;color:var(--muted)" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">🚨 신고</div>
             <div onclick="blockCommUser('${p.id}')" style="padding:10px 14px;font-size:13px;cursor:pointer;color:var(--muted);white-space:nowrap" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">🚫 이 작성자 차단</div>
           </div>
@@ -9223,7 +9226,7 @@ function openCommWrite() {
   resetCommStar();
   // 투표 선택지 초기화
   const wrap = document.getElementById('comm-vote-options-wrap');
-  const iStyle = "flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif";
+  const iStyle = "flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif";
   wrap.innerHTML = [1,2].map(n =>
     `<div class="comm-vote-option-row" style="display:flex;flex-direction:column;gap:4px">
       <div style="display:flex;gap:6px;align-items:center">
@@ -9308,7 +9311,7 @@ function addVoteOption() {
   const rows = wrap.querySelectorAll('.comm-vote-option-row');
   if (rows.length >= 4) { showToast('선택지는 최대 4개까지 가능해요'); return; }
   const n = rows.length;
-  const iStyle = "flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif";
+  const iStyle = "flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif";
   const div = document.createElement('div');
   div.className = 'comm-vote-option-row';
   div.style.cssText = 'display:flex;flex-direction:column;gap:4px';
@@ -9491,7 +9494,7 @@ function deleteCommPost(postId) {
 
   const bar = document.createElement('div');
   bar.id = 'comm-delete-confirm';
-  bar.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:400;box-shadow:0 4px 20px rgba(0,0,0,0.4);font-size:13px;color:var(--text);white-space:nowrap';
+  bar.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:400;box-shadow:0 4px 20px rgba(0,0,0,0.4);font-size:13px;color:var(--text);white-space:nowrap';
   bar.innerHTML = `
     <span>이 글을 삭제할까요?</span>
     <button onclick="confirmDeletePost('${postId}')" style="background:var(--red);border:none;border-radius:8px;color:white;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">삭제</button>
