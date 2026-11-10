@@ -623,5 +623,6 @@
     go(id) { if (room !== 'street') return; const d = ROOMS[id]?.door; if (!d) return; pendingSeat = null; pendingDoor = id; walkTo(d[0], d[1]); },
     leave, sit, sitAny, stand, goSit, walkTo, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
     avatarSVG, room: () => room, count: () => Object.keys(lobbyState).length,
+    who: () => Object.entries(lobbyState).map(([k, p]) => (k === SID ? '(나)' : '') + p.room + ':' + p.nick),
   };
 })();
