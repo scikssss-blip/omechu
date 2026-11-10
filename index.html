@@ -2019,6 +2019,18 @@
   </div>
 </div>
 
+<!-- 지도 앱 선택 -->
+<div id="map-picker" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1100;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeMapPicker()">
+  <div style="width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;padding:22px 20px 28px">
+    <div style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text);margin-bottom:4px">어떤 지도로 열까요?</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px">한 번 고르면 다음부터 바로 열려요. 설정에서 언제든 바꿀 수 있어요.</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="chooseMapApp('kakao')" style="flex:1;padding:16px 8px;border-radius:14px;border:1.5px solid var(--border);background:#FEE500;color:#191919;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">카카오맵</button>
+      <button onclick="chooseMapApp('naver')" style="flex:1;padding:16px 8px;border-radius:14px;border:1.5px solid var(--border);background:#03C75A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">네이버지도</button>
+    </div>
+  </div>
+</div>
+
 <div id="onboarding-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center">
   <div style="width:100%;max-width:380px;margin:0 20px;position:relative;background:var(--card);border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
 
@@ -2313,6 +2325,9 @@
     </div>
     <div class="my-setting-row" onclick="openSuggest()">
       <span>📮 메뉴 건의•추천하기</span><span class="my-setting-arrow">›</span>
+    </div>
+    <div class="my-setting-row" onclick="openMapPicker()">
+      <span>🗺️ 지도 앱</span><span style="font-size:11px;color:var(--orange)" id="map-app-label">선택 안 함</span>
     </div>
     <div class="my-setting-row" onclick="clearBlockedUsers()">
       <span>🚫 차단한 사용자 해제</span><span class="my-setting-arrow">›</span>
@@ -4561,7 +4576,9 @@ function renderResults(rejectPattern, flipIndex) {
           <div class="result-actions">
             <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${getLikedMenus().some(m=>m.name===item.name)?'❤️':'🤍'} 좋아요</button>
             <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">😅 안땡겨</button>
-            <button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">📋 레시피</button>
+            ${selectedCat === 'cook'
+              ? `<button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">📋 레시피</button>`
+              : `<button class="result-btn" onclick="openNearbyMap('${item.name.replace(/'/g,"\\'")}')" style="color:var(--orange)">📍 근처 찾기</button>`}
             <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? `💬 후기 ${rc}개` : '✍️ 첫 후기 남기기'; })()}</button>
           </div>
           <div id="similar-btn-wrap-${i}">
@@ -4896,6 +4913,7 @@ function saveHistorySnapshot() {
 
 function showPage(page) {
   window.scrollTo(0, 0);
+  if (page === 'settings') setTimeout(updateMapLabel, 0);
   // 내 활동 하위 페이지(달력/저장글/내글)로 가면 펼침 유지, 그 외 다른 메뉴면 접힘
   if (['food-calendar','saved-posts','my-posts'].includes(page)) keepActivityOpen = true;
   else if (page !== 'mypage') keepActivityOpen = false;
@@ -5075,6 +5093,7 @@ function renderMyPage() {
   if (themeLabel) themeLabel.textContent = localStorage.getItem('wmjTheme') === 'light' ? '라이트' : '다크';
 
   renderTasteAnalysis();
+  updateMapLabel();
   // 프로필 내 스탯 칩 (입맛 캐릭터 · 추천 횟수 · 식단 스트릭)
   const pStats = document.getElementById('my-profile-stats');
   if (pStats) {
@@ -5471,6 +5490,33 @@ function reportCommPost(postId) {
     <button onclick="document.getElementById('comm-report-confirm').remove()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 12px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">취소</button>`;
   document.body.appendChild(bar);
   setTimeout(() => { if (bar.parentNode) bar.remove(); }, 5000);
+}
+
+// ── 지도 연결 ──
+const MAP_APPS = {
+  kakao: { name: '카카오맵', url: q => 'https://map.kakao.com/link/search/' + encodeURIComponent(q) },
+  naver: { name: '네이버지도', url: q => 'https://map.naver.com/p/search/' + encodeURIComponent(q) },
+};
+let pendingMapQuery = null;
+function getMapApp() { const v = localStorage.getItem('wmjMapApp'); return MAP_APPS[v] ? v : null; }
+function updateMapLabel() {
+  const el = document.getElementById('map-app-label');
+  if (el) el.textContent = getMapApp() ? MAP_APPS[getMapApp()].name : '선택 안 함';
+}
+function openNearbyMap(menuName) {
+  const app = getMapApp();
+  if (!app) { pendingMapQuery = menuName; openMapPicker(); return; }
+  window.open(MAP_APPS[app].url(menuName), '_blank');
+}
+function openMapPicker() { document.getElementById('map-picker').style.display = 'flex'; }
+function closeMapPicker() { document.getElementById('map-picker').style.display = 'none'; pendingMapQuery = null; }
+function chooseMapApp(app) {
+  localStorage.setItem('wmjMapApp', app);
+  updateMapLabel();
+  const q = pendingMapQuery;
+  closeMapPicker();
+  showToast(`🗺️ 앞으로 ${MAP_APPS[app].name}로 열게요`);
+  if (q) window.open(MAP_APPS[app].url(q), '_blank');
 }
 
 // ── 신고·차단 ──
