@@ -21,23 +21,44 @@
     low:   [[-42, -60], [42, -60], [-42, 56], [42, 56]],   // 좌식 상 (방석 위아래)
     booth: [[-78, -20], [-78, 34], [78, -20], [78, 34]],   // 소파 부스 (좌우)
   };
+  // bg: Canva 크레파스 배경. 테이블의 s는 그림 속 의자 위치(테이블 중심 기준), ly는 이름표, by는 인원 배지 위치
   const ROOMS = {
-    street: { name: '오메추 먹자골목', w: 420, h: 1000, ch: 'omechu-street-v1', spawn: [210, 940], tables: [] },
-    pocha: { name: '오메추 포차', kind: '포장마차', w: 720, h: 960, ch: 'omechu-pocha-v1', spawn: [360, 880], exit: [360, 930],
-      tags: ['🍺 술안주', '🌙 야식'], vote: '안주', door: [210, 262], front: { x: 50, y: 70, w: 320, h: 160 },
-      tables: [{ x: 180, y: 250, k: 'round', n: '1번 테이블' }, { x: 540, y: 250, k: 'round', n: '2번 테이블' }, { x: 180, y: 680, k: 'round', n: '3번 테이블' }, { x: 540, y: 680, k: 'bar', n: '이모네 바' }] },
-    korean: { name: '오메추 밥상', kind: '한식집', w: 720, h: 900, ch: 'omechu-room-korean-v1', spawn: [360, 820], exit: [360, 870],
-      tags: ['🍱 한식'], vote: '메뉴', door: [192, 440], front: { x: 8, y: 290, w: 160, h: 180 },
-      tables: [{ x: 180, y: 260, k: 'low', n: '1번 상' }, { x: 540, y: 260, k: 'low', n: '2번 상' }, { x: 180, y: 590, k: 'low', n: '3번 상' }, { x: 540, y: 590, k: 'low', n: '4번 상' }] },
-    japanese: { name: '오메추 스시야', kind: '일식집', w: 720, h: 900, ch: 'omechu-room-japanese-v1', spawn: [360, 820], exit: [360, 870],
-      tags: ['🍣 일식'], vote: '메뉴', door: [228, 440], front: { x: 252, y: 290, w: 160, h: 180 },
-      tables: [{ x: 360, y: 200, k: 'bar', n: '스시 카운터' }, { x: 160, y: 500, k: 'low', n: '1번 자리' }, { x: 560, y: 500, k: 'low', n: '2번 자리' }, { x: 360, y: 620, k: 'low', n: '3번 자리' }] },
-    chinese: { name: '오메추 반점', kind: '중식집', w: 720, h: 900, ch: 'omechu-room-chinese-v1', spawn: [360, 820], exit: [360, 870],
-      tags: ['🥢 중식'], vote: '메뉴', door: [192, 740], front: { x: 8, y: 590, w: 160, h: 180 },
-      tables: [{ x: 180, y: 250, k: 'round', n: '1번 원탁' }, { x: 540, y: 250, k: 'round', n: '2번 원탁' }, { x: 180, y: 590, k: 'round', n: '3번 원탁' }, { x: 540, y: 590, k: 'round', n: '4번 원탁' }] },
-    western: { name: '오메추 비스트로', kind: '양식집', w: 720, h: 900, ch: 'omechu-room-western-v1', spawn: [360, 820], exit: [360, 870],
-      tags: ['🍝 양식'], vote: '메뉴', door: [228, 740], front: { x: 252, y: 590, w: 160, h: 180 },
-      tables: [{ x: 180, y: 240, k: 'booth', n: '1번 부스' }, { x: 540, y: 240, k: 'booth', n: '2번 부스' }, { x: 180, y: 580, k: 'booth', n: '3번 부스' }, { x: 540, y: 580, k: 'booth', n: '4번 부스' }] },
+    street: { name: '오메추 먹자골목', w: 420, h: 832, ch: 'omechu-street-v1', spawn: [215, 790], bg: '/images/pocha/street.jpg', tables: [] },
+    pocha: { name: '오메추 포차', kind: '포장마차', w: 720, h: 900, ch: 'omechu-pocha-v1', spawn: [200, 770], exit: [180, 830], bg: '/images/pocha/pocha.jpg',
+      tags: ['🍺 술안주', '🌙 야식'], vote: '안주', door: [215, 172], front: { x: 120, y: 0, w: 190, h: 150 },
+      tables: [
+        { x: 200, y: 430, k: 'round', n: '1번 테이블', s: [[-70, -45], [92, 2], [-75, 68], [32, 92]], by: 125 },
+        { x: 550, y: 415, k: 'round', n: '2번 테이블', s: [[-100, 18], [92, 18], [-50, 98], [45, 98]], by: 130 },
+        { x: 410, y: 650, k: 'round', n: '3번 테이블', s: [[-110, 32], [105, 12], [-50, 122], [50, 122]], by: 150 },
+        { x: 370, y: 200, k: 'bar', n: '이모네 바', s: [[-145, 60], [-50, 60], [40, 60], [145, 60]], by: 95 }] },
+    korean: { name: '오메추 밥상', kind: '한식집', w: 720, h: 900, ch: 'omechu-room-korean-v1', spawn: [360, 790], exit: [320, 850], bg: '/images/pocha/korean.jpg',
+      tags: ['🍱 한식'], vote: '메뉴', door: [160, 322], front: { x: 0, y: 190, w: 150, h: 230 },
+      tables: [
+        { x: 237, y: 335, k: 'low', n: '1번 상', s: [[3, -82], [-95, 12], [97, 12], [-2, 102]], by: 130 },
+        { x: 505, y: 335, k: 'low', n: '2번 상', s: [[0, -82], [-93, 12], [93, 12], [3, 102]], by: 130 },
+        { x: 222, y: 635, k: 'low', n: '3번 상', s: [[5, -95], [-105, 5], [110, 5], [0, 105]], by: 135 },
+        { x: 515, y: 635, k: 'low', n: '4번 상', s: [[-8, -95], [-105, 5], [100, 5], [0, 105]], by: 135 }] },
+    japanese: { name: '오메추 스시야', kind: '일식집', w: 720, h: 900, ch: 'omechu-room-japanese-v1', spawn: [360, 790], exit: [360, 860], bg: '/images/pocha/japanese.jpg',
+      tags: ['🍣 일식'], vote: '메뉴', door: [276, 332], front: { x: 290, y: 150, w: 130, h: 270 },
+      tables: [
+        { x: 365, y: 250, k: 'bar', n: '스시 카운터', s: [[-150, 50], [-50, 50], [50, 50], [155, 50]], by: 95 },
+        { x: 165, y: 580, k: 'low', n: '1번 자리', s: [[-30, -72], [40, -72], [-35, 80], [35, 80]], by: 120 },
+        { x: 360, y: 580, k: 'low', n: '2번 자리', s: [[-35, -72], [35, -72], [-35, 80], [35, 80]], by: 120 },
+        { x: 555, y: 580, k: 'low', n: '3번 자리', s: [[-35, -72], [35, -72], [-35, 80], [35, 80]], by: 120 }] },
+    chinese: { name: '오메추 반점', kind: '중식집', w: 720, h: 900, ch: 'omechu-room-chinese-v1', spawn: [360, 800], exit: [360, 860], bg: '/images/pocha/chinese.jpg',
+      tags: ['🥢 중식'], vote: '메뉴', door: [152, 622], front: { x: 0, y: 470, w: 140, h: 280 },
+      tables: [
+        { x: 245, y: 325, k: 'round', n: '1번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 140 },
+        { x: 535, y: 325, k: 'round', n: '2번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 140 },
+        { x: 205, y: 650, k: 'round', n: '3번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 135 },
+        { x: 525, y: 660, k: 'round', n: '4번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 125 }] },
+    western: { name: '오메추 비스트로', kind: '양식집', w: 720, h: 900, ch: 'omechu-room-western-v1', spawn: [360, 760], exit: [360, 845], bg: '/images/pocha/western.jpg',
+      tags: ['🍝 양식'], vote: '메뉴', door: [280, 622], front: { x: 295, y: 480, w: 125, h: 250 },
+      tables: [
+        { x: 200, y: 305, k: 'booth', n: '1번 부스', s: [[-112, -40], [-112, 45], [97, -40], [97, 45]], by: 100 },
+        { x: 555, y: 305, k: 'booth', n: '2번 부스', s: [[-97, -40], [-97, 45], [110, -40], [110, 45]], by: 100 },
+        { x: 190, y: 600, k: 'booth', n: '3번 부스', s: [[-112, -40], [-112, 45], [100, -40], [100, 45]], by: 100 },
+        { x: 560, y: 600, k: 'booth', n: '4번 부스', s: [[-100, -40], [-100, 45], [112, -40], [112, 45]], by: 100 }] },
   };
   const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
 
@@ -59,7 +80,7 @@
   const esc = (v) => (typeof escHtml === 'function' ? escHtml(String(v ?? '')) : String(v ?? '').replace(/[&<>"']/g, ''));
   const nick = () => (typeof getMyNick === 'function' ? getMyNick() : '손님');
   const T = () => R.tables.length;
-  const seatXY = (t, s) => { const tb = R.tables[t], o = SEAT_KIND[tb.k][s]; return [tb.x + o[0], tb.y + o[1]]; };
+  const seatXY = (t, s) => { const tb = R.tables[t], o = (tb.s || SEAT_KIND[tb.k])[s]; return [tb.x + o[0], tb.y + o[1]]; };
 
   // ── 다른 손님이 보낸 값은 믿지 않고 정해진 값만 받기 ──
   const okSid = (v) => typeof v === 'string' && /^[a-z0-9]{1,24}$/i.test(v);
@@ -525,6 +546,9 @@
   }
   function roomSVG() {
     const th = room, w = R.w, h = R.h;
+    if (R.bg) {
+      return `<svg class="pc-map" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><image href="${R.bg}" width="${w}" height="${h}" preserveAspectRatio="none"/><rect width="${w}" height="${h}" fill="rgba(20,12,24,.12)"/>${exitSVG()}</svg>`;
+    }
     let floor = '', deco = '';
     if (th === 'pocha') {
       floor = `<rect width="${w}" height="${h}" fill="url(#pcBrick)"/><rect x="0" y="420" width="${w}" height="110" fill="#1b1622"/><path d="M0 475h${w}" stroke="#3a3249" stroke-width="3" stroke-dasharray="16 14"/><rect x="300" y="530" width="120" height="${h - 530}" fill="#1b1622"/>`;
@@ -557,6 +581,12 @@
   function shopRect(id) { return ROOMS[id].front; }
   function streetSVG() {
     const w = ROOMS.street.w, h = ROOMS.street.h;
+    if (ROOMS.street.bg) {
+      const sign = (id) => { const r = shopRect(id), cx = r.x + r.w / 2, y = r.y + r.h / 2; const tw = ROOMS[id].name.length * 13 + 20;
+        return `<g class="pc-shop"><rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" fill="transparent"/><rect x="${cx - tw / 2}" y="${y - 15}" width="${tw}" height="30" rx="15" fill="rgba(25,16,30,.72)" stroke="rgba(255,215,160,.55)"/><text x="${cx}" y="${y + 5}" class="pc-sign2" style="font-size:13px">${ROOMS[id].name}</text></g>`; };
+      return `<svg class="pc-map" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><image href="${ROOMS.street.bg}" width="${w}" height="${h}" preserveAspectRatio="none"/>${SHOPS.map(sign).join('')}
+        <g transform="translate(215 ${h - 18})"><rect x="-78" y="-16" width="156" height="30" rx="10" fill="#c8102e"/><text x="0" y="5" class="pc-sign2">오메추 먹자골목</text></g></svg>`;
+    }
     const front = (id) => {
       const r = shopRect(id), R2 = ROOMS[id], cx = r.x + r.w / 2;
       if (id === 'pocha') return `<g><rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="14" fill="#3a2a26"/><rect x="${r.x}" y="${r.y}" width="${r.w}" height="30" rx="12" fill="url(#pcAwnR)"/>
@@ -667,8 +697,8 @@
     // 골목: 가게 문 위에 지금 인원
     const dl0 = document.getElementById('pc-doors');
     if (dl0) dl0.innerHTML = room !== 'street'
-      ? R.tables.map((tb, t) => { const n = seatedAt(t).length; return `<div class="pc-doorcount ${n ? 'hot' : ''}" style="left:${tb.x}px;top:${tb.y + (tb.k === 'bar' ? 64 : tb.k === 'low' ? 70 : 80)}px">👥 ${n}/${SEATS}</div>`; }).join('')
-      : (() => { const c = roomCounts(); return SHOPS.map(id => { const r = shopRect(id); return `<div class="pc-doorcount ${c[id] ? 'hot' : ''}" style="left:${r.x + r.w / 2}px;top:${r.y - 14}px">${c[id] ? '🔥' : '👥'} ${c[id] || 0}명</div>`; }).join(''); })();
+      ? R.tables.map((tb, t) => { const n = seatedAt(t).length; return `<div class="pc-doorcount ${n ? 'hot' : ''}" style="left:${tb.x}px;top:${tb.y + (tb.by ?? (tb.k === 'bar' ? 64 : tb.k === 'low' ? 70 : 80))}px">${R.bg ? esc(tb.n) + ' · ' : ''}👥 ${n}/${SEATS}</div>`; }).join('')
+      : (() => { const c = roomCounts(); return SHOPS.map(id => { const r = shopRect(id); return `<div class="pc-doorcount ${c[id] ? 'hot' : ''}" style="left:${r.x + r.w / 2}px;top:${Math.max(14, r.y + r.h / 2 - 30)}px">${c[id] ? '🔥' : '👥'} ${c[id] || 0}명</div>`; }).join(''); })();
     // 투표로 정한 메뉴를 테이블 위에
     const dl = document.getElementById('pc-dishes');
     if (dl) dl.innerHTML = room === 'street' ? '' : Object.entries(dishes).map(([t, d]) => {
