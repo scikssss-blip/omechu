@@ -83,7 +83,12 @@ async function login() {
   document.getElementById('login-msg').textContent = '확인 중...';
   const { data } = await sb.rpc('admin_login', { p_pass: pw });
   if (data === true) { PASS = pw; sessionStorage.setItem('omechuAdmin', pw); show(); }
-  else document.getElementById('login-msg').textContent = '비밀번호가 맞지 않아요';
+  else {
+    const { data: mins } = await sb.rpc('admin_locked');
+    document.getElementById('login-msg').textContent = mins > 0
+      ? `여러 번 틀려서 잠겼어요. ${mins}분 뒤에 다시 시도해 주세요`
+      : '비밀번호가 맞지 않아요 (5번 틀리면 10분 잠금)';
+  }
 }
 function logout() { PASS = ''; sessionStorage.removeItem('omechuAdmin'); document.getElementById('app').style.display = 'none'; document.getElementById('login').style.display = 'block'; }
 function show() { document.getElementById('login').style.display = 'none'; document.getElementById('app').style.display = 'block'; go(tab); }

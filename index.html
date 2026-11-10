@@ -5631,8 +5631,8 @@ async function confirmReportPost(postId) {
     localStorage.setItem('wmjMyReported', JSON.stringify(myReportedPosts));
   }
   try {
-    const { error } = await sb.from('reports').insert({ post_id: postId, user_key: MY_USER_KEY, reason: 'user_report' });
-    if (error) throw error;
+    const ok = await ownerRpc('report_post', { p_post_id: postId });
+    if (!ok) throw new Error('rejected');
     showToast('🚨 신고가 접수됐어요. 이 글은 더 이상 보이지 않아요.');
   } catch (e) {
     console.warn('신고 저장 실패:', e?.message || String(e));
@@ -8182,6 +8182,23 @@ function openCommPostModal(postId) {
 function closeCommPostModal() {
   document.getElementById('comm-post-modal').classList.remove('open');
 }
+// 사진을 앱에 맞게 줄이기 (긴 변 maxSide, JPG, 용량 maxLen 이하가 될 때까지 화질 낮춤)
+function shrinkImage(dataUrl, maxSide, maxLen) {
+  return new Promise(resolve => {
+    const im = new Image();
+    im.onload = () => {
+      let w = im.naturalWidth, h = im.naturalHeight;
+      const r = Math.min(1, maxSide / Math.max(w, h)); w = Math.round(w * r); h = Math.round(h * r);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(im, 0, 0, w, h);
+      for (const q of [0.82, 0.7, 0.58, 0.45]) { const out = c.toDataURL('image/jpeg', q); if (out.length <= maxLen) return resolve(out); }
+      resolve(null);
+    };
+    im.onerror = () => resolve(null);
+    im.src = dataUrl;
+  });
+}
+
 // ── 커뮤니티 이미지 첨부 ──
 let pendingImgs = []; // base64 배열
 
@@ -8194,8 +8211,10 @@ function handleCommImgUpload(e) {
 
   toAdd.forEach(file => {
     const reader = new FileReader();
-    reader.onload = ev => {
-      pendingImgs.push(ev.target.result);
+    reader.onload = async ev => {
+      const small = await shrinkImage(ev.target.result, 1080, 420000);
+      if (!small) { showToast('이 사진은 올릴 수 없어요'); return; }
+      pendingImgs.push(small);
       renderImgPreview();
     };
     reader.readAsDataURL(file);
@@ -8836,7 +8855,7 @@ async function fetchMyLikes() {
 // ── Supabase 글 쓰기 ──
 async function savePostToSupabase(post) {
   try {
-    const { error } = await sb.from('posts').insert({
+    const ok = await ownerRpc('create_post', { p_post: {
       id: post.id,
       type: post.type,
       nick: post.nick,
@@ -8845,16 +8864,16 @@ async function savePostToSupabase(post) {
       menu_tag: post.menuTag || null,
       imgs: post.imgs || [],
       star: post.star || 0,
-      likes: 0,
       vote_options: post.voteOptions || null,
-      vote_counts: post.voteCounts || null,
       vote_imgs: post.voteImgs || null,
       vote_deadline: post.voteDeadline || null,
       is_anonymous: post.isAnonymous || false,
-      user_key: MY_USER_KEY,
-    });
-    if (error) throw error;
-  } catch(e) { console.warn('글 저장 실패:', e?.message || String(e)); }
+    } });
+    if (!ok) throw new Error('rejected');
+  } catch(e) {
+    console.warn('글 저장 실패:', e?.message || String(e));
+    showToast('⚠️ 글이 서버에 저장되지 않았어요. 사진 크기나 글 길이를 확인해 주세요');
+  }
 }
 
 // ── Supabase 글 삭제 ──
@@ -9288,10 +9307,12 @@ function attachVoteImg(input, idx) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     const img = document.getElementById('vote-img-' + idx);
     const preview = document.getElementById('vote-img-preview-' + idx);
-    if (img) img.src = e.target.result;
+    const small = await shrinkImage(e.target.result, 640, 240000);
+    if (!small) { showToast('이 사진은 올릴 수 없어요'); return; }
+    if (img) img.src = small;
     if (preview) preview.style.display = 'block';
   };
   reader.readAsDataURL(file);
