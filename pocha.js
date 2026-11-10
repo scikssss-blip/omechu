@@ -110,9 +110,11 @@
     lobby.on('presence', { event: 'sync' }, () => {
       const raw = lobby.presenceState(); lobbyState = {};
       Object.entries(raw).forEach(([k, arr]) => { const p = okSid(k) && arr && safePresence(arr[0], ROOMS.street.w, ROOMS.street.h); if (p) lobbyState[k] = p; });
+      applyMoves(lobbyState);
       if (room === 'street') { state = lobbyState; joined = true; }
       render();
     });
+    lobby.on('broadcast', { event: 'move' }, ({ payload: m }) => { if (room === 'street') onMove(m, ROOMS.street.w, ROOMS.street.h); });
     lobby.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') { if (room === 'street') joined = true; await trackLobby(); render(); }
     });
@@ -131,12 +133,13 @@
       if (room !== my) return;
       const raw = ch.presenceState(); state = {};
       Object.entries(raw).forEach(([k, arr]) => { const p = okSid(k) && arr && safePresence(arr[0], R.w, R.h); if (p) state[k] = p; });
-      resolveSeatConflict(); render();
+      applyMoves(state); resolveSeatConflict(); render();
     });
     ch.on('presence', { event: 'join' }, ({ key, newPresences }) => {
       const p = okSid(key) && newPresences && safePresence(newPresences[0], R.w, R.h);
       if (p && myTable !== null && p.table === myTable && key !== SID) sys(myTable, `${esc(p.nick)}님이 자리에 앉았어요`);
     });
+    ch.on('broadcast', { event: 'move' }, ({ payload: m }) => { if (room === my) onMove(m, R.w, R.h); });
     ch.on('broadcast', { event: 'chat' }, ({ payload: m }) => {
       if (!m || !okSid(m.sid) || !okTable(m.table) || muted.has(m.sid)) return;
       m.nick = String(m.nick ?? '손님').slice(0, 12);
@@ -181,6 +184,28 @@
     return ch.track({ nick: nick(), color: me.color, acc: me.acc, face: me.face, table: myTable, seat: mySeat, at: seatAt, x: Math.round(dest.x), y: Math.round(dest.y) });
   }
 
+  // ── 걷는 위치는 메시지(broadcast)로, 위치 공유(presence)는 상태가 바뀔 때만 ──
+  // 무료 요금제 한도: 위치 공유 초당 20건, 메시지 초당 100건 → 걷기는 메시지로 보내 여유를 둔다
+  let moveTimer = 0, lastMoveAt = 0, trackTimer = 0, moves = {};   // moves: 최근 받은 걷기 목적지(위치 공유가 늦게 와도 되돌아가지 않게)
+  function sendMove() {
+    const c = room === 'street' ? lobby : ch; if (!c) return;
+    const go = () => { moveTimer = 0; lastMoveAt = Date.now(); const d = target || pos;
+      c.send({ type: 'broadcast', event: 'move', payload: { sid: SID, x: Math.round(d.x), y: Math.round(d.y) } }); };
+    const wait = 300 - (Date.now() - lastMoveAt);
+    if (wait <= 0) go(); else if (!moveTimer) moveTimer = setTimeout(go, wait);   // 너무 자주 누르면 마지막 것만
+  }
+  function applyMoves(st) { const now = Date.now(); Object.entries(st).forEach(([k, p]) => { const mv = moves[k]; if (mv && now - mv.t < 15000 && (p.table === null || p.table === undefined)) { p.x = mv.x; p.y = mv.y; } }); }
+  function trackSoon() { clearTimeout(trackTimer); trackTimer = setTimeout(track, 3000); }   // 멈춘 뒤 3초 후 한 번만
+  function onMove(m, w, h) {
+    if (!m || !okSid(m.sid) || m.sid === SID || !Number.isFinite(m.x) || !Number.isFinite(m.y)) return;
+    const p = state[m.sid]; if (!p) return;
+    if (room === 'street' && p.room !== 'street') return;
+    if (p.table !== null && p.table !== undefined && room !== 'street') { p.table = null; p.seat = null; }
+    p.x = Math.max(0, Math.min(w, Math.round(m.x))); p.y = Math.max(0, Math.min(h, Math.round(m.y)));
+    moves[m.sid] = { x: p.x, y: p.y, t: Date.now() };
+    updateWorld();
+  }
+
   // ── 가게 드나들기 ──
   function enterRoom(id, from) {
     if (!ROOMS[id] || id === room) return;
@@ -188,7 +213,7 @@
     const prev = room;
     room = id; R = ROOMS[id];
     myTable = null; mySeat = null; target = null; pendingSeat = null; pendingDoor = null;
-    logs = {}; votes = {}; dishes = {}; bubbles = {}; lastDrawn = {};
+    logs = {}; votes = {}; dishes = {}; bubbles = {}; lastDrawn = {}; moves = {};
     state = id === 'street' ? lobbyState : {}; joined = id === 'street' ? !!lobby : false;
     if (id === 'street') { const d = ROOMS[from || prev]?.door || R.spawn; pos = { x: d[0], y: d[1] }; }
     else pos = { x: R.spawn[0], y: R.spawn[1] };
@@ -240,7 +265,7 @@
   // ── 걷기 ──
   function walkTo(x, y) {
     x = Math.max(16, Math.min(R.w - 16, x)); y = Math.max(30, Math.min(R.h - 10, y));
-    target = { x, y }; follow = true; track(); render();
+    target = { x, y }; follow = true; sendMove(); render();
     const next = (fn) => {   // 보통은 화면 주사율(rAF)로, rAF가 멈춘 환경에선 타이머로 대신
       let done = false;
       const id = requestAnimationFrame((t) => { if (!done) { done = true; clearTimeout(to); fn(t); } });
@@ -255,7 +280,7 @@
         pos = { ...target }; target = null; walkRAF = 0; drawMe(false); if (follow) centerOn(pos.x, pos.y, true);
         if (pendingSeat) { const ps = pendingSeat; pendingSeat = null; sitNow(ps.t, ps.s); }
         else if (pendingDoor) { const d2 = pendingDoor; pendingDoor = null; enterRoom(d2); }
-        else { track(); render(); }
+        else { trackSoon(); render(); }
         return;
       }
       pos = { x: pos.x + dx / d * mv, y: pos.y + dy / d * mv }; me.face_dir = dx < 0 ? -1 : 1;
@@ -614,8 +639,8 @@
     updateWorld(); renderPanel();
   }
 
-  // 위치 공유가 가끔 빠질 수 있어 열려 있는 동안 주기적으로 다시 알림
-  setInterval(() => { if (isOpen && !document.hidden) track(); }, 20000);
+  // 위치 공유가 가끔 빠질 수 있어 열려 있는 동안 30초마다 다시 알림
+  setInterval(() => { if (isOpen && !document.hidden) track(); }, 30000);
 
   // 투표 남은 시간 표시 갱신
   setInterval(() => { if (myTable !== null && votes[myTable] && !votes[myTable].done) render(); }, 1000);
