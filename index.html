@@ -6688,15 +6688,9 @@ async function fetchCommentLikes() {
 async function toggleCommentLikeOnSupabase(commentId, isLiking) {
   try {
     if (isLiking) {
-      await sb.from('comment_likes').insert({ comment_id: commentId, user_key: MY_USER_KEY });
-      // 댓글 좋아요 수 업데이트
-      for (const comments of Object.values(commComments)) {
-        const c = comments.find(c => c.id === commentId);
-        if (c) { await sb.from('comments').update({ likes: (c.likes||0) + 1 }).eq('id', commentId); break; }
-      }
+      await ownerRpc('toggle_comment_like', { p_comment_id: commentId, p_like: true });
     } else {
-      await sb.from('comment_likes').delete()
-        .eq('comment_id', commentId).eq('user_key', MY_USER_KEY);
+      await ownerRpc('toggle_comment_like', { p_comment_id: commentId, p_like: false });
     }
   } catch(e) { console.warn('댓글 좋아요 저장 실패:', e?.message || String(e)); }
 }
@@ -8225,6 +8219,30 @@ function getUserKey() {
   return key;
 }
 const MY_USER_KEY = getUserKey();
+// 본인 확인용 비밀값: 이 기기에만 저장되고 서버에는 해시로만 저장됨
+const MY_SECRET = (() => {
+  let s = localStorage.getItem('wmjOwnerSecret');
+  if (!s) {
+    const a = new Uint8Array(24); crypto.getRandomValues(a);
+    s = [...a].map(b => b.toString(16).padStart(2, '0')).join('');
+    localStorage.setItem('wmjOwnerSecret', s);
+  }
+  return s;
+})();
+let ownerReady = null;
+function ensureOwner() {
+  if (!ownerReady) ownerReady = sb.rpc('register_owner', { p_user_key: MY_USER_KEY, p_secret: MY_SECRET })
+    .then(({ data }) => data === true).catch(() => false);
+  return ownerReady;
+}
+// 본인 확인이 필요한 서버 함수 호출
+async function ownerRpc(fn, args) {
+  await ensureOwner();
+  const { data, error } = await sb.rpc(fn, { ...args, p_user_key: MY_USER_KEY, p_secret: MY_SECRET });
+  if (error) throw error;
+  return data;
+}
+setTimeout(ensureOwner, 500);
 
 // ── 실제 알림 불러오기: 내 글에 달린 댓글·좋아요 ──
 async function loadRealNotifications() {
@@ -8319,15 +8337,18 @@ async function changeNickname(newNick) {
     }
   } catch(_) {}
 
-  // 저장
-  localStorage.setItem('wmjMyNick', nick);
+  // 저장 (서버에서 횟수·중복 다시 확인)
   try {
+    const res = await ownerRpc('set_my_nickname', { p_nick: nick });
+    if (res === 'taken') { showToast('이미 사용 중인 닉네임이에요 😅'); return; }
+    if (res === 'limit') { showToast('닉네임 변경은 3회까지만 무료예요 🙏'); return; }
+    if (res !== 'ok') { showToast('닉네임을 바꾸지 못했어요. 잠시 후 다시 해주세요'); return; }
+    localStorage.setItem('wmjMyNick', nick);
     const { data: userData } = await sb.from('users').select('nick_change_count').eq('user_key', MY_USER_KEY).single();
-    const count = (userData?.nick_change_count || 0) + 1;
-    await sb.from('users').upsert({ user_key: MY_USER_KEY, nickname: nick, nick_change_count: count });
-    const remaining = 3 - count;
+    const remaining = 3 - (userData?.nick_change_count || 0);
     showToast(`✅ 닉네임이 변경됐어요! (남은 무료 변경: ${remaining}회)`);
   } catch(_) {
+    localStorage.setItem('wmjMyNick', nick);
     showToast('✅ 닉네임이 변경됐어요!');
   }
   renderMyPage();
@@ -8465,7 +8486,8 @@ async function savePostToSupabase(post) {
 // ── Supabase 글 삭제 ──
 async function deletePostFromSupabase(postId) {
   try {
-    await sb.from('posts').delete().eq('id', postId);
+    const ok = await ownerRpc('delete_my_post', { p_id: postId });
+    if (!ok) console.warn('글 삭제 권한 없음');
   } catch(e) { console.warn('글 삭제 실패:', e?.message || String(e)); }
 }
 
@@ -8473,13 +8495,9 @@ async function deletePostFromSupabase(postId) {
 async function toggleLikeOnSupabase(postId, isLiking) {
   try {
     if (isLiking) {
-      await sb.from('likes').insert({
-        target_id: postId, target_type: 'post', user_key: MY_USER_KEY
-      });
-      await sb.from('posts').update({ likes: (commPosts.find(p=>p.id===postId)?.likes||0) }).eq('id', postId);
+      await ownerRpc('toggle_post_like', { p_post_id: postId, p_like: true });
     } else {
-      await sb.from('likes').delete()
-        .eq('target_id', postId).eq('target_type', 'post').eq('user_key', MY_USER_KEY);
+      await ownerRpc('toggle_post_like', { p_post_id: postId, p_like: false });
     }
   } catch(e) { console.warn('좋아요 저장 실패:', e?.message || String(e)); }
 }
@@ -8510,25 +8528,19 @@ async function fetchCommentsFromSupabase(postId) {
 // ── Supabase 댓글 저장 ──
 async function saveCommentToSupabase(postId, comment) {
   try {
-    await sb.from('comments').insert({
-      id: comment.id,
-      post_id: postId,
-      nick: comment.nick,
-      avatar: comment.avatar,
-      text: comment.text,
+    const ok = await ownerRpc('add_comment', {
+      p_id: comment.id, p_post_id: postId, p_nick: comment.nick, p_avatar: comment.avatar, p_text: comment.text,
     });
-    // 댓글 수 업데이트
-    const post = commPosts.find(p => p.id === postId);
-    if (post) {
-      await sb.from('posts').update({ comments: (post.comments||0) + 1 }).eq('id', postId);
-    }
+    if (!ok) console.warn('댓글 저장 거부됨');
   } catch(e) { console.warn('댓글 저장 실패:', e?.message || String(e)); }
 }
 
 // ── Supabase 투표 저장 ──
-async function saveVoteToSupabase(postId, newCounts) {
+async function saveVoteToSupabase(postId, choiceIdx) {
   try {
-    await sb.from('posts').update({ vote_counts: newCounts }).eq('id', postId);
+    const counts = await ownerRpc('cast_vote', { p_post_id: postId, p_choice: choiceIdx });
+    const post = commPosts.find(p => p.id === postId);
+    if (post && Array.isArray(counts)) { post.voteCounts = counts; renderCommFeed(); }
   } catch(e) { console.warn('투표 저장 실패:', e?.message || String(e)); }
 }
 
@@ -8754,12 +8766,7 @@ async function voteComm(id, choiceIdx) {
   localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
 
   // Supabase에 투표 수 + 중복방지 기록 저장
-  if (post.voteCounts) saveVoteToSupabase(id, post.voteCounts);
-  try {
-    await sb.from('likes').insert({
-      target_id: id, target_type: 'vote', user_key: MY_USER_KEY
-    });
-  } catch(e) { console.warn('투표 중복방지 저장 실패:', e?.message || String(e)); }
+  if (post.voteCounts) saveVoteToSupabase(id, choiceIdx);
 
   renderCommFeed();
   renderHotBanner(currentCommTab);
@@ -9015,8 +9022,8 @@ function submitCommPost(editId) {
       post.edited = true;
       localStorage.setItem('wmjCommPosts', JSON.stringify(commPosts));
       // Supabase 수정
-      sb.from('posts').update({ text, menu_tag: menuTag || null }).eq('id', editId)
-        .catch(e => console.warn('글 수정 저장 실패:', e));
+      ownerRpc('update_my_post', { p_id: editId, p_text: text, p_menu_tag: menuTag || null })
+        .catch(e => console.warn('글 수정 저장 실패:', e?.message || String(e)));
       document.getElementById('comm-write-modal').classList.remove('open');
       renderCommFeed();
       showToast('✅ 수정됐어요!');
