@@ -4,9 +4,10 @@
 .pc-viewwrap { position:relative; margin-top:10px; border-radius:18px; overflow:hidden; border:1px solid #3a3249; }
 .pc-view { height:min(60vh, 520px); overflow:auto; position:relative; scrollbar-width:none; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
 .pc-view::-webkit-scrollbar { display:none; }
-.pc-world { position:relative; cursor:pointer; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; }
+.pc-sizer { position:relative; overflow:hidden; }
+.pc-world { position:relative; transform-origin:0 0; cursor:pointer; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; }
 .pc-map { position:absolute; left:0; top:0; display:block; }
-.pc-tname { font-family:'Jua',sans-serif; font-size:15px; fill:#ffd7a3; text-anchor:middle; }
+.pc-tname { font-family:'Jua',sans-serif; font-size:15px; fill:#ffd7a3; text-anchor:middle; paint-order:stroke; stroke:rgba(0,0,0,.7); stroke-width:4px; stroke-linejoin:round; }
 .pc-sign2 { font-family:'Jua',sans-serif; font-size:14px; fill:#fff7e6; text-anchor:middle; }
 .pc-bulb { animation:pcGlow 2.4s ease-in-out infinite; }
 .pc-person { position:absolute; left:0; top:0; width:60px; text-align:center; will-change:transform; }
@@ -96,3 +97,8 @@
 .pc-entry .t { font-family:'Jua',sans-serif; font-size:16px; }
 .pc-entry .s { font-size:11px; color:#ffd7a3; margin-top:2px; }
 .pc-entry .go { margin-left:auto; flex-shrink:0; white-space:nowrap; background:#ff7a1a; color:#2b1300; border-radius:12px; padding:9px 12px; font-size:13px; font-weight:800; }
+
+/* 먹자골목 */
+.pc-doorcount { position:absolute; transform:translateX(-50%); z-index:3; background:rgba(0,0,0,.6); color:#ffd7a3; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; white-space:nowrap; pointer-events:none; }
+.pc-live { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pc-leave { width:100%; margin-top:8px; padding:11px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
