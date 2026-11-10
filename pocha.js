@@ -174,8 +174,10 @@
   function walkTo(x, y) {
     x = Math.max(16, Math.min(W - 16, x)); y = Math.max(30, Math.min(H - 10, y));
     target = { x, y }; follow = true; track(); render();
+    // 화면이 가려져 있을 때도 멈추지 않게(백그라운드에선 rAF가 멈춤)
+    const next = (fn) => document.hidden ? setTimeout(() => fn(performance.now()), 100) : requestAnimationFrame(fn);
     if (!walkRAF) { let last = performance.now(); const step = (now) => {
-      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      const dt = Math.min(0.3, (now - last) / 1000); last = now;
       if (!target) { walkRAF = 0; return; }
       const dx = target.x - pos.x, dy = target.y - pos.y, d = Math.hypot(dx, dy), mv = SPEED * dt;
       if (d <= mv) {
@@ -184,8 +186,8 @@
         return;
       }
       pos = { x: pos.x + dx / d * mv, y: pos.y + dy / d * mv }; me.face_dir = dx < 0 ? -1 : 1;
-      drawMe(true); walkRAF = requestAnimationFrame(step);
-    }; walkRAF = requestAnimationFrame(step); }
+      drawMe(true); walkRAF = next(step);
+    }; walkRAF = next(step); }
   }
   function onWorldTap(e) {
     const world = document.getElementById('pc-world'); if (!world) return;
