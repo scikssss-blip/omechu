@@ -2923,8 +2923,8 @@ let pickReasons = {};
 // 어떤 메뉴가 많이 추천되는지 익명 집계 (메뉴 이름·방식만, 개인 정보 없음)
 function logRecEvents(items) {
   try {
-    const rows = items.map(m => ({ menu: m.name, cat: selectedCat || null }));
-    if (rows.length) sb.from('rec_events').insert(rows).then(() => {}, () => {});
+    const names = items.map(m => m.name).slice(0, 5);
+    if (names.length) ownerRpc('log_recs', { p_menus: names, p_cat: selectedCat || null }).catch(() => {});
   } catch(e) {}
 }
 
@@ -6856,7 +6856,7 @@ function saveCustomMenuRequest(menuName, cat = 'all') {
     requests.push({ name: menuName, date: new Date().toISOString() });
     localStorage.setItem('wmjMenuRequests', JSON.stringify(requests));
     // 운영자가 볼 수 있게 서버에도 저장
-    try { sb.from('menu_requests').insert({ name: menuName.slice(0, 30), cat, user_key: MY_USER_KEY }).then(() => {}, () => {}); } catch(e) {}
+    ownerRpc('request_menu', { p_name: menuName.slice(0, 30), p_cat: cat }).catch(() => {});
   }
 }
 
@@ -6997,6 +6997,7 @@ function renderCommentListHTML(postId) {
         <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px">
           <span style="font-size:11px;font-weight:700;color:var(--text)">${c.nick}</span>
           <span style="font-size:11px;color:var(--muted)">${fmtCommDate(c.date)}</span>
+          ${c.mine ? `<button onclick="deleteMyComment('${postId}','${c.id}')" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px">삭제</button>` : ''}
           <button onclick="likeCommentInModal('${postId}','${c.id}')" style="margin-left:auto;background:none;border:none;color:${liked?'#ff4d6d':'var(--muted)'};font-size:11px;cursor:pointer;padding:0">
             ${liked?'❤️':'🤍'}${cnt>0?' '+cnt:''}
           </button>
@@ -7005,6 +7006,21 @@ function renderCommentListHTML(postId) {
       </div>
     </div>`;
   }).join('');
+}
+
+async function deleteMyComment(postId, commentId) {
+  if (!confirm('이 댓글을 삭제할까요?')) return;
+  try {
+    const ok = await ownerRpc('delete_my_comment', { p_id: commentId });
+    if (!ok) { showToast('댓글을 삭제하지 못했어요'); return; }
+  } catch (e) { showToast('댓글을 삭제하지 못했어요'); return; }
+  commComments[postId] = (commComments[postId] || []).filter(c => c.id !== commentId);
+  localStorage.setItem('wmjComments', JSON.stringify(commComments));
+  const post = commPosts.find(p => p.id === postId); if (post && post.comments > 0) post.comments--;
+  const el = document.getElementById('modal-comment-list-' + postId);
+  if (el) el.innerHTML = renderCommentListHTML(postId);
+  if (currentCommentPostId === postId) renderCommentList(postId);
+  showToast('🗑️ 댓글을 삭제했어요');
 }
 
 function likeCommentInModal(postId, commentId) {
@@ -7024,7 +7040,7 @@ function submitModalComment(postId) {
   const text = input.value.trim();
   if (!text) return;
   const comment = {
-    id: 'c'+Date.now(), nick: getMyNick(),
+    id: 'c'+Date.now(), nick: getMyNick(), mine: true,
     avatar: COMMENT_AVATARS[Math.floor(Math.random()*COMMENT_AVATARS.length)],
     text, date: Date.now(),
   };
@@ -7091,9 +7107,7 @@ async function fetchDailyQVotes(dateKey) {
 
 async function saveDailyQVote(dateKey, optIdx) {
   try {
-    await sb.from('daily_q_votes').insert({
-      date_key: dateKey, opt_idx: optIdx, user_key: MY_USER_KEY
-    });
+    await ownerRpc('cast_daily_q', { p_date_key: dateKey, p_opt: optIdx });
   } catch(e) { console.warn('오늘의 질문 투표 저장 실패:', e?.message || String(e)); }
 }
 let commComments = JSON.parse(localStorage.getItem('wmjComments') || '{}');
@@ -7158,6 +7172,7 @@ function renderCommentList(postId) {
         <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px">
           <span style="font-size:12px;font-weight:700;color:var(--text)">${c.nick}</span>
           <span style="font-size:11px;color:var(--muted)">${fmtCommDate(c.date)}</span>
+          ${c.mine ? `<button onclick="deleteMyComment('${postId}','${c.id}')" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px">삭제</button>` : ''}
           <button onclick="likeComment('${postId}','${c.id}')" style="margin-left:auto;background:none;border:none;color:${liked?'#ff4d6d':'var(--muted)'};font-size:11px;cursor:pointer;padding:0;font-family:'Noto Sans KR',sans-serif">
             ${liked?'❤️':'🤍'} ${likeCount > 0 ? likeCount : ''}
           </button>
@@ -7175,7 +7190,7 @@ function submitComment() {
 
   const comment = {
     id: 'c' + Date.now(),
-    nick: getMyNick(),
+    nick: getMyNick(), mine: true,
     avatar: COMMENT_AVATARS[Math.floor(Math.random() * COMMENT_AVATARS.length)],
     text,
     date: Date.now(),
@@ -7556,19 +7571,7 @@ async function fetchBattleVotes() {
 
 async function saveBattleVote(roundIdx, matchIdx, side) {
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/battle_votes`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify({
-        week_seed: getWeekSeed(), round_idx: roundIdx,
-        match_idx: matchIdx, side, user_key: MY_USER_KEY,
-      })
-    });
+    await ownerRpc('cast_battle', { p_week: getWeekSeed(), p_round: roundIdx, p_match: matchIdx, p_side: side });
   } catch(e) { /* ignore */ }
 }
 
@@ -8297,7 +8300,7 @@ const EXTRA_IMAGES = {
   '그릭요거트볼':'https://images.unsplash.com/photo-1733197012835-e99ebf3c914d?w=400',
   '기스면':'https://images.pexels.com/photos/1395319/pexels-photo-1395319.jpeg?w=400',
   '김치돼지볶음':'https://images.pexels.com/photos/32087659/pexels-photo-32087659.jpeg?w=400',
-  '깐쇼새우':'https://images.pexels.com/photos/5858115/pexels-photo-5858115.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '깐쇼새우':'https://images.pexels.com/photos/5858115/pexels-photo-5858115.jpeg?auto=compress&cs=tinysrgb&w=480',
   '꼬리곰탕':'https://upload.wikimedia.org/wikipedia/commons/3/3e/Kkori-gomtang.jpg',
   '꼬막찜':'https://images.unsplash.com/photo-1685985873036-f40783a84b32?w=400',
   '꽃등심':'https://images.pexels.com/photos/36683024/pexels-photo-36683024.jpeg?w=400',
@@ -8457,7 +8460,7 @@ const EXTRA_IMAGES = {
   '아구찜':'https://omechu-rouge.vercel.app/images/아구찜.jpg',
   '간장게장':'https://images.pexels.com/photos/8980370/pexels-photo-8980370.jpeg?w=400',
   '쌈밥':'https://images.pexels.com/photos/36964141/pexels-photo-36964141.jpeg?w=400',
-  '모츠나베':'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Motsunabe.jpg/400px-Motsunabe.jpg',
+  '모츠나베':'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Motsunabe.jpg/330px-Motsunabe.jpg',
   '스테이크덮밥':'https://images.unsplash.com/photo-1706513043845-afb903a8c4c5?w=400',
   '짬뽕밥':'https://images.pexels.com/photos/8895732/pexels-photo-8895732.jpeg?w=400',
   '리코타치즈샐러드':'https://images.pexels.com/photos/5021721/pexels-photo-5021721.jpeg?w=400',
@@ -8472,7 +8475,7 @@ const EXTRA_IMAGES = {
   '김치찌개':'https://images.unsplash.com/photo-1704890514547-b6b7d64086c1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxfHwlRUElQjklODAlRUMlQjklOTglRUMlQjAlOEMlRUElQjAlOUN8ZW58MHx8fHwxNzc3NzI2ODk0fDA&ixlib=rb-4.1.0&q=85',
   '제육볶음':'https://upload.wikimedia.org/wikipedia/commons/6/65/%EC%A0%9C%EC%9C%A1_%EB%B3%B6%EC%9D%8C.jpg',
   '비빔밥':'https://images.pexels.com/photos/5773960/pexels-photo-5773960.jpeg?w=400',
-  '갈비찜':'https://images.pexels.com/photos/32767703/pexels-photo-32767703.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '갈비찜':'https://images.pexels.com/photos/32767703/pexels-photo-32767703.jpeg?auto=compress&cs=tinysrgb&w=480',
   '잡채':'https://images.pexels.com/photos/8948967/pexels-photo-8948967.jpeg?w=400',
   '콩나물국밥':'https://omechu-rouge.vercel.app/images/콩나물국밥.jpg',
   '미역국':'https://omechu-rouge.vercel.app/images/소고기미역국.jpg',
@@ -8492,57 +8495,57 @@ const EXTRA_IMAGES = {
   '불고기버거':'https://images.pexels.com/photos/15146310/pexels-photo-15146310.jpeg?w=400',
   '치킨버거':'https://images.pexels.com/photos/14710225/pexels-photo-14710225.jpeg?w=400',
   '마라탕':'https://images.unsplash.com/photo-1609948952339-76f02790cfcb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw4fHxtYWxhJTIwdGFuZyUyMENoaW5lc2UlMjBzcGljeSUyMGhvdCUyMHBvdHxlbnwwfHx8fDE3Nzc3MzEwNDJ8MA&ixlib=rb-4.1.0&q=85',
-  '닭갈비':'https://images.pexels.com/photos/33085044/pexels-photo-33085044.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '닭갈비':'https://images.pexels.com/photos/33085044/pexels-photo-33085044.jpeg?auto=compress&cs=tinysrgb&w=480',
   '순대국밥':'https://images.pexels.com/photos/8952374/pexels-photo-8952374.jpeg?w=400',
   '부대찌개':'https://images.unsplash.com/photo-1709433420392-ff3396eba541?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw0fHxidWRhZSUyMGpqaWdhZSUyMEtvcmVhbiUyMGFybXklMjBzdGV3fGVufDB8fHx8MTc3NzczMTIxM3ww&ixlib=rb-4.1.0&q=85',
-  '감자탕':'https://images.pexels.com/photos/8934866/pexels-photo-8934866.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '감자탕':'https://images.pexels.com/photos/8934866/pexels-photo-8934866.jpeg?auto=compress&cs=tinysrgb&w=480',
   '해장국':'https://upload.wikimedia.org/wikipedia/commons/9/9a/Korean_soup-Seonjiguk-01.jpg',
-  '설렁탕':'https://images.pexels.com/photos/8054794/pexels-photo-8054794.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '설렁탕':'https://images.pexels.com/photos/8054794/pexels-photo-8054794.jpeg?auto=compress&cs=tinysrgb&w=480',
   '육개장':'https://omechu-rouge.vercel.app/images/육개장.jpg',
   '칼국수':'https://omechu-rouge.vercel.app/images/칼국수.jpg',
   '삼계탕':'https://omechu-rouge.vercel.app/images/삼계탕.jpg',
-  '추어탕':'https://images.pexels.com/photos/31649644/pexels-photo-31649644.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '추어탕':'https://images.pexels.com/photos/31649644/pexels-photo-31649644.jpeg?auto=compress&cs=tinysrgb&w=480',
   '떡국':'https://images.unsplash.com/photo-1775883374700-bddbb6c80fcb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxfHwlRUIlOTYlQTElRUElQjUlQUR8ZW58MHx8fHwxNzc3NzI2MjExfDA&ixlib=rb-4.1.0&q=85',
   '수제비':'https://upload.wikimedia.org/wikipedia/commons/a/a4/Sujebi.jpg',
-  '쫄면':'https://images.pexels.com/photos/8980455/pexels-photo-8980455.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '쫄면':'https://images.pexels.com/photos/8980455/pexels-photo-8980455.jpeg?auto=compress&cs=tinysrgb&w=480',
   '깐풍기':'https://images.unsplash.com/photo-1712460843374-025edf9703f6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxM3x8S29yZWFuJTIwQ2hpbmVzZSUyMGNyaXNweSUyMHNwaWN5JTIwY2hpY2tlbnxlbnwwfHx8fDE3Nzc3MzE3NDN8MA&ixlib=rb-4.1.0&q=85',
-  '팔보채':'https://images.pexels.com/photos/9106507/pexels-photo-9106507.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '규카츠':'https://images.pexels.com/photos/27009850/pexels-photo-27009850.png?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '가라아게':'https://images.pexels.com/photos/1860202/pexels-photo-1860202.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '타코':'https://images.pexels.com/photos/15801922/pexels-photo-15801922.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '떡갈비':'https://images.pexels.com/photos/8880744/pexels-photo-8880744.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '낙지볶음':'https://images.pexels.com/photos/8954073/pexels-photo-8954073.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '팔보채':'https://images.pexels.com/photos/9106507/pexels-photo-9106507.jpeg?auto=compress&cs=tinysrgb&w=480',
+  '규카츠':'https://images.pexels.com/photos/27009850/pexels-photo-27009850.png?auto=compress&cs=tinysrgb&w=480',
+  '가라아게':'https://images.pexels.com/photos/1860202/pexels-photo-1860202.jpeg?auto=compress&cs=tinysrgb&w=480',
+  '타코':'https://images.pexels.com/photos/15801922/pexels-photo-15801922.jpeg?auto=compress&cs=tinysrgb&w=480',
+  '떡갈비':'https://images.pexels.com/photos/8880744/pexels-photo-8880744.jpeg?auto=compress&cs=tinysrgb&w=480',
+  '낙지볶음':'https://images.pexels.com/photos/8954073/pexels-photo-8954073.jpeg?auto=compress&cs=tinysrgb&w=480',
   '오코노미야키':'https://images.unsplash.com/photo-1764520406362-b1673b2213bf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxfHxva29ub21peWFraSUyMEphcGFuZXNlJTIwc2F2b3J5JTIwcGFuY2FrZXxlbnwwfHx8fDE3Nzc3MzE5NzJ8MA&ixlib=rb-4.1.0&q=85',
-  '팬케이크':'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Blueberry_pancakes_%283%29.jpg/400px-Blueberry_pancakes_%283%29.jpg',
-  '카레라이스':'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Beef_curry_rice_003.jpg/400px-Beef_curry_rice_003.jpg',
+  '팬케이크':'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Blueberry_pancakes_%283%29.jpg/330px-Blueberry_pancakes_%283%29.jpg',
+  '카레라이스':'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Beef_curry_rice_003.jpg/330px-Beef_curry_rice_003.jpg',
   '전복죽':'https://upload.wikimedia.org/wikipedia/commons/4/42/Korean_abalone_porridge-Jeonbokjuk-01A.jpg',
-  '호박죽':'https://images.pexels.com/photos/1277483/pexels-photo-1277483.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '닭죽':'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Dakjuk.jpg/400px-Dakjuk.jpg',
-  '팥죽':'https://images.pexels.com/photos/1103912/pexels-photo-1103912.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '갈비탕':'https://images.pexels.com/photos/27420468/pexels-photo-27420468.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '호박죽':'https://images.pexels.com/photos/1277483/pexels-photo-1277483.jpeg?auto=compress&cs=tinysrgb&w=480',
+  '닭죽':'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Dakjuk.jpg/330px-Dakjuk.jpg',
+  '팥죽':'https://images.pexels.com/photos/1103912/pexels-photo-1103912.jpeg?auto=compress&cs=tinysrgb&w=480',
+  '갈비탕':'https://images.pexels.com/photos/27420468/pexels-photo-27420468.jpeg?auto=compress&cs=tinysrgb&w=480',
   '닭꼬치':'https://upload.wikimedia.org/wikipedia/commons/e/ee/Dak-kkochi.jpg',
   '김치찜':'https://upload.wikimedia.org/wikipedia/commons/9/9d/%EA%B9%80%EC%B9%98%EC%B0%9C.jpg',
   '물냉면':'https://images.unsplash.com/photo-1676686997059-fb817ebbb2b5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw5fHwlRUElQjklODAlRUMlQjklOTglRUMlQjAlOEMlRUElQjAlOUN8ZW58MHx8fHwxNzc3NzI2ODk0fDA&ixlib=rb-4.1.0&q=85&w=400',
-  '닭강정':'https://images.pexels.com/photos/20152618/pexels-photo-20152618.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '닭강정':'https://images.pexels.com/photos/20152618/pexels-photo-20152618.jpeg?auto=compress&cs=tinysrgb&w=480',
   '잣죽':'https://upload.wikimedia.org/wikipedia/commons/1/1d/Jatjuk.jpg',
   '굴국밥':'https://omechu-rouge.vercel.app/images/굴국밥.jpg',
   '돼지국밥':'https://images.unsplash.com/photo-1673520859629-ae3f781cf034?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw0fHxLb3JlYW4lMjBwb3JrJTIwcmljZSUyMHNvdXAlMjBkd2FlamklMjBndWtiYXB8ZW58MHx8fHwxNzc3NzMyMDQ0fDA&ixlib=rb-4.1.0&q=85',
   '소유라멘':'https://images.pexels.com/photos/37283917/pexels-photo-37283917.jpeg?w=400',
-  '시오라멘':'https://images.pexels.com/photos/37014726/pexels-photo-37014726.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '시오라멘':'https://images.pexels.com/photos/37014726/pexels-photo-37014726.jpeg?auto=compress&cs=tinysrgb&w=480',
   '두부김치':'https://omechu-rouge.vercel.app/images/두부김치.jpg',
   '오징어볶음':'https://images.unsplash.com/photo-1702638372048-355b8193a01f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHw3fHwlRUMlOTglQTQlRUMlQTclOTUlRUMlOTYlQjQlRUIlQjMlQjYlRUMlOUQlOEN8ZW58MHx8fHwxNzc3NzI2NDc5fDA&ixlib=rb-4.1.0&q=85',
-  '육회':'https://images.pexels.com/photos/14316595/pexels-photo-14316595.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '육회':'https://images.pexels.com/photos/14316595/pexels-photo-14316595.jpeg?auto=compress&cs=tinysrgb&w=480',
   '도가니탕':'https://omechu-rouge.vercel.app/images/도가니탕.jpg',
   '부리토':'https://images.pexels.com/photos/27603260/pexels-photo-27603260.jpeg?w=400',
-  '나초':'https://images.pexels.com/photos/6399998/pexels-photo-6399998.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-  '파에야':'https://images.pexels.com/photos/24906297/pexels-photo-24906297.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '나초':'https://images.pexels.com/photos/6399998/pexels-photo-6399998.jpeg?auto=compress&cs=tinysrgb&w=480',
+  '파에야':'https://images.pexels.com/photos/24906297/pexels-photo-24906297.jpeg?auto=compress&cs=tinysrgb&w=480',
   '막창':'https://upload.wikimedia.org/wikipedia/commons/9/94/2%EB%AF%B8-%EB%A7%89%EC%B0%BD%EA%B5%AC%EC%9D%B4.jpg',
   '감자옹심이':'https://upload.wikimedia.org/wikipedia/commons/c/c9/Gamja-ongsimi.jpg',
   '양장피':'https://images.unsplash.com/photo-1687445129853-11ec4d8301f2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwzfHxLb3JlYW4lMjBDaGluZXNlJTIwc2VhZm9vZCUyMHN0YXJjaCUyMG5vb2RsZSUyMGRpc2h8ZW58MHx8fHwxNzc3NzMyMjA2fDA&ixlib=rb-4.1.0&q=85',
-  '감자전':'https://images.pexels.com/photos/18976996/pexels-photo-18976996.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '감자전':'https://images.pexels.com/photos/18976996/pexels-photo-18976996.jpeg?auto=compress&cs=tinysrgb&w=480',
   '평양냉면':'https://images.unsplash.com/photo-1673698968269-cc44ae70f296?crop=entropy&cs=srgb&fm=jpg&ixid=M3w5MzQ5Nzd8MHwxfHNlYXJjaHwxfHwlRUQlOEYlODklRUMlOTYlOTElRUIlODMlODklRUIlQTklQjR8ZW58MHx8fHwxNzc3NzI2NjQ3fDA&ixlib=rb-4.1.0&q=85',
   '새우버거':'https://images.pexels.com/photos/27988496/pexels-photo-27988496.jpeg?w=400',
-  '돈까스덮밥(가츠동)':'https://images.pexels.com/photos/37279873/pexels-photo-37279873.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+  '돈까스덮밥(가츠동)':'https://images.pexels.com/photos/37279873/pexels-photo-37279873.jpeg?auto=compress&cs=tinysrgb&w=480',
   '돼지불고기':'https://omechu-rouge.vercel.app/images/돼지불고기.jpg',
   '갈치찌개':'https://omechu-rouge.vercel.app/images/갈치찌개.jpg',
   '계란탕':'https://omechu-rouge.vercel.app/images/계란탕.jpg',
@@ -8700,10 +8703,15 @@ async function initUserNickname() {
   } catch(_) {}
 
   // 새 닉네임 생성
-  const nick = generateRandomNick();
+  let nick = generateRandomNick();
   localStorage.setItem('wmjMyNick', nick);
   try {
-    await sb.from('users').insert({ user_key: MY_USER_KEY, nickname: nick });
+    for (let i = 0; i < 3; i++) {
+      const got = await ownerRpc('init_my_nickname', { p_nick: nick });
+      if (got) { localStorage.setItem('wmjMyNick', got); break; }
+      nick = generateRandomNick() + Math.floor(Math.random() * 90 + 10);   // 겹치면 숫자 붙여 다시
+      localStorage.setItem('wmjMyNick', nick.slice(0, 12));
+    }
   } catch(_) {}
 }
 
@@ -8787,7 +8795,7 @@ async function fetchPostsFromSupabase() {
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Invalid response');
 
-    const posts = data.map(p => ({
+    const posts = data.filter(p => /^[a-z0-9_-]{1,40}$/i.test(String(p.id))).map(p => ({
       id: escHtml(String(p.id)), type: p.type, nick: escHtml(p.nick), avatar: escHtml(p.avatar),
       text: escHtml(p.text), menuTag: escHtml(p.menu_tag || ''), imgs: escHtml(p.imgs || []),
       star: p.star || 0, likes: p.likes || 0, comments: p.comments || 0,
@@ -8884,7 +8892,8 @@ async function fetchCommentsFromSupabase(postId) {
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
     if (error) throw error;
-    return data.map(c => ({
+    return data.filter(c => /^c\d+$/.test(String(c.id))).map(c => ({
+      mine: !!c.user_key && c.user_key === MY_USER_KEY,
       id: escHtml(String(c.id)),
       nick: escHtml(c.nick),
       avatar: escHtml(c.avatar),
