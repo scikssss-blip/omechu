@@ -22,7 +22,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="오메추">
 <meta property="og:title" content="오메추 — 오늘 뭐 먹지?">
-<meta property="og:description" content="오늘 메뉴 고민 끝! 음식 월드컵·메뉴 배틀로 골라주는 메뉴 추천 앱. 지금 바로 뽑아보세요 🍽️">
+<meta property="og:description" content="오늘 메뉴 고민 끝! 음식 월드컵·메뉴 배틀로 골라주는 메뉴 추천 앱. 지금 바로 뽑아 보세요 🍽️">
 <meta property="og:image" content="https://omechu-rouge.vercel.app/og-image.png">
 <meta property="og:url" content="https://omechu-rouge.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
@@ -1710,7 +1710,7 @@
   <div id="comm-hot-wrap" style="margin:14px 0 4px;display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <span style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:0.5px" id="comm-hot-title">🔥 오늘의 TOP 5</span>
-      <button onclick="generateWeeklySummary()" style="background:none;border:none;font-size:10px;color:var(--muted);cursor:pointer;padding:0;font-family:'Noto Sans KR',sans-serif;text-decoration:underline">주간결산</button>
+      <button onclick="generateWeeklySummary()" style="background:none;border:none;font-size:10px;color:var(--muted);cursor:pointer;padding:0;font-family:'Noto Sans KR',sans-serif;text-decoration:underline">주간 결산</button>
     </div>
     <div style="position:relative;overflow:hidden;border-radius:14px" id="comm-hot-slide-wrap">
       <div id="comm-hot-track" style="display:flex;transition:transform 0.3s ease"></div>
@@ -1859,7 +1859,7 @@
 <div id="comm-post-modal" onclick="closeCommPostModal()" class="comm-post-modal-wrap">>
   <div onclick="event.stopPropagation()" style="background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 20px 90px;max-height:85vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <span style="font-size:14px;font-weight:700;color:var(--text)">게시글</span>
+      <span style="font-size:14px;font-weight:700;color:var(--text)">글</span>
       <button onclick="closeCommPostModal()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">×</button>
     </div>
     <div id="comm-post-modal-body"></div>
@@ -1875,7 +1875,7 @@
     </div>
     <div id="comm-comment-list" style="overflow-y:auto;flex:1;padding:12px 20px 16px"></div>
     <div style="padding:12px 20px 32px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:8px">
-      <input id="comm-comment-input" type="text" maxlength="100" placeholder="댓글을 입력하세요..."
+      <input id="comm-comment-input" type="text" maxlength="100" placeholder="댓글을 남겨 주세요"
         style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:10px 14px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif"
         onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'"
         onkeydown="if(event.key==='Enter')submitComment()">
@@ -2015,7 +2015,7 @@
 <div class="pwa-banner" id="pwa-banner">
   <div class="pwa-banner-icon">🍽️</div>
   <div class="pwa-banner-text">
-    <div class="pwa-banner-title">홈화면에 추가하기</div>
+    <div class="pwa-banner-title">홈 화면에 추가하기</div>
     <div class="pwa-banner-sub">홈 화면에서 앱처럼 바로 열려요</div>
   </div>
   <div class="pwa-banner-btns">
@@ -2047,7 +2047,7 @@
         <div style="min-width:100%;padding:40px 28px 20px;text-align:center">
           <div style="font-size:64px;margin-bottom:16px">🍽️</div>
           <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">오늘 <em style="color:var(--orange);font-style:normal">뭐 먹지?</em></div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.8">직접요리 · 배달 · 외식 중 고르고<br>조건 태그 선택하면<br><strong style="color:var(--text)">딱 맞는 메뉴 3개</strong>를 추천해드려요</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.8">직접 요리 · 배달 · 외식 중 고르고<br>조건 태그 선택하면<br><strong style="color:var(--text)">딱 맞는 메뉴 3개</strong>를 추천해드려요</div>
           <div style="margin-top:24px;background:var(--surface);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;text-align:left">
             <span style="font-size:28px">🎯</span>
             <div style="font-size:12px;color:var(--muted);line-height:1.6">질문으로 추천받기도 있어요!<br>몇 가지 질문에 답하면 자동으로 추려줘요</div>
@@ -2174,7 +2174,7 @@
 <div id="weekly-summary-modal" onclick="closeWeeklySummary()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:500;align-items:center;justify-content:center;padding:20px">
   <div onclick="event.stopPropagation()" style="background:var(--card);border-radius:20px;width:100%;max-width:420px;padding:24px;max-height:80vh;overflow-y:auto">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <span style="font-size:16px;font-weight:700;color:var(--text)">📊 주간결산</span>
+      <span style="font-size:16px;font-weight:700;color:var(--text)">📊 주간 결산</span>
       <button onclick="closeWeeklySummary()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">×</button>
     </div>
     <div id="weekly-summary-body"></div>
@@ -2371,7 +2371,7 @@
 <div id="page-cart" style="display:none; max-width:480px; margin:0 auto; padding:0 16px 170px;">
   <div class="hero" style="padding:20px 0 10px">
     <h2 style="font-family:'Jua',sans-serif;font-size:22px;margin:0">🛒 장보기</h2>
-    <p style="font-size:13px;color:var(--muted);margin:4px 0 0">레시피 재료를 한번에 주문해요</p>
+    <p style="font-size:13px;color:var(--muted);margin:4px 0 0">레시피 재료를 한 번에 주문해요</p>
   </div>
 
   <!-- 쿠팡 로켓배송 배너 -->
@@ -2545,7 +2545,7 @@
     <div class="modal-field">
       <label class="modal-label">어디서 먹는 음식인가요?</label>
       <select id="suggest-cat" class="modal-input">
-        <option value="all">전체 (직접요리/배달/외식 모두)</option>
+        <option value="all">전체 (직접 요리/배달/외식 모두)</option>
         <option value="cook">직접 요리</option>
         <option value="delivery">배달</option>
         <option value="dine">외식</option>
@@ -3704,7 +3704,7 @@ let currentPicked = [];
 let currentCandidates = [];
 
 function getRecommendation() {
-  if (!selectedCat) { showToast('카테고리를 먼저 선택해주세요!'); return; }
+  if (!selectedCat) { showToast('카테고리를 먼저 선택해 주세요!'); return; }
 
   // 새 추천 시작 전 현재 카드 스냅샷 저장
   saveHistorySnapshot();
@@ -3721,7 +3721,7 @@ function getRecommendation() {
       <div class="empty-state">
         <span class="empty-icon">😅</span>
         <div class="empty-title">조건에 맞는 메뉴가 없어요</div>
-        <div class="empty-desc">선택한 조건을 조금 줄여보세요!</div>
+        <div class="empty-desc">선택한 조건을 조금 줄여 보세요!</div>
       </div>`;
     resultArea.scrollIntoView({behavior:'smooth', block:'nearest'});
     return;
@@ -4421,7 +4421,7 @@ function showExhausted() {
         <div class="chat-bubble">
           <div class="avatar">👨‍💻</div>
           <div class="bubble">
-            <strong>개발자</strong>에게 먹고 싶은 메뉴를 추천해주세요!<br>
+            <strong>개발자</strong>에게 먹고 싶은 메뉴를 추천해 주세요!<br>
             <span style="font-size:12px;color:var(--muted)">직접 추가해서 다음 업데이트에 반영할게요 😊</span>
             <div style="margin-top:8px">
               <button class="feedback-btn yes" onclick="openSuggest()" style="width:100%">📮 메뉴 건의•추천하기</button>
@@ -4523,7 +4523,7 @@ async function shareTodayMenu() {
   }
   try {
     await navigator.clipboard.writeText(text + '\n' + url);
-    showToast('공유 문구를 복사했어요! 붙여넣기 해보세요 📋');
+    showToast('공유 문구를 복사했어요! 붙여넣기 해 보세요 📋');
   } catch (e) { showToast('이 브라우저는 공유를 지원하지 않아요'); }
 }
 
@@ -4559,10 +4559,10 @@ async function saveMenuImage() {
       a.download = 'omechu-menu.png';
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-      showToast('이미지를 저장했어요! 인스타·카톡에 올려보세요 📸');
+      showToast('이미지를 저장했어요! 인스타·카톡에 올려 보세요 📸');
     }, 'image/png');
   } catch (e) {
-    showToast('이미지 저장이 안 되는 환경이에요. 공유하기를 써보세요!');
+    showToast('이미지 저장이 안 되는 환경이에요. 공유하기를 써 보세요!');
   }
 }
 
@@ -4895,7 +4895,7 @@ function renderCartList() {
   const clearBtn = document.getElementById('cart-clear');
 
   if (cartItems.length === 0) {
-    list.innerHTML = `<div class="cart-empty">🛒 장보기 목록이 비어있어요<br><span style="font-size:12px;margin-top:6px;display:block">레시피에서 재료를 추가해보세요!</span></div>`;
+    list.innerHTML = `<div class="cart-empty">🛒 장보기 목록이 비어있어요<br><span style="font-size:12px;margin-top:6px;display:block">레시피에서 재료를 추가해 보세요!</span></div>`;
     buyAllBtn.style.display = 'none';
     clearBtn.style.display = 'none';
     return;
@@ -5056,7 +5056,7 @@ function renderPageCartList() {
       <div style="text-align:center;padding:40px 20px;color:var(--muted)">
         <div style="font-size:40px;margin-bottom:12px">🛒</div>
         <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">장보기 목록이 비어있어요</div>
-        <div style="font-size:12px">레시피에서 재료를 추가해보세요!</div>
+        <div style="font-size:12px">레시피에서 재료를 추가해 보세요!</div>
       </div>`;
     return;
   }
@@ -5273,9 +5273,9 @@ function savePresets(presets) {
 
 // 현재 세팅 저장
 function saveCurrentPreset() {
-  if (!selectedCat) { showToast('카테고리(어디서?)를 먼저 선택해주세요!'); return; }
+  if (!selectedCat) { showToast('카테고리(어디서?)를 먼저 선택해 주세요!'); return; }
   const tags = getActiveTags();
-  if (tags.length === 0) { showToast('태그를 하나 이상 선택해주세요!'); return; }
+  if (tags.length === 0) { showToast('태그를 하나 이상 선택해 주세요!'); return; }
 
   const presets = loadPresets();
   if (presets.length >= PRESET_MAX) {
@@ -5297,7 +5297,7 @@ function closePresetModal() {
 function confirmPresetName() {
   const input = document.getElementById('preset-name-input');
   const name = input.value.trim().slice(0, 10);
-  if (!name) { input.focus(); showToast('이름을 입력해주세요!'); return; }
+  if (!name) { input.focus(); showToast('이름을 입력해 주세요!'); return; }
 
   const presets = loadPresets();
   if (presets.find(p => p.name === name)) {
@@ -5439,7 +5439,7 @@ function renderHistoryPage() {
   const histEl = document.getElementById('hist-page-list');
   if (!histEl) return;
   if (hist.length === 0) {
-    histEl.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--muted)"><div style="font-size:44px;margin-bottom:14px">🕘</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">아직 추천받은 기록이 없어요</div><div style="font-size:12px">추천받기 버튼을 눌러보세요!</div></div>`;
+    histEl.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--muted)"><div style="font-size:44px;margin-bottom:14px">🕘</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">아직 추천받은 기록이 없어요</div><div style="font-size:12px">추천받기 버튼을 눌러 보세요!</div></div>`;
     return;
   }
   const PAGE_SIZE = 5;
@@ -5458,7 +5458,7 @@ function renderHistoryPage() {
     if (diffD < 7) return diffD + '일 전';
     return (d.getMonth()+1) + '/' + d.getDate();
   }
-  const catLabel = { cook:'직접요리', delivery:'배달', dine:'외식' };
+  const catLabel = { cook:'직접 요리', delivery:'배달', dine:'외식' };
   const modeLabel = { crave:'이런느낌땡겨', hate:'이것만은싫어' };
   const globalStart = page * PAGE_SIZE;
   histEl.innerHTML =
@@ -5855,7 +5855,7 @@ function renderTasteStats() {
   if (totalScore < 5) {
     el.innerHTML = `<div class="my-saved-empty" style="text-align:center;padding:20px 0">
       👀 아직 데이터가 부족해요<br>
-      <span style="font-size:11px;color:var(--muted)">메뉴에 ❤️ 좋아요를 눌러보세요!</span>
+      <span style="font-size:11px;color:var(--muted)">메뉴에 ❤️ 좋아요를 눌러 보세요!</span>
     </div>`;
     return;
   }
@@ -5993,7 +5993,7 @@ function renderCalendarDetail(dateKey) {
     </div>
     ${items.length === 0
       ? `<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0">
-          기록이 없어요${isToday ? '' : '<br><span style="font-size:10px">오늘 날짜를 눌러 기록해보세요!</span>'}
+          기록이 없어요${isToday ? '' : '<br><span style="font-size:10px">오늘 날짜를 눌러 기록해 보세요!</span>'}
          </div>`
       : items.map(item => `
         <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
@@ -6139,7 +6139,7 @@ function generateWeeklySummary() {
   const weekStartTs = weekStart.getTime();
 
   const weekPosts = commPosts.filter(p => isPostVisible(p) && p.date >= weekStartTs && !p.isResult);
-  if (weekPosts.length === 0) { showToast('이번 주 게시글이 없어요!'); return; }
+  if (weekPosts.length === 0) { showToast('이번 주 글이 없어요!'); return; }
 
   // 1. 가장 많이 언급된 메뉴 TOP3
   const menuCount = {};
@@ -6205,7 +6205,7 @@ function generateWeeklySummary() {
 
   if (topUser) {
     html += `<div style="margin-bottom:4px">
-      <div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:6px">💪 가장 활발한 유저</div>
+      <div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:6px">💪 가장 활발한 사용자</div>
       <div style="font-size:13px;color:var(--text)">${topUser[0]}님 <span style="color:var(--muted);font-size:11px">${topUser[1]}개 작성</span></div>
     </div>`;
   }
@@ -6226,7 +6226,7 @@ function postWeeklySummary() {
   // 중복 방지 - 오늘 이미 올렸으면 차단
   const todayKey = 'weeklyPosted_' + new Date().toDateString();
   if (localStorage.getItem(todayKey)) {
-    showToast('오늘 이미 주간결산을 올렸어요!');
+    showToast('오늘 이미 주간 결산을 올렸어요!');
     closeWeeklySummary();
     return;
   }
@@ -6257,7 +6257,7 @@ function postWeeklySummary() {
     lines.push('');
   }
   if (topUser) {
-    lines.push(`💪 가장 활발한 유저`);
+    lines.push(`💪 가장 활발한 사용자`);
     lines.push(`  ${topUser[0]}님 ${topUser[1]}개 작성`);
   }
 
@@ -6285,7 +6285,7 @@ function postWeeklySummary() {
   document.querySelectorAll('.comm-tab').forEach((b,i) => b.classList.toggle('active', i===0));
   renderCommFeed('all');
   renderHotBanner('all');
-  showToast('📊 주간결산이 올라갔어요!');
+  showToast('📊 주간 결산이 올라갔어요!');
 }
 
 // ── 알림 ──
@@ -6367,7 +6367,7 @@ function openUserProfile(nick) {
       <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#cc1a2e);display:flex;align-items:center;justify-content:center;font-size:24px">${avatar}</div>
       <div>
         <div style="font-size:15px;font-weight:700;color:var(--text)">${nick}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">게시글 ${userPosts.length}개 · 받은 좋아요 ${totalLikes}개</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">글 ${userPosts.length}개 · 받은 좋아요 ${totalLikes}개</div>
       </div>
     </div>`;
 
@@ -6666,7 +6666,7 @@ function openMenuReviewModal(menuName, emoji) {
   if (posts.length === 0) {
     list.innerHTML = `
       <div style="text-align:center;padding:40px 0 20px;color:var(--muted);font-size:13px">
-        아직 후기가 없어요<br>첫 번째로 올려보세요! 😊
+        아직 후기가 없어요<br>첫 번째로 올려 보세요! 😊
       </div>
       <button onclick="closeMenuReviewModal();openCommWrite()" style="width:100%;padding:12px;background:var(--orange);border:none;border-radius:12px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'Jua',sans-serif">✍️ 후기 올리기</button>`;
     document.getElementById('menu-review-modal').style.display = 'flex';
@@ -6867,7 +6867,7 @@ function closeSuggest() { document.getElementById('suggest-modal')?.classList.re
 function submitSuggest() {
   const name = (document.getElementById('suggest-input').value || '').trim();
   const cat = document.getElementById('suggest-cat').value || 'all';
-  if (name.length < 1) { showToast('메뉴 이름을 적어주세요'); return; }
+  if (name.length < 1) { showToast('메뉴 이름을 적어 주세요'); return; }
   if (menuDB.some(m => m.name === name)) { showToast(`'${name}'은(는) 이미 있는 메뉴예요 😊`); return; }
   saveCustomMenuRequest(name, cat);
   closeSuggest();
@@ -6982,7 +6982,7 @@ function renderCommentListHTML(postId) {
       const lb = (b.likes||0)+(commentLiked.has(b.id)?1:0);
       return lb !== la ? lb-la : a.date-b.date;
     });
-  if (comments.length === 0) return `<div style="font-size:12px;color:var(--muted);padding:8px 0">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</div>`;
+  if (comments.length === 0) return `<div style="font-size:12px;color:var(--muted);padding:8px 0">아직 댓글이 없어요. 첫 댓글을 남겨 보세요!</div>`;
   return comments.map(c => {
     const liked = commentLiked.has(c.id);
     const cnt = (c.likes||0)+(liked?1:0);
@@ -7133,7 +7133,7 @@ function renderCommentList(postId) {
   const list = document.getElementById('comm-comment-list');
   const comments = commComments[postId] || [];
   if (comments.length === 0) {
-    list.innerHTML = `<div style="text-align:center;padding:30px 0;color:var(--muted);font-size:13px">첫 댓글을 남겨보세요! 😊</div>`;
+    list.innerHTML = `<div style="text-align:center;padding:30px 0;color:var(--muted);font-size:13px">첫 댓글을 남겨 보세요! 😊</div>`;
     return;
   }
   // 좋아요 내림차순, 동수면 먼저 등록된 것
@@ -7281,7 +7281,7 @@ function renderDailyMeal() {
         <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
           <div style="background:var(--yellow);height:100%;border-radius:4px;width:${cnt > 0 ? pct : 0}%;transition:width 0.5s ease"></div>
         </div>
-        <div style="font-size:10px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어보세요'}</div>
+        <div style="font-size:10px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어 보세요'}</div>
       </div>
       <button onclick="certifyDailyMeal('${m.name}')"
         style="background:var(--yellow);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#1a1400;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%">
@@ -7950,7 +7950,7 @@ function renderFunPage() {
           <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden;margin-bottom:3px">
             <div style="background:var(--yellow);height:100%;border-radius:4px;width:${cnt>0?pct:0}%;transition:width 0.5s ease"></div>
           </div>
-          <div style="font-size:10px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어보세요'}</div>
+          <div style="font-size:10px;color:var(--muted)">${cnt > 0 ? `인증 ${cnt}명` : '첫 인증의 주인공이 되어 보세요'}</div>
         </div>
         <button onclick="certifyDailyMeal('${m.name}')"
           style="background:var(--yellow);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#1a1400;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%">
@@ -8719,7 +8719,7 @@ async function changeNickname(newNick) {
     const res = await ownerRpc('set_my_nickname', { p_nick: nick });
     if (res === 'taken') { showToast('이미 사용 중인 닉네임이에요 😅'); return; }
     if (typeof res === 'string' && res.startsWith('wait:')) { showToast(`닉네임은 3일에 한 번 바꿀 수 있어요 (${nickWaitText(+res.slice(5))} 뒤 가능)`); return; }
-    if (res !== 'ok') { showToast('닉네임을 바꾸지 못했어요. 잠시 후 다시 해주세요'); return; }
+    if (res !== 'ok') { showToast('닉네임을 바꾸지 못했어요. 잠시 후 다시 해 주세요'); return; }
     localStorage.setItem('wmjMyNick', nick);
     showToast('✅ 닉네임이 변경됐어요! 다음 변경은 3일 뒤에 할 수 있어요');
   } catch(_) {
@@ -8972,8 +8972,8 @@ function renderCommFeed(tab) {
 
   if (displayed.length === 0) {
     feed.innerHTML = commFilterTag
-      ? `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">${commFilterTag} 후기가 아직 없어요<br>첫 번째로 올려보세요! 😊</div>`
-      : `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">아직 글이 없어요<br>첫 번째로 올려보세요! 😊</div>`;
+      ? `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">${commFilterTag} 후기가 아직 없어요<br>첫 번째로 올려 보세요! 😊</div>`
+      : `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">아직 글이 없어요<br>첫 번째로 올려 보세요! 😊</div>`;
     return;
   }
 
@@ -9190,9 +9190,9 @@ function checkVoteExpiry() {
 
 const PLACEHOLDER_BY_TYPE = {
   menu: '오늘 어디서 뭐 드셨어요? 😋',
-  diet: '오늘 식단을 기록해보세요 💪 칼로리나 영양도 적어보세요!',
-  cook: '직접 만든 요리를 자랑해보세요 👨‍🍳 레시피도 공유해주세요!',
-  pick: '추천받고 싶은 상황을 설명해주세요 🤔 ex) 야식으로 뭐 시킬지 고민이에요!',
+  diet: '오늘 식단을 기록해 보세요 💪 칼로리나 영양도 적어 보세요!',
+  cook: '직접 만든 요리를 자랑해 보세요 👨‍🍳 레시피도 공유해 주세요!',
+  pick: '추천받고 싶은 상황을 설명해 주세요 🤔 ex) 야식으로 뭐 시킬지 고민이에요!',
 };
 const MAXLEN_BY_TYPE = { menu:100, diet:150, cook:200, pick:100 };
 const MENUTAG_LABEL_BY_TYPE = {
@@ -9345,7 +9345,7 @@ function submitCommPost(editId) {
       guide.style.cssText = 'font-size:11px;color:var(--red);margin-top:4px';
       ta.parentNode.insertBefore(guide, ta.nextSibling);
     }
-    guide.textContent = '내용을 입력해주세요!';
+    guide.textContent = '내용을 입력해 주세요!';
     setTimeout(() => {
       ta.style.borderColor = 'var(--border)';
       if (guide) guide.textContent = '';
@@ -9356,7 +9356,7 @@ function submitCommPost(editId) {
   // 메뉴태그 입력창에 글자 있는데 선택 안 한 경우 차단
   const tagInput = document.getElementById('comm-menu-tag-input');
   if (tagInput && tagInput.style.display !== 'none' && tagInput.value.trim() && !selectedMenuTag) {
-    showToast('메뉴를 목록에서 선택해주세요! 직접 입력은 안 돼요 🙅');
+    showToast('메뉴를 목록에서 선택해 주세요! 직접 입력은 안 돼요 🙅');
     tagInput.style.borderColor = 'var(--red)';
     // 입력창 아래 안내문구 표시
     let guide = document.getElementById('comm-tag-guide');
@@ -9548,7 +9548,7 @@ window.addEventListener('beforeinstallprompt', e => {
 document.getElementById('pwa-install-btn').addEventListener('click', async () => {
   if (!deferredPrompt) {
     // iOS 안내
-    showToast('Safari → 공유 → "홈 화면에 추가" 를 탭하세요 📱');
+    showToast('Safari → 공유 → "홈 화면에 추가"를 눌러 주세요 📱');
     dismissPWA();
     return;
   }
@@ -9568,7 +9568,7 @@ function dismissPWA() {
 
 window.addEventListener('appinstalled', () => {
   document.getElementById('pwa-banner').classList.remove('show');
-  showToast('🎉 홈화면에 추가됐어요!');
+  showToast('🎉 홈 화면에 추가됐어요!');
 });
 
 // iOS Safari 감지 → 별도 안내
