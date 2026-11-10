@@ -102,3 +102,11 @@
 .pc-doorcount { position:absolute; transform:translateX(-50%); z-index:3; background:rgba(0,0,0,.6); color:#ffd7a3; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; white-space:nowrap; pointer-events:none; }
 .pc-live { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .pc-leave { width:100%; margin-top:8px; padding:11px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+
+/* 감정 표현 바 · 근처 말풍선 */
+.pc-emobar { display:flex; justify-content:center; gap:8px; margin-top:10px; }
+.pc-emobar button { pointer-events:auto; width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(15,12,20,.72); font-size:20px; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .12s; }
+.pc-emobar button:active { transform:scale(.88); }
+.pc-bubble.pc-emo { font-size:28px; background:transparent; box-shadow:none; padding:0; animation:pcPop .4s ease-out; }
+.pc-bubble.pc-emo::after { display:none; }
+@keyframes pcPop { 0% { transform:translateX(-50%) scale(.3); opacity:0; } 70% { transform:translateX(-50%) scale(1.25); } 100% { transform:translateX(-50%) scale(1); opacity:1; } }

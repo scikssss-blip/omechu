@@ -45,7 +45,9 @@
   let lobby = null, ch = null, joined = false, myTable = null, mySeat = null, seatAt = 0;
   let state = {}, lobbyState = {};
   let logs = {}, votes = {}, dishes = {}, bubbles = {};
-  let muted = new Set(), lastSend = 0, rainCtx = null;
+  let muted = new Set(), lastSend = 0, rainCtx = null, nearLog = [], lastEmote = 0;
+  const EMOTES = ['👋', '😋', '😂', '🔥', '👍', '🍻'];
+  const NEAR = 260;   // 이 거리 안에 있는 사람의 말만 보임
   let pos = { x: R.spawn[0], y: R.spawn[1] }, target = null, pendingSeat = null, pendingDoor = null, walkRAF = 0, follow = false;
   let lastDrawn = {}, K = 1, isOpen = false;   // K: 골목을 폰 폭에 맞추는 배율
 
@@ -115,6 +117,8 @@
       render();
     });
     lobby.on('broadcast', { event: 'move' }, ({ payload: m }) => { if (room === 'street') onMove(m, ROOMS.street.w, ROOMS.street.h); });
+    lobby.on('broadcast', { event: 'emote' }, ({ payload: m }) => { if (room === 'street') onEmote(m); });
+    lobby.on('broadcast', { event: 'say' }, ({ payload: m }) => { if (room === 'street') onSay(m); });
     lobby.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') { if (room === 'street') joined = true; await trackLobby(); render(); }
     });
@@ -140,6 +144,8 @@
       if (p && myTable !== null && p.table === myTable && key !== SID) sys(myTable, `${esc(p.nick)}님이 자리에 앉았어요`);
     });
     ch.on('broadcast', { event: 'move' }, ({ payload: m }) => { if (room === my) onMove(m, R.w, R.h); });
+    ch.on('broadcast', { event: 'emote' }, ({ payload: m }) => { if (room === my) onEmote(m); });
+    ch.on('broadcast', { event: 'say' }, ({ payload: m }) => { if (room === my) onSay(m); });
     ch.on('broadcast', { event: 'chat' }, ({ payload: m }) => {
       if (!m || !okSid(m.sid) || !okTable(m.table) || muted.has(m.sid)) return;
       m.nick = String(m.nick ?? '손님').slice(0, 12);
@@ -206,6 +212,44 @@
     updateWorld();
   }
 
+  // ── 근처 말하기 · 감정 표현 (걷는 중에도 가능) ──
+  const curChan = () => (room === 'street' ? lobby : ch);
+  function posOf(sid) {
+    if (sid === SID) return myTable !== null && room !== 'street' ? seatXY(myTable, mySeat) : [pos.x, pos.y];
+    const p = state[sid]; if (!p) return null;
+    if (room !== 'street' && p.table !== null && p.table !== undefined && p.seat !== null) return seatXY(p.table, p.seat);
+    return [p.x, p.y];
+  }
+  function isNear(sid) { const a = posOf(sid), b = posOf(SID); return a && b && Math.hypot(a[0] - b[0], a[1] - b[1]) <= NEAR; }
+  function showBubble(sid, text, ms, emote) { bubbles[sid] = { text, until: Date.now() + ms, emote }; updateWorld(); setTimeout(updateWorld, ms + 100); }
+  function emote(e) {
+    const c = curChan(); if (!c || !EMOTES.includes(e)) return;
+    if (Date.now() - lastEmote < 800) return; lastEmote = Date.now();
+    c.send({ type: 'broadcast', event: 'emote', payload: { sid: SID, e } });
+    showBubble(SID, e, 2500, true);
+  }
+  function say() {
+    const el = document.getElementById('pc-say'); const c = curChan(); if (!el || !c) return;
+    const text = clean(el.value.trim()); if (!text) return;
+    if (Date.now() - lastSend < 1500) { showToast('조금만 천천히 말해 주세요 🙂'); return; }
+    lastSend = Date.now(); el.value = '';
+    c.send({ type: 'broadcast', event: 'say', payload: { sid: SID, nick: nick(), text } });
+    nearLog = nearLog.concat([{ nick: nick(), text, me: true }]).slice(-20);
+    showBubble(SID, text, 5000); renderPanel();
+  }
+  function onEmote(m) {
+    if (!m || !okSid(m.sid) || m.sid === SID || muted.has(m.sid) || !EMOTES.includes(m.e) || !state[m.sid]) return;
+    showBubble(m.sid, m.e, 2500, true);
+  }
+  function onSay(m) {
+    if (!m || !okSid(m.sid) || m.sid === SID || muted.has(m.sid) || !state[m.sid]) return;
+    if (room === 'street' && state[m.sid].room !== 'street') return;
+    if (!isNear(m.sid)) return;                         // 멀리 있는 사람의 말은 안 보임
+    const text = clean(m.text), who = String(m.nick ?? '손님').slice(0, 12);
+    nearLog = nearLog.concat([{ nick: who, text, sid: m.sid }]).slice(-20);
+    showBubble(m.sid, text, 5000); renderPanel();
+  }
+
   // ── 가게 드나들기 ──
   function enterRoom(id, from) {
     if (!ROOMS[id] || id === room) return;
@@ -213,7 +257,7 @@
     const prev = room;
     room = id; R = ROOMS[id];
     myTable = null; mySeat = null; target = null; pendingSeat = null; pendingDoor = null;
-    logs = {}; votes = {}; dishes = {}; bubbles = {}; lastDrawn = {}; moves = {};
+    logs = {}; votes = {}; dishes = {}; bubbles = {}; lastDrawn = {}; moves = {}; nearLog = [];
     state = id === 'street' ? lobbyState : {}; joined = id === 'street' ? !!lobby : false;
     if (id === 'street') { const d = ROOMS[from || prev]?.door || R.spawn; pos = { x: d[0], y: d[1] }; }
     else pos = { x: R.spawn[0], y: R.spawn[1] };
@@ -511,6 +555,7 @@
         <div class="pc-viewwrap"><div class="pc-view" id="pc-view">
           <div class="pc-sizer" id="pc-sizer"><div class="pc-world" id="pc-world" style="width:${R.w}px;height:${R.h}px">${room === 'street' ? streetSVG() : roomSVG()}<div id="pc-doors"></div><div id="pc-dishes"></div><div id="pc-people"></div></div></div>
         </div><div class="pc-rain"></div></div>
+        <div class="pc-emobar">${EMOTES.map(e => `<button aria-label="감정 표현 ${e}" onclick="Pocha.emote('${e}')">${e}</button>`).join('')}</div>
         <div class="pc-hint" id="pc-hint"></div>
       </div>
       <div class="pc-body" id="pc-panel"></div>`;
@@ -532,7 +577,7 @@
   }
   function personHTML(p, sid) {
     const b = bubbles[sid]; const showB = b && b.until > Date.now();
-    return `${showB ? `<div class="pc-bubble">${esc(b.text)}</div>` : ''}<div class="pc-body2">${avatarSVG(p, 46)}</div><div class="pc-name">${esc(p.nick)}${sid === SID ? ' (나)' : ''}</div>`;
+    return `${showB ? `<div class="pc-bubble${b.emote ? ' pc-emo' : ''}">${esc(b.text)}</div>` : ''}<div class="pc-body2">${avatarSVG(p, 46)}</div><div class="pc-name">${esc(p.nick)}${sid === SID ? ' (나)' : ''}</div>`;
   }
   function placeEl(el, x, y, seated) { el.style.transform = `translate(${x - 30}px, ${y - (seated ? 42 : 52)}px)`; el.style.zIndex = String(Math.round(y)); }
   function drawMe(walking) {
@@ -596,17 +641,20 @@
     if (hint) hint.textContent = room === 'street' ? '가게를 누르면 걸어가서 들어가요'
       : myTable !== null ? `${R.tables[myTable].n}에 앉아 있어요 · 다른 곳을 누르면 일어나서 걸어가요`
       : '빈 곳을 누르면 걸어가고, 빈자리를 누르면 앉아요';
+    const nearCard = `<div class="pc-card"><div style="font-weight:700;margin-bottom:8px">💬 근처 사람에게 말하기 <span style="font-size:11px;color:var(--muted);font-weight:400">가까이 있는 사람에게만 보여요</span></div>
+      <div class="pc-log" id="pc-log" style="height:110px">${nearLog.map(m => `<div class="msg"><b>${esc(m.nick)}</b>${esc(m.text)}</div>`).join('') || '<div class="sys">근처에 다가가서 말을 걸어 보세요</div>'}</div>
+      <div class="pc-input"><input id="pc-say" maxlength="60" placeholder="안녕하세요! 뭐 드세요?" onkeydown="if(event.key==='Enter')Pocha.say()"><button onclick="Pocha.say()">말하기</button></div></div>`;
     let body = '';
     if (room === 'street') {
       const c = roomCounts();
-      body = `<div class="pc-card"><div style="font-weight:700;margin-bottom:10px">어디로 들어갈까요?</div><div class="pc-tables">
+      body = nearCard + `<div class="pc-card"><div style="font-weight:700;margin-bottom:10px">어디로 들어갈까요?</div><div class="pc-tables">
         ${SHOPS.map(id => `<div class="pc-trow"><div><div style="font-size:13px;font-weight:700">${ROOMS[id].name} <span style="color:var(--muted);font-weight:400">${ROOMS[id].kind}</span></div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px">${c[id] ? `지금 ${c[id]}명 있어요` : '아직 아무도 없어요'}</div></div>
           <button onclick="Pocha.go('${id}')">들어가기</button></div>`).join('')}
         </div></div>
         <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6">대화는 저장되지 않아요. 같은 테이블에 앉은 사람끼리만 보여요.<br>불편한 손님은 캐릭터를 눌러 말을 숨길 수 있어요.</div>`;
     } else if (myTable === null) {
-      body = `<div class="pc-card"><div style="font-weight:700;margin-bottom:10px">${esc(R.name)} 자리 현황</div><div class="pc-tables">
+      body = nearCard + `<div class="pc-card"><div style="font-weight:700;margin-bottom:10px">${esc(R.name)} 자리 현황</div><div class="pc-tables">
         ${R.tables.map((tb, t) => { const ps = seatedAt(t).filter(p => p.sid !== SID); const full = ps.length >= SEATS;
           return `<div class="pc-trow"><div><div style="font-size:13px;font-weight:700">${tb.n} <span style="color:var(--muted);font-weight:400">${ps.length}/${SEATS}</span></div>
             <div class="who">${ps.map(p => avatarSVG(p, 28)).join('') || '<span style="font-size:11px;color:var(--muted)">아직 아무도 없어요</span>'}</div></div>
@@ -627,10 +675,11 @@
         <div class="pc-card"><div class="pc-log" id="pc-log">${(logs[myTable] || []).map(m => m.sys ? `<div class="sys">${m.text}</div>` : `<div class="msg"><b>${esc(m.nick)}</b>${esc(m.text)}</div>`).join('') || '<div class="sys">아직 조용해요. 먼저 말을 걸어보세요!</div>'}</div>
           <div class="pc-input"><input id="pc-msg" maxlength="60" placeholder="오늘 뭐 드실 거예요?" onkeydown="if(event.key==='Enter')Pocha.send()"><button onclick="Pocha.send()">전송</button></div></div>`;
     }
-    const prevVal = document.getElementById('pc-msg')?.value || '';
-    const hadFocus = document.activeElement && document.activeElement.id === 'pc-msg';
+    const prevVal = document.getElementById('pc-msg')?.value || '', prevSay = document.getElementById('pc-say')?.value || '';
+    const hadFocus = document.activeElement && document.activeElement.id === 'pc-msg', hadSay = document.activeElement && document.activeElement.id === 'pc-say';
     panel.innerHTML = body;
     const inp = document.getElementById('pc-msg'); if (inp) { inp.value = prevVal; if (hadFocus) inp.focus(); }
+    const sy = document.getElementById('pc-say'); if (sy) { sy.value = prevSay; if (hadSay) sy.focus(); }
     const log = document.getElementById('pc-log'); if (log) log.scrollTop = log.scrollHeight;
   }
   function render() {
@@ -651,7 +700,7 @@
     close() { isOpen = false; if (room !== 'street') enterRoom('street'); if (lobby) { try { lobby.untrack(); } catch (e) {} } },
     back() { if (room !== 'street') enterRoom('street'); else showPage('fun'); },
     go(id) { if (room !== 'street') return; const d = ROOMS[id]?.door; if (!d) return; pendingSeat = null; pendingDoor = id; walkTo(d[0], d[1]); },
-    leave, sit, sitAny, stand, goSit, walkTo, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
+    emote, say, leave, sit, sitAny, stand, goSit, walkTo, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
     avatarSVG, room: () => room, count: () => Object.keys(lobbyState).length,
     who: () => Object.entries(lobbyState).map(([k, p]) => (k === SID ? '(나)' : '') + p.room + ':' + p.nick),
   };
