@@ -37,6 +37,28 @@
   .bubble { position:fixed; left:0; top:0; width:max-content; transform:translate(-50%, -100%); background:#fff; color:#231a14; border-radius:14px; padding:6px 10px; font-size:13px; font-weight:600; max-width:170px; pointer-events:none; z-index:3; box-shadow:0 3px 10px #0006; white-space:pre-wrap; word-break:keep-all; overflow-wrap:anywhere; }
   .bubble.dots { background:#ffffffc8; letter-spacing:2px; padding:3px 10px 7px; }
   .bubble.emote { background:none; box-shadow:none; font-size:30px; padding:0; }
+  .log b { pointer-events:auto; cursor:pointer; }
+  .game { background:#1b1529f2; border:1px solid #4a4063; border-radius:14px; padding:10px; margin-bottom:8px; }
+  .game .gt { font-size:13px; font-weight:800; margin-bottom:8px; display:flex; justify-content:space-between; gap:8px; }
+  .game .gt small { font-weight:400; color:#cfc6e6; }
+  .game .go { display:flex; gap:8px; }
+  .game .go button { flex:1; min-width:0; background:#2a2240; border:2px solid #4a4063; border-radius:12px; color:#fff; padding:6px 6px 8px; font-size:13px; font-weight:700; }
+  .game .go button img, .game .go button .em { display:block; width:100%; height:64px; object-fit:cover; border-radius:8px; margin-bottom:6px; background:#120e1e; font-size:34px; line-height:64px; }
+  .game .go button.mine { border-color:#ff7a1a; background:#3a2616; }
+  .game .go button:disabled { opacity:.75; }
+  .game .vs { align-self:center; font-weight:800; color:#ffc27a; font-size:13px; }
+  .game .win { text-align:center; font-size:15px; font-weight:800; } .game .win img { width:120px; height:84px; object-fit:cover; border-radius:10px; display:block; margin:0 auto 8px; }
+  .sheet { position:fixed; inset:0; background:#000a; z-index:8; display:none; align-items:flex-end; }
+  .sheet .box { background:#1b1529; width:100%; max-height:78vh; overflow-y:auto; border-radius:20px 20px 0 0; padding:16px 14px calc(18px + env(safe-area-inset-bottom)); box-sizing:border-box; }
+  .sheet h3 { margin:14px 0 8px; font-size:13px; color:#cfc6e6; font-weight:700; } .sheet h3:first-child { margin-top:0; }
+  .grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+  .grid button { background:#2a2240; border:2px solid #3a3152; border-radius:12px; color:#fff; padding:6px 2px; font-size:11.5px; position:relative; }
+  .grid button img { width:52px; height:52px; display:block; margin:0 auto 2px; } .grid button.on { border-color:#ff7a1a; background:#3a2616; }
+  .grid button.lock img { filter:grayscale(1) brightness(.55); } .grid button .lk { display:block; font-size:10px; color:#bdb4d6; }
+  .grid button .fxe { font-size:28px; line-height:52px; display:block; }
+  .opts { display:flex; flex-wrap:wrap; gap:8px; } .opts button { background:#2a2240; border:2px solid #3a3152; border-radius:999px; color:#fff; padding:7px 12px; font-size:13px; } .opts button.on { border-color:#ff7a1a; background:#3a2616; }
+  .ask { position:fixed; left:12px; right:12px; top:calc(64px + env(safe-area-inset-top)); background:#1b1529f5; border:1px solid #4a4063; border-radius:14px; padding:12px; z-index:7; font-size:13.5px; display:none; }
+  .ask .row { margin-top:10px; }
   .toast { position:fixed; left:50%; top:calc(64px + env(safe-area-inset-top)); transform:translateX(-50%); background:#000000b8; border:1px solid #ffffff30; border-radius:999px; padding:8px 14px; font-size:13px; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; z-index:6; }
   .toast.on { opacity:1; }
   .err { position:fixed; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:30px; font-size:14px; line-height:1.7; z-index:9; background:#120e1e; }
@@ -47,13 +69,16 @@
 <div class="top">
   <a class="back" id="back" href="./" aria-label="돌아가기">‹</a>
   <span class="title" id="title">오메추 포차</span><span class="count" id="count">연결 중…</span>
-  <button class="btn sp" id="snd">🔈 소리 켜기</button>
+  <button class="btn sp" id="dressbtn" aria-label="캐릭터 꾸미기">👕</button><button class="btn" id="snd">🔈 소리</button>
 </div>
 <div id="bubbles"></div>
 <div class="toast" id="toast"></div>
 <div class="panel" id="panel"></div>
+<div class="sheet" id="sheet"><div class="box" id="sheetbox"></div></div>
+<div class="ask" id="ask"></div>
 <div class="err" id="err">이 기기에서는 3D 화면을 열 수 없어요.<br>오메추 앱의 먹자골목은 그대로 쓸 수 있어요.</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+<script src="menu-lite.js"></script>
 <script src="pocha-chars.js"></script>
 <script type="module">
 import * as THREE from './vendor/three.module.min.js';
@@ -62,19 +87,19 @@ import * as THREE from './vendor/three.module.min.js';
 const SUPABASE_URL = 'https://arodifxcwdehcezybhrh.supabase.co', SUPABASE_KEY = 'sb_publishable_fHCAe5O2yY_EPtZhdGPyJg_cHPkjgiB';
 // 가게별 설정: 주소 뒤 ?room=korean 처럼 고름. 자리 배치는 같고 벽·바닥·식탁·사장님·소리가 다름.
 const THEMES = {
-  pocha: { name: '오메추 포차', door: [215, 172], wall: 'tent', wallS: 'tentS', floor: 'floor', table: 'round', seat: 'dark', seatY: 0.5, bar: '이모네 바', solo: '혼술존', soloSub: '조용히 쉬어가요', sign: ['#c8102e', '#fff3d6'], lamp: '#ffb14a', indoor: false,
+  pocha: { name: '오메추 포차', door: [215, 172], wall: 'tent', wallS: 'tentS', floor: 'floor', table: 'round', seat: 'dark', seatY: 0.5, bar: '이모네 바', tags: ['🍺 술안주', '🌙 야식'],  solo: '혼술존', soloSub: '조용히 쉬어가요', sign: ['#c8102e', '#fff3d6'], lamp: '#ffb14a', indoor: false,
     menu: ['떡볶이  4,000', '어묵탕  5,000', '계란말이 7,000', '닭똥집  9,000'], menu2: ['오늘의 안주', '골뱅이무침'],
     owners: [{ nick: '포차 사장님', kind: 'chicken', face: 'happy', acc: 'chef', x: 2.2, lines: ['어서 와요!', '닭똥집 금방 나가요~', '오늘 비 와서 손님 많네', '뜨거우니까 조심해요'] }, { nick: '포차 이모', kind: 'tteok', face: 'happy', acc: 'towel', x: -1.4, lines: ['떡볶이 국물 더 줄까?', '어묵 국물은 서비스야~', '천천히 먹고 가요', '많이 먹어요~'] }] },
-  korean: { name: '오메추 밥상', door: [160, 322], wall: 'hanji', wallS: 'hanjiS', floor: 'plank', table: 'low', seat: 'cushion', seatY: 0.14, bar: '주방 앞자리', solo: '혼밥존', soloSub: '편하게 한 끼', sign: ['#3a2a22', '#f6e7c8'], lamp: '#ffd9a0', indoor: true,
+  korean: { name: '오메추 밥상', tags: ['🍱 한식'], door: [160, 322], wall: 'hanji', wallS: 'hanjiS', floor: 'plank', table: 'low', seat: 'cushion', seatY: 0.14, bar: '주방 앞자리', solo: '혼밥존', soloSub: '편하게 한 끼', sign: ['#3a2a22', '#f6e7c8'], lamp: '#ffd9a0', indoor: true,
     menu: ['된장찌개  8,000', '제육볶음  9,000', '비빔밥   8,500', '계란찜   5,000'], menu2: ['오늘의 반찬', '겉절이·나물'],
     owners: [{ nick: '밥상 사장님', kind: 'kimbap', face: 'smile', acc: 'towel', x: 0.8, lines: ['어서 오세요~', '밥은 더 드려요', '찌개 끓고 있어요', '반찬 모자라면 말해요'] }] },
-  japanese: { name: '오메추 스시야', door: [276, 332], wall: 'dwood', wallS: 'dwoodS', floor: 'tatami', table: 'low', seat: 'cushion', seatY: 0.14, bar: '스시 카운터', solo: '혼밥존', soloSub: '조용히 한 점', sign: ['#1f2a44', '#f3ead8'], lamp: '#ff9a6a', indoor: true,
+  japanese: { name: '오메추 스시야', door: [276, 332], wall: 'dwood', wallS: 'dwoodS', floor: 'tatami', table: 'low', seat: 'cushion', seatY: 0.14, bar: '스시 카운터', tags: ['🍣 일식'],  solo: '혼밥존', soloSub: '조용히 한 점', sign: ['#1f2a44', '#f3ead8'], lamp: '#ff9a6a', indoor: true,
     menu: ['모둠초밥 15,000', '연어덮밥 12,000', '우동    7,000', '타코야키  5,000'], menu2: ['오늘의 생선', '연어·광어'],
     owners: [{ nick: '스시야 사장님', kind: 'salmon', face: 'smile', acc: 'chef', x: 0.4, lines: ['어서 오세요', '오늘 연어가 좋아요', '한 점씩 천천히 드세요', '된장국 나갑니다'] }] },
-  chinese: { name: '오메추 반점', door: [152, 622], wall: 'cred', wallS: 'credS', floor: 'tile', table: 'lazy', seat: 'red', seatY: 0.5, bar: '주방 앞자리', solo: '혼밥존', soloSub: '짜장면 한 그릇', sign: ['#b3121f', '#ffd76a'], lamp: '#ff6a3a', indoor: true,
+  chinese: { name: '오메추 반점', tags: ['🥢 중식'], door: [152, 622], wall: 'cred', wallS: 'credS', floor: 'tile', table: 'lazy', seat: 'red', seatY: 0.5, bar: '주방 앞자리', solo: '혼밥존', soloSub: '짜장면 한 그릇', sign: ['#b3121f', '#ffd76a'], lamp: '#ff6a3a', indoor: true,
     menu: ['짜장면   7,000', '짬뽕    8,000', '탕수육  18,000', '군만두   6,000'], menu2: ['오늘의 요리', '마파두부'],
     owners: [{ nick: '반점 사장님', kind: 'mandu', face: 'happy', acc: 'chef', x: 1.0, lines: ['어서 오세요!', '탕수육 나왔습니다~', '불맛 제대로 냈어요', '단무지 더 드릴까요?'] }] },
-  western: { name: '오메추 비스트로', door: [280, 622], wall: 'brick', wallS: 'brickS', floor: 'check', table: 'cloth', seat: 'wood', seatY: 0.5, bar: '바 자리', solo: '혼밥존', soloSub: '창가 한 접시', sign: ['#23402e', '#f6ecd6'], lamp: '#ffe0a8', indoor: true,
+  western: { name: '오메추 비스트로', door: [280, 622], wall: 'brick', wallS: 'brickS', floor: 'check', table: 'cloth', seat: 'wood', seatY: 0.5, bar: '바 자리', tags: ['🍝 양식'],  solo: '혼밥존', soloSub: '창가 한 접시', sign: ['#23402e', '#f6ecd6'], lamp: '#ffe0a8', indoor: true,
     menu: ['토마토 파스타 13,000', '마르게리타  15,000', '함박스테이크 14,000', '수프     6,000'], menu2: ['오늘의 디저트', '푸딩'],
     owners: [{ nick: '비스트로 사장님', kind: 'pizza', face: 'smile', acc: 'chef', x: 0.6, lines: ['어서 오세요', '파스타 곧 나와요', '빵은 계속 드려요', '오늘 수프가 맛있어요'] }] },
 };
@@ -90,6 +115,25 @@ const SID = Math.random().toString(36).slice(2, 10);            // 이번 접속
 const BAD = /(시발|씨발|씨빨|ㅅㅂ|ㅆㅂ|병신|ㅂㅅ|좆|존나|개새|새끼|꺼져|닥쳐|섹스|자살|죽어|느금|애미|애비)/g;
 const clean = (t) => String(t || '').slice(0, 60).replace(BAD, (m) => '♡'.repeat(m.length));
 const ACC_KEYS = ['none', 'towel', 'beanie', 'glasses', 'ribbon', 'chef'], FACE_KEYS = ['smile', 'happy', 'sleepy', 'wow'], EMOTES = ['👋', '😋', '😂', '🔥', '👍'];
+// 취향 효과: 좋아요한 메뉴 분류가 쌓이면 열리고, 캐릭터 머리 위로 작은 그림이 떠오름 (다른 손님에게도 보임)
+const FX = {
+  none: { e: '', name: '없음' }, heart: { e: '💗', name: '하트' }, note: { e: '🎵', name: '콧노래' },
+  fire: { e: '🔥', name: '불꽃', tags: ['🌶️ 매운/얼큰한맛', '🌶️ 매운 음식'], need: 3, label: '매운 메뉴' },
+  steam: { e: '♨️', name: '모락모락', tags: ['🍲 국물/찌개'], need: 3, label: '국물 메뉴' },
+  sparkle: { e: '✨', name: '반짝반짝', tags: ['🍯 달달한맛'], need: 2, label: '달달한 메뉴' },
+  beer: { e: '🍺', name: '한잔', tags: ['🍺 술안주'], need: 3, label: '술안주 메뉴' },
+  moon: { e: '🌙', name: '야식파', tags: ['🌙 야식'], need: 3, label: '야식 메뉴' },
+  snow: { e: '❄️', name: '눈송이', tags: ['🥶 추운 날'], need: 3, label: '추운 날 메뉴' },
+  sun: { e: '☀️', name: '햇살', tags: ['☀️ 더운 날'], need: 3, label: '더운 날 메뉴' },
+  wave: { e: '🐟', name: '바다파', tags: ['🦐 해산물'], need: 3, label: '해산물 메뉴' },
+  meat: { e: '🍖', name: '고기파', tags: ['🥩 고기'], need: 5, label: '고기 메뉴' },
+  leaf: { e: '🌿', name: '풀잎', tags: ['🥗 채소'], need: 4, label: '채소 메뉴' },
+  noodle: { e: '🍜', name: '면치기', tags: ['🍜 면'], need: 3, label: '면 메뉴' },
+  fry: { e: '🍤', name: '바삭바삭', tags: ['🫕 튀김'], need: 3, label: '튀김 메뉴' },
+};
+function tasteCounts() { const liked = getLikedMenus().map(m => m && m.name), c = {}; liked.forEach(n => { const m = menuDB.find(x => x.name === n); if (m) m.tags.forEach(t => { c[t] = (c[t] || 0) + 1; }); }); return c; }
+function fxProgress(k) { const f = FX[k]; if (!f || !f.tags) return { open: true }; const c = tasteCounts(), have = Math.max(...f.tags.map(t => c[t] || 0)); return { open: have >= f.need, have, need: f.need, label: f.label }; }
+const MENU_NAMES = new Map(menuDB.map(m => [m.name, m]));
 const HW = 11, HD = 8.5, WH = 3.2;                              // 천막 반너비, 반깊이, 벽 높이
 const $ = (id) => document.getElementById(id);
 
@@ -356,9 +400,15 @@ function makePerson(sid, d, mine) {
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: charTexture(d.kind, d.face, d.acc), transparent: true, alphaTest: 0.08 })); sp.center.set(0.5, 0.06); sp.scale.set(1.5, 1.5, 1); g.add(sp);
   const nm = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTexture(d.nick, mine), transparent: true, depthTest: false })); nm.center.set(0.5, 0); nm.scale.set(1.5, 0.375, 1); nm.position.y = 1.55; nm.renderOrder = 5; g.add(nm);
   const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.95), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })); sh.rotation.x = -Math.PI / 2; sh.position.y = 0.03; g.add(sh);
-  const p = { sid, g, sp, nm, sh, d, t: null, s: null, target: null, ph: Math.random() * 6, mine, look: [d.kind, d.face, d.acc, d.nick].join('|'), bubble: null, at: 0 };
-  people.set(sid, p); return p;
+  const p = { sid, g, sp, nm, sh, d, t: null, s: null, target: null, ph: Math.random() * 6, mine, look: lookKey(d), bubble: null, at: 0, fx: [] };
+  setFx(p, d.fx); people.set(sid, p); return p;
 }
+const lookKey = (d) => [d.kind, d.face, d.acc, d.nick, d.fx || 'none'].join('|');
+const fxTex = new Map();
+function emojiTexture(e) { if (fxTex.has(e)) return fxTex.get(e); const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); g.font = '46px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e, 32, 36); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; fxTex.set(e, t); return t; }
+function setFx(p, k) { for (const f of p.fx) p.g.remove(f); p.fx = []; const f = FX[k]; if (!f || !f.e) return;
+  for (let i = 0; i < 3; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: emojiTexture(f.e), transparent: true, opacity: 0, depthWrite: false })); sp.scale.set(0.42, 0.42, 1); p.g.add(sp); p.fx.push(sp); } }
+function restyle(p, d) { p.d = d; p.look = lookKey(d); p.sp.material.map = charTexture(d.kind, d.face, d.acc); p.sp.material.needsUpdate = true; p.nm.material.map.dispose(); p.nm.material.map = nameTexture(d.nick, p.mine); setFx(p, d.fx); }
 function dropPerson(p) { scene.remove(p.g); p.nm.material.map.dispose(); if (p.bubble) { clearTimeout(p.bubble.tm); p.bubble.el.remove(); } people.delete(p.sid); }
 const seatOf = (t, s) => seats.find(q => q.t === t && q.i === s);
 function putSeat(p, t, s) { const q = seatOf(t, s); if (!q) return; p.t = t; p.s = s; p.target = null; p.g.position.set(q.x, q.y, q.z); p.sh.visible = false; }
@@ -368,7 +418,7 @@ function unseat(p) { if (p.t === null) return; const q = seatOf(p.t, p.s), tb = 
 
 let look = {}; try { look = JSON.parse(localStorage.getItem('wmjPochaLook') || '{}') || {}; } catch (e) {}
 let myNick = '손님'; try { myNick = (localStorage.getItem('wmjMyNick') || '손님').slice(0, 12); } catch (e) {}
-const myLook = { nick: myNick, kind: FoodChars.BY[look.kind] ? look.kind : 'onigiri', face: FACE_KEYS.includes(look.face) ? look.face : 'smile', acc: ACC_KEYS.includes(look.acc) ? look.acc : 'none' };
+const myLook = { nick: myNick, kind: FoodChars.BY[look.kind] ? look.kind : 'onigiri', face: FACE_KEYS.includes(look.face) ? look.face : 'smile', acc: ACC_KEYS.includes(look.acc) ? look.acc : 'none', fx: FX[look.fx] && fxProgress(look.fx).open ? look.fx : 'none' };
 const me = makePerson(SID, myLook, true);
 if (STREET) { const d = DOOR3[QS.get('from')]; if (d) me.g.position.set(d.x * 0.6 + 0.1, 0, d.z + (QS.get('from') === 'pocha' ? 1.2 : 0)); else me.g.position.set(0.25 + (Math.random() - 0.5) * 2, 0, 18.7); }
 else me.g.position.set((Math.random() - 0.5) * 3, 0, HD - 1.2);
@@ -390,6 +440,7 @@ scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: '
 // ═══ 접속 (Supabase Realtime) ═══
 // 가게 채널: 누가 어디 있는지 + "말하는 중" 표시만 오감. 대화 내용은 테이블 채널로만 보내서 같은 테이블 사람만 받음.
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+const muted = new Set();
 let ch = null, tch = null, lobby = null, joined = false, lastSend = 0, lastMove = 0, log = [];
 const okSid = (v) => typeof v === 'string' && /^[a-z0-9]{1,24}$/i.test(v);
 function safe(p) {
@@ -397,7 +448,7 @@ function safe(p) {
   const t = Number.isInteger(p.t) && p.t >= 0 && p.t < tables.length ? p.t : null;
   const s = t !== null && Number.isInteger(p.s) && p.s >= 0 && p.s < tables[t].cap ? p.s : null;
   const num = (v, lo, hi, d) => (typeof v === 'number' && isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d);
-  return { nick: String(p.nick ?? '손님').slice(0, 12) || '손님', kind: FoodChars.BY[p.kind] ? p.kind : 'onigiri', face: FACE_KEYS.includes(p.face) ? p.face : 'smile', acc: ACC_KEYS.includes(p.acc) ? p.acc : 'none',
+  return { nick: String(p.nick ?? '손님').slice(0, 12) || '손님', kind: FoodChars.BY[p.kind] ? p.kind : 'onigiri', face: FACE_KEYS.includes(p.face) ? p.face : 'smile', acc: ACC_KEYS.includes(p.acc) ? p.acc : 'none', fx: Object.prototype.hasOwnProperty.call(FX, p.fx) ? p.fx : 'none',
     t: s === null ? null : t, s, x: STREET ? num(p.x, -3.4, 4.0, 0.25) : num(p.x, -HW + 0.6, HW - 0.6, 0), z: STREET ? num(p.z, -12.8, 20.4, 18) : num(p.z, -3.9, HD + 4, HD - 1), at: num(p.at, 0, 9e15, 0) };
 }
 // ── 골목: 골목 채널 하나로 위치·가게별 인원수를 주고받음 (2D 골목과 같은 채널·같은 좌표) ──
@@ -408,9 +459,9 @@ function streetSync() {
     const q = arr && arr[0]; if (!okSid(k) || !q || typeof q !== 'object') continue; lobbyTotal++;
     const r = k === SID ? 'street' : SHOPS.includes(q.room) ? q.room : 'street'; shopCount[r] = (shopCount[r] || 0) + 1;
     if (k === SID || r !== 'street') continue;
-    const d = safe({ nick: q.nick, kind: q.kind, face: q.face, acc: q.acc, x: pxX(+q.x), z: pxZ(+q.y) }); if (!d) continue; seen.add(k);
-    let p = people.get(k); const lk = [d.kind, d.face, d.acc, d.nick].join('|');
-    if (p && p.look !== lk) { dropPerson(p); p = null; }
+    const d = safe({ nick: q.nick, kind: q.kind, face: q.face, acc: q.acc, fx: q.fx, x: pxX(+q.x), z: pxZ(+q.y) }); if (!d) continue; seen.add(k);
+    let p = people.get(k); const lk = lookKey(d);
+    if (p && p.look !== lk) restyle(p, d);
     if (!p) { p = makePerson(k, d, false); p.g.position.set(d.x, 0, d.z); } else if (Math.hypot(p.g.position.x - d.x, p.g.position.z - d.z) > 0.15) p.target = { x: d.x, z: d.z };
   }
   for (const p of [...people.values()]) if (!p.mine && !seen.has(p.sid)) dropPerson(p);
@@ -425,13 +476,13 @@ function connectStreet() {
   setInterval(track, 30000);
 }
 function track() { if (!ch || !joined) return;
-  if (STREET) { const d = me.target || me.g.position, [x, y] = toPx(d.x, d.z); return ch.track({ nick: myNick, kind: myLook.kind, color: '#ffd36b', acc: myLook.acc, face: myLook.face, room: 'street', x, y }); } const d = me.target || me.g.position; return ch.track({ ...myLook, t: me.t, s: me.s, at: seatAt, x: +d.x.toFixed(2), z: +d.z.toFixed(2) }); }
+  if (STREET) { const d = me.target || me.g.position, [x, y] = toPx(d.x, d.z); return ch.track({ nick: myNick, kind: myLook.kind, color: '#ffd36b', acc: myLook.acc, face: myLook.face, fx: myLook.fx, room: 'street', x, y }); } const d = me.target || me.g.position; return ch.track({ ...myLook, t: me.t, s: me.s, at: seatAt, x: +d.x.toFixed(2), z: +d.z.toFixed(2) }); }
 function sync() {
   const raw = ch.presenceState(), seen = new Set();
   for (const [k, arr] of Object.entries(raw)) {
     if (!okSid(k) || k === SID) continue; const d = safe(arr && arr[0]); if (!d) continue; seen.add(k);
-    let p = people.get(k); const lk = [d.kind, d.face, d.acc, d.nick].join('|');
-    if (p && p.look !== lk) { dropPerson(p); p = null; }
+    let p = people.get(k); const lk = lookKey(d);
+    if (p && p.look !== lk) restyle(p, d);
     if (!p) { p = makePerson(k, d, false); p.g.position.set(d.x, 0, d.z); }
     if (d.t !== null) { if (p.t !== d.t || p.s !== d.s) putSeat(p, d.t, d.s); }
     else { if (p.t !== null) unseat(p); if (Math.hypot(p.g.position.x - d.x, p.g.position.z - d.z) > 0.15) p.target = { x: d.x, z: d.z }; }
@@ -449,7 +500,7 @@ function connect() {
   ch = sb.channel(ROOM_CH, { config: { presence: { key: SID }, broadcast: { self: false } } });
   ch.on('presence', { event: 'sync' }, sync);
   ch.on('broadcast', { event: 'move' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (!p || p.mine || p.t !== null) return; const d = safe(m); if (d) p.target = { x: d.x, z: d.z }; });
-  ch.on('broadcast', { event: 'talk' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && p.t !== me.t) bubble(p, '…', 'dots', 1800); });
+  ch.on('broadcast', { event: 'talk' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && p.t !== me.t && !muted.has(p.sid)) bubble(p, '…', 'dots', 1800); });
   ch.on('broadcast', { event: 'emote' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && EMOTES.concat('🍻').includes(m.e)) { bubble(p, m.e, 'emote', 2200); if (m.e === '🍻') clink(); } });
   ch.subscribe((st) => { if (st === 'SUBSCRIBED' && !joined) { joined = true; track(); ui(); if (owners[0]) bubble(owners[0], `${owners[0].lines[0]} ${myNick}님`, '', 3800); if (QS.get('sit') === '1') setTimeout(() => { if (me.t === null) quick(false); }, 1200); } });
   // 골목 채널에도 '어느 가게에 있는지' 알려서 골목 문 앞 인원수에 잡히게 함
@@ -462,13 +513,80 @@ function joinTable(t) {
   leaveTable(); log = []; if (!sb || tables[t].solo) return;
   const my = t, c = sb.channel(TABLE_CH(t), { config: { broadcast: { self: true } } });
   c.on('broadcast', { event: 'chat' }, ({ payload: m }) => {
-    if (me.t !== my || !m || !okSid(m.sid)) return; const p = people.get(m.sid); if (!p || p.t !== my) return;      // 그 테이블에 앉은 사람 말만
+    if (me.t !== my || !m || !okSid(m.sid) || muted.has(m.sid)) return; const p = people.get(m.sid); if (!p || p.t !== my) return;      // 그 테이블에 앉은 사람 말만
     const text = clean(m.text); if (!text) return;
-    log.push({ nick: p.d.nick, text, mine: p.mine }); log = log.slice(-30); bubble(p, text, '', 4200); ui(true);
+    log.push({ nick: p.d.nick, text, mine: p.mine, sid: p.sid }); log = log.slice(-30); bubble(p, text, '', 4200); ui(true);
   });
+  for (const ev of ['g_start', 'g_pick', 'g_res']) c.on('broadcast', { event: ev }, ({ payload: m }) => { if (me.t === my) onGame(ev, m); });
   c.subscribe(); tch = c;
 }
-function leaveTable() { if (tch && sb) { try { sb.removeChannel(tch); } catch (e) {} } tch = null; }
+function leaveTable() { endGame(); if (tch && sb) { try { sb.removeChannel(tch); } catch (e) {} } tch = null; }
+
+// ═══ 같이 고르기: 메뉴 투표(3개 중 하나) / 음식 월드컵(8강) ═══
+// 시작한 사람이 진행자: 모두 골랐거나 시간이 지나면 진행자가 결과를 알림 → 테이블 모두 같은 결과를 봄
+let game = null, gameTimer = null, gameWatch = null, lastGame = 0;
+const tableSids = () => [...people.values()].filter(p => p.t === me.t && me.t !== null).map(p => p.sid);
+function endGame() { clearTimeout(gameTimer); clearTimeout(gameWatch); game = null; const el = $('game'); if (el) el.innerHTML = ''; }
+function startGame(kind) {
+  if (me.t === null || tables[me.t].solo) return;
+  if (game && !game.done) { toast('지금 고르는 중이에요'); return; }
+  if (Date.now() - lastGame < 4000) { toast('잠시 후에 다시 눌러 주세요'); return; } lastGame = Date.now();
+  const pool = menuDB.filter(m => TH.tags.some(t => m.tags.includes(t))).sort(() => Math.random() - 0.5), n = kind === 'wc' ? 8 : 3;
+  const opts = pool.filter(m => m.img).concat(pool.filter(m => !m.img)).slice(0, n).sort(() => Math.random() - 0.5).map(m => m.name);
+  if (opts.length < n) { toast('이 가게는 메뉴가 부족해요'); return; }
+  const payload = { id: SID + Date.now().toString(36), kind, opts, sid: SID };
+  if (tch) tch.send({ type: 'broadcast', event: 'g_start', payload }); else onGame('g_start', payload);
+}
+function gameChoices() { return game.kind === 'vote' ? game.opts : [game.alive[game.k * 2], game.alive[game.k * 2 + 1]]; }
+function onGame(ev, m) {
+  if (!m || !okSid(m.sid) || typeof m.id !== 'string' || m.id.length > 40) return;
+  const from = people.get(m.sid); if (!from || from.t !== me.t || muted.has(m.sid)) return;
+  if (ev === 'g_start') {
+    if (game && !game.done) return;
+    const n = m.kind === 'wc' ? 8 : m.kind === 'vote' ? 3 : 0; if (!n || !Array.isArray(m.opts) || m.opts.length !== n || new Set(m.opts).size !== n || !m.opts.every(o => MENU_NAMES.has(o))) return;
+    endGame(); game = { id: m.id, kind: m.kind, host: m.sid, hostNick: from.d.nick, opts: m.opts, alive: m.opts.slice(), next: [], k: 0, picks: {}, done: false, winner: null };
+    log.push({ sys: true, text: `${from.d.nick}님이 ${m.kind === 'wc' ? '음식 월드컵' : '메뉴 투표'}을 시작했어요` }); armGame(); ui();
+  } else if (ev === 'g_pick') {
+    if (!game || game.done || m.id !== game.id || m.m !== game.k || !Number.isInteger(m.c) || m.c < 0 || m.c >= gameChoices().length || game.picks[m.sid] !== undefined) return;
+    game.picks[m.sid] = m.c; renderGame();
+    if (game.host === SID && tableSids().every(sd => game.picks[sd] !== undefined)) resolveGame();
+  } else if (ev === 'g_res') {
+    if (!game || game.done || m.id !== game.id || m.sid !== game.host || m.m !== game.k || !Number.isInteger(m.win) || m.win < 0 || m.win >= gameChoices().length) return;
+    const won = gameChoices()[m.win];
+    if (game.kind === 'vote') { game.done = true; game.winner = won; game.votes = Object.values(game.picks).filter(c => c === m.win).length; }
+    else { game.next.push(won); game.k++; game.picks = {}; if (game.k * 2 >= game.alive.length) { game.alive = game.next; game.next = []; game.k = 0; } if (game.alive.length === 1) { game.done = true; game.winner = game.alive[0]; } }
+    if (game.done) { clearTimeout(gameTimer); clearTimeout(gameWatch); log.push({ sys: true, text: `🍽️ 우리 테이블의 선택은 '${game.winner}'!` }); ui(true); }
+    else armGame();
+    renderGame();
+  }
+}
+// 진행자는 제한 시간 뒤에 결과를 내고, 나머지는 진행자가 나가 버렸는지 지켜봄
+function armGame() {
+  clearTimeout(gameTimer); clearTimeout(gameWatch); if (!game || game.done) return;
+  if (game.host === SID) gameTimer = setTimeout(resolveGame, game.kind === 'vote' ? 20000 : 10000);
+  else gameWatch = setTimeout(() => { if (game && !game.done) { endGame(); log.push({ sys: true, text: '진행하던 분이 자리를 떠서 고르기가 끝났어요' }); ui(true); } }, 40000);
+}
+function resolveGame() {
+  if (!game || game.done || game.host !== SID) return; clearTimeout(gameTimer);
+  const n = gameChoices().length, cnt = Array(n).fill(0); Object.values(game.picks).forEach(c => { cnt[c]++; });
+  const max = Math.max(...cnt), tops = cnt.map((c, i) => c === max ? i : -1).filter(i => i >= 0), win = tops[Math.floor(Math.random() * tops.length)];
+  const payload = { id: game.id, m: game.k, win, sid: SID };
+  if (tch) tch.send({ type: 'broadcast', event: 'g_res', payload }); else onGame('g_res', payload);
+}
+function pickGame(c) {
+  if (!game || game.done || game.picks[SID] !== undefined) return;
+  const payload = { id: game.id, m: game.k, c, sid: SID };
+  if (tch) tch.send({ type: 'broadcast', event: 'g_pick', payload }); else onGame('g_pick', payload);
+}
+function renderGame() {
+  const el = $('game'); if (!el) return; if (!game) { el.innerHTML = ''; return; }
+  const pic = (name) => { const m = MENU_NAMES.get(name); return m && m.img ? `<img src="${m.img}" alt="">` : `<span class="em">${m ? m.emoji : '🍽️'}</span>`; };
+  if (game.done) { el.innerHTML = `<div class="game"><div class="win">${pic(game.winner)}🎉 ${esc(game.winner)}</div><div class="row" style="margin-top:10px;justify-content:center"><a class="btn hot" href="./#find=${encodeURIComponent(game.winner)}">📍 근처에서 찾기</a><button class="btn" id="gx">닫기</button></div></div>`; $('gx').onclick = endGame; return; }
+  const ch2 = gameChoices(), mine = game.picks[SID], total = tableSids().length, done = Object.keys(game.picks).length;
+  const title = game.kind === 'vote' ? '🗳️ 메뉴 투표' : `🏆 음식 월드컵 · ${game.alive.length === 2 ? '결승' : game.alive.length + '강'} ${game.k + 1}/${game.alive.length / 2}`;
+  el.innerHTML = `<div class="game"><div class="gt"><span>${title}</span><small>${done}/${total}명 선택</small></div><div class="go">${ch2.map((o, i) => `${i && game.kind === 'wc' ? '<span class="vs">VS</span>' : ''}<button data-c="${i}" class="${mine === i ? 'mine' : ''}" ${mine !== undefined ? 'disabled' : ''}>${pic(o)}${esc(o)}</button>`).join('')}</div></div>`;
+  el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => pickGame(+b.dataset.c));
+}
 
 // ═══ 앉기 / 일어나기 / 말하기 ═══
 const taken = (t, s) => [...people.values()].some(p => p.t === t && p.s === s);
@@ -519,25 +637,67 @@ function ui(logOnly) {
     panelMode = 'street';
     P.innerHTML = `<div class="where">가게를 누르면 걸어가서 들어가요 <small>· 대화는 가게 안에서 앉아야 할 수 있어요</small></div>
       <div class="shops">${SHOPS.map(id => `<button class="btn" data-shop="${id}">${THEMES[id].name.replace('오메추 ', '')} <span class="n">👥 <b id="n-${id}">${shopCount[id] || 0}</b></span></button>`).join('')}</div>
-      <div class="row" style="margin-top:8px"><div class="emo" style="margin:0">${EMOTES.map(e => `<button data-e="${e}" aria-label="감정 표현 ${e}">${e}</button>`).join('')}</div><a class="btn sp" href="./?v2d=dress#dress">👕 꾸미기</a></div>
+      <div class="row" style="margin-top:8px"><div class="emo" style="margin:0">${EMOTES.map(e => `<button data-e="${e}" aria-label="감정 표현 ${e}">${e}</button>`).join('')}</div></div>
       <div class="foot"><a href="./?v2d=1#meokja">2D로 보기</a></div>`;
     P.querySelectorAll('[data-shop]').forEach(b => b.onclick = () => walkToShop(b.dataset.shop));
     P.querySelectorAll('[data-e]').forEach(b => b.onclick = () => emote(b.dataset.e));
     return;
   }
   const mode = me.t === null ? 'walk' : tables[me.t].solo ? 'solo' : 'table:' + me.t;
-  const logHTML = log.map(l => l.sys ? `<div class="sys">${esc(l.text)}</div>` : `<div class="${l.mine ? 'me' : ''}"><b>${esc(l.nick)}</b>${esc(l.text)}</div>`).join('');
+  const logHTML = log.map(l => l.sys ? `<div class="sys">${esc(l.text)}</div>` : `<div class="${l.mine ? 'me' : ''}"><b ${l.sid && !l.mine ? `data-mute="${l.sid}"` : ''}>${esc(l.nick)}</b>${esc(l.text)}</div>`).join('');
   if (logOnly && mode === panelMode) { if ($('log')) { $('log').innerHTML = logHTML; $('log').scrollTop = 1e6; } if ($('where2')) $('where2').textContent = whereText(); return; }
   panelMode = mode; const P = $('panel');
   const emo = (xs, st = '') => `<div class="emo" ${st}>${xs.map(e => `<button data-e="${e}" aria-label="감정 표현 ${e}">${e}</button>`).join('')}</div>`;
   if (mode === 'walk') P.innerHTML = `<div class="where">테이블을 누르면 바로 앉아요 <small>· 대화는 앉아야 할 수 있어요</small></div><div class="row"><button class="btn hot" id="q1">🪑 바로 앉기</button><button class="btn" id="q2">${RID === 'pocha' ? '🍶' : '🍚'} ${TH.solo} 가기</button></div>${emo(EMOTES)}`;
   else if (mode === 'solo') P.innerHTML = `<div class="log" id="log">${logHTML}</div><div class="where">${RID === 'pocha' ? '🍶' : '🍚'} ${TH.solo} <small>· 대화 없이 빗소리와 가게 소리만 들려요</small></div><div class="row"><button class="btn" id="up">🚪 일어나기</button></div>`;
-  else P.innerHTML = `<div class="log" id="log">${logHTML}</div><div class="where"><span id="where2">${whereText()}</span></div><div class="row"><input class="in" id="msg" maxlength="60" placeholder="우리 테이블에만 보여요" autocomplete="off" enterkeyhint="send"><button class="btn hot" id="go">전송</button></div><div class="row" style="margin-top:8px"><button class="btn" id="up">🚪 일어나기</button>${emo(EMOTES.concat('🍻'), 'style="margin:0"')}</div>`;
+  else P.innerHTML = `<div id="game"></div><div class="log" id="log">${logHTML}</div><div class="where"><span id="where2">${whereText()}</span></div><div class="row"><input class="in" id="msg" maxlength="60" placeholder="우리 테이블에만 보여요" autocomplete="off" enterkeyhint="send"><button class="btn hot" id="go">전송</button></div><div class="row" style="margin-top:8px"><button class="btn" id="gv">🗳️ 메뉴 투표</button><button class="btn" id="gw">🏆 음식 월드컵</button><button class="btn" id="up">🚪 일어나기</button></div>${emo(EMOTES.concat('🍻'))}`;
   const on = (id, f) => { const el = $(id); if (el) el.onclick = f; };
-  on('q1', () => quick(false)); on('q2', () => quick(true)); on('up', stand); on('go', say);
+  on('q1', () => quick(false)); on('q2', () => quick(true)); on('up', stand); on('go', say); on('gv', () => startGame('vote')); on('gw', () => startGame('wc')); renderGame();
+  if ($('log')) $('log').onclick = (e) => { const sd = e.target && e.target.dataset && e.target.dataset.mute; if (!sd) return; if (muted.has(sd)) { muted.delete(sd); toast('다시 보이게 했어요'); } else { muted.add(sd); toast('이 손님의 말을 가렸어요 (이름을 다시 누르면 풀려요)'); } };
   if ($('msg')) $('msg').onkeydown = (e) => { if (e.key === 'Enter' && !e.isComposing) say(); };
   P.querySelectorAll('[data-e]').forEach(b => b.onclick = () => emote(b.dataset.e));
   if ($('log')) $('log').scrollTop = 1e6;
+}
+
+// ═══ 꾸미기 (3D 안에서 바로) ═══
+const FACE_NAMES = { smile: '방긋', happy: '신남', sleepy: '졸림', wow: '놀람' }, ACC_NAMES = { none: '없음', towel: '수건 머리띠', beanie: '털모자', glasses: '안경', ribbon: '리본', chef: '요리사 모자' };
+function saveLook() { try { const old = JSON.parse(localStorage.getItem('wmjPochaLook') || '{}') || {}; localStorage.setItem('wmjPochaLook', JSON.stringify({ ...old, kind: myLook.kind, face: myLook.face, acc: myLook.acc, fx: myLook.fx })); } catch (e) {} }
+function setLook(k, v) {
+  if (k === 'kind' && !FoodChars.isOpen(v)) { const pr = FoodChars.progress(v); toast(`🔒 ${pr.label}에 좋아요 ${pr.need}번이면 열려요 (지금 ${pr.have}번)`); return; }
+  if (k === 'fx' && !fxProgress(v).open) { const pr = fxProgress(v); toast(`🔒 ${pr.label}에 좋아요 ${pr.need}번이면 열려요 (지금 ${pr.have}번)`); return; }
+  myLook[k] = v; saveLook(); restyle(me, { ...myLook }); track(); renderSheet();
+}
+function renderSheet() {
+  const img = (k) => FoodChars.url(k, '#ffd36b', 'none', 'smile', false);
+  $('sheetbox').innerHTML = `<h3>캐릭터 <small style="font-weight:400">· 좋아요한 메뉴 취향에 따라 열려요</small></h3><div class="grid">${FoodChars.IDS.map(k => { const pr = FoodChars.progress(k); return `<button data-k="kind" data-v="${k}" class="${myLook.kind === k ? 'on' : ''} ${pr.open ? '' : 'lock'}"><img src="${img(k)}" alt="">${esc(FoodChars.name(k))}${pr.open ? '' : `<span class="lk">🔒 ${pr.have}/${pr.need}</span>`}</button>`; }).join('')}</div>
+    <h3>취향 효과 <small style="font-weight:400">· 머리 위로 떠올라요</small></h3><div class="grid">${Object.keys(FX).map(k => { const pr = fxProgress(k), f = FX[k]; return `<button data-k="fx" data-v="${k}" class="${myLook.fx === k ? 'on' : ''} ${pr.open ? '' : 'lock'}"><span class="fxe" style="${pr.open ? '' : 'filter:grayscale(1);opacity:.5'}">${f.e || '∅'}</span>${f.name}${pr.open ? '' : `<span class="lk">🔒 ${pr.have}/${pr.need}</span>`}</button>`; }).join('')}</div>
+    <h3>표정</h3><div class="opts">${FACE_KEYS.map(k => `<button data-k="face" data-v="${k}" class="${myLook.face === k ? 'on' : ''}">${FACE_NAMES[k]}</button>`).join('')}</div>
+    <h3>장식</h3><div class="opts">${ACC_KEYS.map(k => `<button data-k="acc" data-v="${k}" class="${myLook.acc === k ? 'on' : ''}">${ACC_NAMES[k]}</button>`).join('')}</div>
+    <h3>화면 품질</h3><div class="opts"><button id="ql" class="${lowQ ? '' : 'on'}">보통</button><button id="qh" class="${lowQ ? 'on' : ''}">가볍게</button></div>
+    <div class="row" style="margin-top:16px"><button class="btn hot" id="sx" style="flex:1">완료</button></div>`;
+  $('sheetbox').querySelectorAll('[data-k]').forEach(b => b.onclick = () => setLook(b.dataset.k, b.dataset.v));
+  $('sx').onclick = () => { $('sheet').style.display = 'none'; };
+  $('ql').onclick = () => { setQuality(false, true); renderSheet(); }; $('qh').onclick = () => { setQuality(true, true); renderSheet(); };
+}
+$('dressbtn').onclick = () => { renderSheet(); $('sheet').style.display = 'flex'; };
+$('sheet').onclick = (e) => { if (e.target === $('sheet')) $('sheet').style.display = 'none'; };
+
+// ═══ 느린 기기 대응: 초당 화면 수가 낮으면 자동으로 가볍게, 그래도 느리면 2D를 권함 ═══
+let lowQ = false, fpsT = 0, fpsN = 0, slowAsked = false;
+const pointLights = () => lanterns.filter(l => l.L).map(l => l.L);
+function setQuality(low, byUser) {
+  lowQ = low; try { localStorage.setItem('wmj3dLow', low ? '1' : '0'); } catch (e) {}
+  renderer.setPixelRatio(low ? 1 : Math.min(2, window.devicePixelRatio || 1)); resize();
+  rainGeo.setDrawRange(0, low ? Math.floor(RN * 0.35) * 2 : RN * 2);
+  pointLights().forEach((L, i) => { L.visible = !low || i < 3; });
+  if (byUser) { fpsT = 0; fpsN = 0; }
+}
+function watchFps(raw, T) {
+  if (document.visibilityState !== 'visible' || raw > 0.5 || T < 3) return;
+  fpsT += raw; fpsN++; if (fpsT < 4) return; const fps = fpsN / fpsT; fpsT = 0; fpsN = 0;
+  if (fps < 24 && !lowQ) { setQuality(true); toast('기기에 맞춰 화면을 가볍게 바꿨어요'); }
+  else if (fps < 13 && lowQ && !slowAsked) { slowAsked = true; const a = $('ask'); a.style.display = 'block';
+    a.innerHTML = `이 기기에서는 3D 화면이 느려요. 2D 화면으로 볼까요?<div class="row"><a class="btn hot" href="./?v2d=1#meokja">2D로 보기</a><button class="btn" id="askx">계속 3D로</button></div>`; $('askx').onclick = () => { a.style.display = 'none'; }; }
 }
 
 // ═══ 소리 (모두 직접 합성): 빗소리 + 주방 지글지글 + 사람이 많을수록 커지는 왁자지껄 ═══
@@ -597,7 +757,7 @@ function crowdTune() {
   au.rainBus.frequency.setTargetAtTime(STREET ? 9000 : TH.indoor ? (inSolo ? 2800 : 1300) : (inSolo ? 6500 : 4200), t, 0.8);     // 창가는 빗소리가 더 또렷
 }
 function clink(v = 1) { if (!au) return; const c = au.ctx, t = c.currentTime; for (const f of [2100 + Math.random() * 500, 3300 + Math.random() * 700]) { const o = c.createOscillator(), g = c.createGain(); o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.06 * v, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5); o.connect(g).connect(au.out); o.start(t); o.stop(t + 0.55); } }
-$('snd').onclick = () => { try { if (au) soundOff(); else soundOn(); } catch (e) { toast('이 기기에서는 소리를 낼 수 없어요'); } $('snd').textContent = au ? '🔊 소리 끄기' : '🔈 소리 켜기'; $('snd').classList.toggle('on', !!au); };
+$('snd').onclick = () => { try { if (au) soundOff(); else soundOn(); } catch (e) { toast('이 기기에서는 소리를 낼 수 없어요'); } $('snd').textContent = au ? '🔊 소리 끄기' : '🔈 소리'; $('snd').classList.toggle('on', !!au); };
 setInterval(crowdTune, 1500);
 
 // ═══ 카메라·조작 ═══
@@ -653,13 +813,14 @@ function avoid(p) { if (STREET) { p.x = Math.min(4.0, Math.max(-3.4, p.x)); p.z 
 // ═══ 매 프레임 ═══
 let last = performance.now();
 function frame(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now; const T = now / 1000;
+  const raw = (now - last) / 1000, dt = Math.min(0.05, raw); last = now; const T = now / 1000; watchFps(raw, T);
   for (const p of people.values()) {
     let walking = false;
     if (p.target && p.t === null) { const q = p.g.position, dx = p.target.x - q.x, dz = p.target.z - q.z, d = Math.hypot(dx, dz);
       if (d < 0.08) { p.target = null; if (p.mine) { track(); if (goDoor) { const id = goDoor; goDoor = null; enterShop(id); } } } else { walking = true; const st = Math.min(d, 4.2 * dt), ox = q.x, oz = q.z; q.x += dx / d * st; q.z += dz / d * st; avoid(q); if (Math.hypot(q.x - ox, q.z - oz) < st * 0.2) { p.target = null; if (p.mine) { track(); if (goDoor) { const id = goDoor; goDoor = null; enterShop(id); } } } p.sp.scale.x = (dx * Math.cos(cam.az) - dz * Math.sin(cam.az)) < 0 ? -1.5 : 1.5; } }
     p.sp.position.y = walking ? Math.abs(Math.sin(T * 9 + p.ph)) * 0.16 : Math.sin(T * 2 + p.ph) * 0.035;
     p.sp.scale.y = 1.5 * (1 + (walking ? 0 : Math.sin(T * 2 + p.ph) * 0.025));
+    for (let i = 0; i < p.fx.length; i++) { const k = (T * 0.42 + i / 3 + p.ph) % 1, f = p.fx[i]; f.position.set(Math.sin(i * 2.1 + p.ph) * 0.5 + Math.sin(k * 5) * 0.08, 1.05 + k * 0.95, 0.02); f.material.opacity = Math.sin(k * Math.PI) * 0.95; const sc = 0.3 + k * 0.2; f.scale.set(sc, sc, 1); }
   }
   for (const o of owners) { o.g.position.x = o.home + Math.sin(T * 0.35 + o.ph) * 1.1; o.sp.position.y = Math.abs(Math.sin(T * 3 + o.ph)) * 0.05; }
   cam.tx += (me.g.position.x * 0.8 - cam.tx) * Math.min(1, dt * 3); cam.tz += ((me.g.position.z * 0.75 + 0.3) - cam.tz) * Math.min(1, dt * 3);
@@ -670,10 +831,11 @@ function frame(now) {
   placeCamera(); renderer.render(scene, camera); placeBubbles();
   requestAnimationFrame(frame);
 }
+try { if (localStorage.getItem('wmj3dLow') === '1') setQuality(true); } catch (e) {}
 ui(); connect(); requestAnimationFrame(frame);
 addEventListener('pagehide', () => { try { if (ch) ch.untrack(); if (lobby) lobby.untrack(); } catch (e) {} });
 $('title').textContent = TH.name; $('back').href = STREET ? './' : `pocha3d.html?room=street&from=${RID}`;
-window.__p3d = { cam, me, people, seats, tables, tap, sit, stand, quick, say, soundOn, SID, get au() { return au; }, get log() { return log; } };
+window.__p3d = { cam, me, people, seats, tables, tap, sit, stand, quick, say, soundOn, SID, startGame, pickGame, onGame, setLook, setQuality, watchFps, get game() { return game; }, get lowQ() { return lowQ; }, get au() { return au; }, get log() { return log; } };
 </script>
 </body>
 </html>

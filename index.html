@@ -4979,6 +4979,12 @@ document.addEventListener('DOMContentLoaded', paintFoodFriends);
 // 3D 가게에서 돌아오면 먹자골목 화면으로 바로 엶
 window.addEventListener('load', () => {
   const h = location.hash, v2d = new URLSearchParams(location.search).get('v2d');
+  if (h.startsWith('#find=')) {                              // 3D 가게에서 고른 메뉴를 근처에서 찾기
+    let name = ''; try { name = decodeURIComponent(h.slice(6)).slice(0, 30); } catch (e) {}
+    history.replaceState(null, '', location.pathname);
+    if (name && typeof menuDB !== 'undefined' && menuDB.some(m => m.name === name) && typeof openNearbyMap === 'function') setTimeout(() => openNearbyMap(name), 300);
+    return;
+  }
   if (h !== '#meokja' && h !== '#dress') return;
   history.replaceState(null, '', location.pathname);
   if (h === '#meokja' && v2d === '1') { try { localStorage.setItem('wmjPocha2d', '1'); } catch (e) {} }
