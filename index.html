@@ -4976,6 +4976,8 @@ function paintFoodFriends() {
   if (av) { av.classList.add('char'); av.innerHTML = img(mine, look.face || 'smile'); }
 }
 document.addEventListener('DOMContentLoaded', paintFoodFriends);
+// 3D 가게에서 돌아오면 먹자골목 화면으로 바로 엶
+window.addEventListener('load', () => { if (location.hash === '#meokja') { history.replaceState(null, '', location.pathname); setTimeout(() => showPage('pocha'), 80); } });
 function showPage(page) {
   if (page === 'mypage' || page === 'home') setTimeout(paintFoodFriends, 0);
   window.scrollTo(0, 0);

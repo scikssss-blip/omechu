@@ -60,7 +60,7 @@
         { x: 190, y: 600, k: 'booth', n: '3번 부스', s: [[-112, -40], [-112, 45], [100, -40], [100, 45]], by: 100 },
         { x: 560, y: 600, k: 'booth', n: '4번 부스', s: [[-100, -40], [-100, 45], [112, -40], [112, 45]], by: 100 }] },
   };
-  const BUILD = 'v11.12b';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
+  const BUILD = 'v11.12c';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
   const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
 
   let room = 'street', R = ROOMS.street;
@@ -301,8 +301,17 @@
   }
 
   // ── 가게 드나들기 ──
+  // 가게는 3D 화면으로 엶. 3D가 안 되는 기기이거나 '2D로 보기'를 고르면 예전 2D 가게로 들어감.
+  let gl3d = null;
+  function use3d() {
+    try { if (localStorage.getItem('wmjPocha2d') === '1') return false; } catch (e) {}
+    if (gl3d === null) { try { const c = document.createElement('canvas'); gl3d = !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { gl3d = false; } }
+    return gl3d;
+  }
+  function toggle3d() { try { localStorage.setItem('wmjPocha2d', localStorage.getItem('wmjPocha2d') === '1' ? '0' : '1'); } catch (e) {} const rootEl = document.getElementById('pocha-root'); if (rootEl) rootEl.innerHTML = ''; render(); }
   function enterRoom(id, from) {
     if (!ROOMS[id] || id === room) return;
+    if (id !== 'street' && use3d()) { const q = pendingQuick ? '&sit=1' : ''; pendingQuick = false; location.href = `pocha3d.html?room=${id}${q}`; return; }
     leaveRoomChannel();
     const prev = room;
     room = id; R = ROOMS[id];
@@ -706,7 +715,7 @@
           <div class="pc-sizer" id="pc-sizer"><div class="pc-world" id="pc-world" style="width:${R.w}px;height:${R.h}px">${room === 'street' ? streetSVG() : roomSVG()}<div id="pc-doors"></div><div id="pc-dishes"></div><div id="pc-people"></div></div></div>
         <canvas class="pc-raincv" id="pc-raincv"></canvas><div class="pc-rainmood"></div></div></div>
         <div class="pc-emobar">${EMOTES.map(e => `<button aria-label="감정 표현 ${e}" onclick="Pocha.emote('${e}')">${e}</button>`).join('')}</div>
-        <div class="pc-hint" id="pc-hint"></div><div class="pc-ver">먹자골목 ${BUILD} · <a href="pocha3d.html" style="color:#ffb37a;font-weight:700;text-decoration:none">3D 포차 열어보기 ›</a></div>
+        <div class="pc-hint" id="pc-hint"></div><div class="pc-ver">먹자골목 ${BUILD} · <a href="#" onclick="Pocha.toggle3d();return false" style="color:#ffb37a;font-weight:700;text-decoration:none">${use3d() ? '가게를 2D로 보기' : '가게를 3D로 보기'}</a></div>
       </div>
       <div class="pc-body" id="pc-panel"></div>`;
     const world = document.getElementById('pc-world');
@@ -861,7 +870,7 @@
     close() { isOpen = false; if (rainCtx) rainStop(); if (room !== 'street') enterRoom('street'); if (lobby) { try { lobby.untrack(); } catch (e) {} } },
     back() { if (room !== 'street') enterRoom('street'); else showPage('fun'); },
     go(id) { if (room !== 'street') return; const d = ROOMS[id]?.door; if (!d) return; pendingSeat = null; pendingDoor = id; walkTo(d[0], d[1]); },
-    emote, say, sendTab, setTab, quickSit, quickGo, leave, sit, sitAny, stand, goSit, walkTo, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
+    emote, say, sendTab, setTab, quickSit, quickGo, leave, sit, sitAny, stand, goSit, walkTo, send, cheers, startVote, vote, mute, toggleRain, toggle3d, openDress, closeDress, setLook, render,
     avatarSVG, room: () => room, count: () => Object.keys(lobbyState).length,
     who: () => Object.entries(lobbyState).map(([k, p]) => (k === SID ? '(나)' : '') + p.room + ':' + p.nick),
   };
