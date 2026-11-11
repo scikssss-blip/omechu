@@ -60,7 +60,7 @@
         { x: 190, y: 600, k: 'booth', n: '3번 부스', s: [[-112, -40], [-112, 45], [100, -40], [100, 45]], by: 100 },
         { x: 560, y: 600, k: 'booth', n: '4번 부스', s: [[-100, -40], [-100, 45], [112, -40], [112, 45]], by: 100 }] },
   };
-  const BUILD = 'v11.12';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
+  const BUILD = 'v11.12b';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
   const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
 
   let room = 'street', R = ROOMS.street;
@@ -706,7 +706,7 @@
           <div class="pc-sizer" id="pc-sizer"><div class="pc-world" id="pc-world" style="width:${R.w}px;height:${R.h}px">${room === 'street' ? streetSVG() : roomSVG()}<div id="pc-doors"></div><div id="pc-dishes"></div><div id="pc-people"></div></div></div>
         <canvas class="pc-raincv" id="pc-raincv"></canvas><div class="pc-rainmood"></div></div></div>
         <div class="pc-emobar">${EMOTES.map(e => `<button aria-label="감정 표현 ${e}" onclick="Pocha.emote('${e}')">${e}</button>`).join('')}</div>
-        <div class="pc-hint" id="pc-hint"></div><div class="pc-ver">먹자골목 ${BUILD}</div>
+        <div class="pc-hint" id="pc-hint"></div><div class="pc-ver">먹자골목 ${BUILD} · <a href="pocha3d.html" style="color:#ffb37a;font-weight:700;text-decoration:none">3D 포차 열어보기 ›</a></div>
       </div>
       <div class="pc-body" id="pc-panel"></div>`;
     const world = document.getElementById('pc-world');
