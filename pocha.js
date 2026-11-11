@@ -24,35 +24,35 @@
   // bg: Canva 크레파스 배경. 테이블의 s는 그림 속 의자 위치(테이블 중심 기준), ly는 이름표, by는 인원 배지 위치
   const ROOMS = {
     street: { name: '오메추 먹자골목', w: 420, h: 832, ch: 'omechu-street-v1', spawn: [215, 790], bg: '/images/pocha/street.jpg', tables: [] },
-    pocha: { name: '오메추 포차', kind: '포장마차', w: 720, h: 900, ch: 'omechu-pocha-v1', spawn: [200, 770], exit: [180, 830], bg: '/images/pocha/pocha.jpg',
+    pocha: { name: '오메추 포차', kind: '포장마차', w: 720, h: 900, ch: 'omechu-pocha-v1', spawn: [200, 770], exit: [180, 830], bg: '/images/pocha/pocha.jpg', lights: [[50, 115, 110], [650, 60, 100], [700, 170, 100], [15, 330, 100]],
       tags: ['🍺 술안주', '🌙 야식'], vote: '안주', door: [215, 172], front: { x: 120, y: 0, w: 190, h: 150 },
       tables: [
         { x: 200, y: 430, k: 'round', n: '1번 테이블', s: [[-70, -45], [92, 2], [-75, 68], [32, 92]], by: 125 },
         { x: 550, y: 415, k: 'round', n: '2번 테이블', s: [[-100, 18], [92, 18], [-50, 98], [45, 98]], by: 130 },
         { x: 410, y: 650, k: 'round', n: '3번 테이블', s: [[-110, 32], [105, 12], [-50, 122], [50, 122]], by: 150 },
         { x: 370, y: 200, k: 'bar', n: '이모네 바', s: [[-145, 60], [-50, 60], [40, 60], [145, 60]], by: 95 }] },
-    korean: { name: '오메추 밥상', kind: '한식집', w: 720, h: 900, ch: 'omechu-room-korean-v1', spawn: [360, 790], exit: [320, 850], bg: '/images/pocha/korean.jpg',
+    korean: { name: '오메추 밥상', kind: '한식집', w: 720, h: 900, ch: 'omechu-room-korean-v1', spawn: [360, 790], exit: [320, 850], bg: '/images/pocha/korean.jpg', lights: [[695, 130, 110], [360, 300, 220]],
       tags: ['🍱 한식'], vote: '메뉴', door: [160, 322], front: { x: 0, y: 190, w: 150, h: 230 },
       tables: [
         { x: 237, y: 335, k: 'low', n: '1번 상', s: [[3, -82], [-95, 12], [97, 12], [-2, 102]], by: 130 },
         { x: 505, y: 335, k: 'low', n: '2번 상', s: [[0, -82], [-93, 12], [93, 12], [3, 102]], by: 130 },
         { x: 222, y: 635, k: 'low', n: '3번 상', s: [[5, -95], [-105, 5], [110, 5], [0, 105]], by: 135 },
         { x: 515, y: 635, k: 'low', n: '4번 상', s: [[-8, -95], [-105, 5], [100, 5], [0, 105]], by: 135 }] },
-    japanese: { name: '오메추 스시야', kind: '일식집', w: 720, h: 900, ch: 'omechu-room-japanese-v1', spawn: [360, 790], exit: [360, 860], bg: '/images/pocha/japanese.jpg',
+    japanese: { name: '오메추 스시야', kind: '일식집', w: 720, h: 900, ch: 'omechu-room-japanese-v1', spawn: [360, 790], exit: [360, 860], bg: '/images/pocha/japanese.jpg', lights: [[55, 75, 120], [668, 85, 120], [50, 815, 110], [668, 820, 110]],
       tags: ['🍣 일식'], vote: '메뉴', door: [276, 332], front: { x: 290, y: 150, w: 130, h: 270 },
       tables: [
         { x: 365, y: 250, k: 'bar', n: '스시 카운터', s: [[-150, 50], [-50, 50], [50, 50], [155, 50]], by: 95 },
         { x: 165, y: 580, k: 'low', n: '1번 자리', s: [[-30, -72], [40, -72], [-35, 80], [35, 80]], by: 120 },
         { x: 360, y: 580, k: 'low', n: '2번 자리', s: [[-35, -72], [35, -72], [-35, 80], [35, 80]], by: 120 },
         { x: 555, y: 580, k: 'low', n: '3번 자리', s: [[-35, -72], [35, -72], [-35, 80], [35, 80]], by: 120 }] },
-    chinese: { name: '오메추 반점', kind: '중식집', w: 720, h: 900, ch: 'omechu-room-chinese-v1', spawn: [360, 800], exit: [360, 860], bg: '/images/pocha/chinese.jpg',
+    chinese: { name: '오메추 반점', kind: '중식집', w: 720, h: 900, ch: 'omechu-room-chinese-v1', spawn: [360, 800], exit: [360, 860], bg: '/images/pocha/chinese.jpg', lights: [[95, 90, 170], [610, 35, 140], [30, 540, 120], [700, 430, 110], [150, 810, 90]],
       tags: ['🥢 중식'], vote: '메뉴', door: [152, 622], front: { x: 0, y: 470, w: 140, h: 280 },
       tables: [
         { x: 245, y: 325, k: 'round', n: '1번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 140 },
         { x: 535, y: 325, k: 'round', n: '2번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 140 },
         { x: 205, y: 650, k: 'round', n: '3번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 135 },
         { x: 525, y: 660, k: 'round', n: '4번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 125 }] },
-    western: { name: '오메추 비스트로', kind: '양식집', w: 720, h: 900, ch: 'omechu-room-western-v1', spawn: [360, 760], exit: [360, 845], bg: '/images/pocha/western.jpg',
+    western: { name: '오메추 비스트로', kind: '양식집', w: 720, h: 900, ch: 'omechu-room-western-v1', spawn: [360, 760], exit: [360, 845], bg: '/images/pocha/western.jpg', lights: [[240, 15, 80], [585, 15, 80], [20, 185, 80], [20, 780, 90], [630, 825, 90], [205, 300, 70], [560, 300, 70], [190, 600, 70], [565, 600, 70]],
       tags: ['🍝 양식'], vote: '메뉴', door: [280, 622], front: { x: 295, y: 480, w: 125, h: 250 },
       tables: [
         { x: 200, y: 305, k: 'booth', n: '1번 부스', s: [[-112, -40], [-112, 45], [97, -40], [97, 45]], by: 100 },
@@ -70,7 +70,8 @@
   const EMOTES = ['👋', '😋', '😂', '🔥', '👍', '🍻'];
   const NEAR = 260;   // 이 거리 안에 있는 사람의 말만 보임
   let pos = { x: R.spawn[0], y: R.spawn[1] }, target = null, pendingSeat = null, pendingDoor = null, walkRAF = 0, follow = false;
-  let lastDrawn = {}, K = 1, isOpen = false;   // K: 골목을 폰 폭에 맞추는 배율
+  let lastDrawn = {}, K = 1, PS = 1, isOpen = false;   // PS: 화면에 맞춰 줄인 방에서 캐릭터를 다시 키우는 배율
+  let _unused_k;   // K: 골목을 폰 폭에 맞추는 배율
 
   const look = () => {
     try { return Object.assign({ kind: 'onigiri', color: COLORS[Math.floor(Math.random() * COLORS.length)], acc: 'none', face: 'smile' }, JSON.parse(localStorage.getItem('wmjPochaLook') || '{}')); }
@@ -542,12 +543,12 @@
   }
   function exitSVG() {
     const [x, y] = R.exit;
-    return `<g transform="translate(${x} ${y})"><rect x="-56" y="-14" width="112" height="26" rx="10" fill="rgba(0,0,0,.45)" stroke="rgba(255,255,255,.35)"/><text x="0" y="5" class="pc-sign2" style="font-size:13px">🚪 골목으로 나가기</text></g>`;
+    return `<g transform="translate(${x} ${y}) scale(${R.bg ? 1.6 : 1})"><rect x="-56" y="-14" width="112" height="26" rx="10" fill="rgba(0,0,0,.45)" stroke="rgba(255,255,255,.35)"/><text x="0" y="5" class="pc-sign2" style="font-size:13px">🚪 골목으로 나가기</text></g>`;
   }
   function roomSVG() {
     const th = room, w = R.w, h = R.h;
     if (R.bg) {
-      return `<svg class="pc-map" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><image href="${R.bg}" width="${w}" height="${h}" preserveAspectRatio="none"/><rect width="${w}" height="${h}" fill="rgba(20,12,24,.12)"/>${exitSVG()}</svg>`;
+      return `<svg class="pc-map" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><image href="${R.bg}" width="${w}" height="${h}" preserveAspectRatio="none"/><rect width="${w}" height="${h}" fill="rgba(20,12,24,.12)"/>${exitSVG()}</svg>` + (R.lights || []).map(([x, y, r], i) => `<i class="pc-glow" style="left:${x - r}px;top:${y - r}px;width:${r * 2}px;height:${r * 2}px;animation-delay:${-(i * 0.9)}s"></i>`).join('');
     }
     let floor = '', deco = '';
     if (th === 'pocha') {
@@ -640,8 +641,11 @@
     world.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY }; });
     world.addEventListener('click', (e) => { if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8) return; if (e.target.closest('.pc-person:not(.me)')) return; onWorldTap(e); });
     const view = document.getElementById('pc-view');
-    K = room === 'street' ? Math.min(1, (view.clientWidth || R.w) / R.w) : 1;
+    K = Math.min(1, (view.clientWidth || R.w) / R.w);
+    PS = room === 'street' ? 1 : Math.min(1.7, 0.82 / K);
     world.style.transform = K < 1 ? `scale(${K})` : '';
+    world.style.setProperty('--ps', PS);
+    view.style.height = Math.min(R.h * K, Math.max(280, window.innerHeight - 390)) + 'px';
     const sizer = document.getElementById('pc-sizer'); sizer.style.width = R.w * K + 'px'; sizer.style.height = R.h * K + 'px';
     view.addEventListener('touchstart', () => { follow = false; }, { passive: true });
     view.addEventListener('wheel', () => { follow = false; }, { passive: true });
@@ -655,7 +659,7 @@
     const b = bubbles[sid]; const showB = b && b.until > Date.now();
     return `${showB ? `<div class="pc-bubble${b.emote ? ' pc-emo' : ''}">${esc(b.text)}</div>` : ''}<div class="pc-body2">${avatarSVG(p, 46)}</div><div class="pc-name">${esc(p.nick)}${sid === SID ? ' (나)' : ''}</div>`;
   }
-  function placeEl(el, x, y, seated) { el.style.transform = `translate(${x - 30}px, ${y - (seated ? 42 : 52)}px)`; el.style.zIndex = String(Math.round(y)); }
+  function placeEl(el, x, y, seated) { el.style.transform = `translate(${x - 30}px, ${y - (seated ? 42 : 52)}px)` + (PS !== 1 ? ` scale(${PS})` : ''); el.style.zIndex = String(Math.round(y)); }
   function drawMe(walking) {
     const el = document.getElementById('pc-p-' + SID); if (!el) return;
     el.classList.toggle('walking', !!walking);
@@ -716,6 +720,7 @@
     const rb = document.getElementById('pc-rainbtn'); if (rb) rb.textContent = rainCtx ? '🔇' : '🌧️';
     document.querySelector('.pc-scene')?.classList.toggle('raining', !!rainCtx);
     const hint = document.getElementById('pc-hint');
+    if (hint) hint.style.display = room === 'street' ? '' : 'none';
     if (hint) hint.textContent = room === 'street' ? '가게를 누르면 걸어가서 들어가요'
       : myTable !== null ? `${R.tables[myTable].n}에 앉아 있어요 · 다른 곳을 누르면 일어나서 걸어가요`
       : '빈 곳을 누르면 걸어가고, 빈자리를 누르면 앉아요';
@@ -725,8 +730,8 @@
     const src = chatTab === 'table' ? (logs[myTable] || []) : chatTab === 'near' ? nearLog : hallLog;
     const empty = { table: '아직 조용해요. 먼저 말을 걸어보세요!', hall: room === 'street' ? '골목에 있는 모두에게 보여요' : '이 가게에 있는 모두에게 보여요', near: '가까이 있는 사람에게만 보여요' }[chatTab];
     const nearCard = `<div class="pc-card pc-chat"><div class="pc-tabs">${TABS.map(([k, n]) => `<button class="${chatTab === k ? 'on' : ''}" onclick="Pocha.setTab('${k}')">${n}${unread[k] ? `<span class="dot">${unread[k]}</span>` : ''}</button>`).join('')}</div>
-      <div class="pc-log" id="pc-log" style="height:130px">${src.map(m => m.sys ? `<div class="sys">${m.text}</div>` : `<div class="msg"><b>${esc(m.nick)}</b>${esc(m.text)}</div>`).join('') || `<div class="sys">${empty}</div>`}</div>
-      <div class="pc-input"><input id="pc-msg" maxlength="60" placeholder="${chatTab === 'table' ? '오늘 뭐 드실 거예요?' : '안녕하세요! 뭐 드세요?'}" onkeydown="if(event.key==='Enter')Pocha.sendTab()"><button onclick="Pocha.sendTab()">전송</button></div></div>`;
+      <div class="pc-input" style="margin:0 0 8px"><input id="pc-msg" maxlength="60" placeholder="${chatTab === 'table' ? '오늘 뭐 드실 거예요?' : '안녕하세요! 뭐 드세요?'}" onkeydown="if(event.key==='Enter')Pocha.sendTab()"><button onclick="Pocha.sendTab()">전송</button></div>
+      <div class="pc-log" id="pc-log" style="height:96px">${src.map(m => m.sys ? `<div class="sys">${m.text}</div>` : `<div class="msg"><b>${esc(m.nick)}</b>${esc(m.text)}</div>`).join('') || `<div class="sys">${empty}</div>`}</div></div>`;
     let body = '';
     if (room === 'street') {
       const c = roomCounts();
@@ -754,7 +759,8 @@
           <button class="hot" onclick="Pocha.cheers()">🍻 짠!</button>
           <button onclick="Pocha.startVote()">🍽️ ${R.vote} 고르기</button>
           <button onclick="Pocha.stand()">🚪 일어나기</button></div></div>
-        ${voteHTML}${nearCard}`;
+        `;
+      body = voteHTML + nearCard + body;
     }
     const prevVal = document.getElementById('pc-msg')?.value || '', prevSay = document.getElementById('pc-say')?.value || '';
     const hadFocus = document.activeElement && document.activeElement.id === 'pc-msg', hadSay = document.activeElement && document.activeElement.id === 'pc-say';

@@ -65,6 +65,14 @@
 
   .hero { text-align:center; padding:32px 0 20px; }
   .hero-emoji { font-size:60px; display:block; margin-bottom:14px; animation:float 3s ease-in-out infinite; }
+  .hero-emoji.chars { animation:none; display:flex; justify-content:center; align-items:flex-end; gap:2px; height:92px; margin-bottom:10px; }
+  .hero-emoji.chars img { width:72px; height:72px; animation:float 3s ease-in-out infinite; filter:drop-shadow(0 6px 6px rgba(0,0,0,.35)); }
+  .hero-emoji.chars img:nth-child(2) { width:92px; height:92px; animation-delay:-1s; }
+  .hero-emoji.chars img:nth-child(3) { animation-delay:-2s; }
+  .my-avatar.char { background:#fff6e6; font-size:0; overflow:hidden; }
+  .my-avatar.char img { width:58px; height:58px; margin-top:4px; }
+  .empty-char { display:block; width:84px; height:84px; margin:0 auto 10px; opacity:.95; }
+  @media (prefers-reduced-motion: reduce) { .hero-emoji.chars img { animation:none; } }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   .hero h1 { font-family:'Jua',sans-serif; font-size:30px; line-height:1.25; margin-bottom:8px; }
   .hero h1 em { color:var(--orange); font-style:normal; }
@@ -913,7 +921,7 @@
 
 <main>
   <div class="hero">
-    <span class="hero-emoji">🍽️</span>
+    <span class="hero-emoji" id="hero-chars">🍽️</span>
     <h1>오늘 메뉴<br><em>추천해드려요</em></h1>
     <p>원하는 느낌을 고르거나, 싫은 것만 빼도 돼요</p>
   </div>
@@ -2414,7 +2422,7 @@
   <!-- 프로필 -->
   <div class="my-profile-card">
     <div class="my-profile-top">
-      <div class="my-avatar">😋</div>
+      <div class="my-avatar" id="my-avatar">😋</div>
       <div class="my-profile-info">
         <div class="my-nickname" id="my-profile-nick">로딩중...</div>
         <div class="my-join">오메추 회원</div>
@@ -4951,7 +4959,25 @@ function saveHistorySnapshot() {
   localStorage.setItem('wmjHistory', JSON.stringify(hist.slice(0, 200)));
 }
 
+
+// 음식 친구(크레파스 캐릭터)를 앱 곳곳에 쓰기
+function emptyChar(kind, face) {
+  if (!window.FoodChars) return '';
+  return `<img class="empty-char" alt="" src="${FoodChars.url(kind, '#ffd36b', 'none', face || 'smile', false)}">`;
+}
+function paintFoodFriends() {
+  if (!window.FoodChars) return;
+  let look = {}; try { look = JSON.parse(localStorage.getItem('wmjPochaLook') || '{}') || {}; } catch (e) {}
+  const mine = FoodChars.BY[look.kind] ? look.kind : 'onigiri';
+  const img = (k, f) => `<img alt="" src="${FoodChars.url(k, look.color || '#ffd36b', k === mine ? (look.acc || 'none') : 'none', f, false)}">`;
+  const hero = document.getElementById('hero-chars');
+  if (hero) { const side = ['mandu', 'egg', 'kimbap', 'onigiri'].filter(k => k !== mine); hero.classList.add('chars'); hero.innerHTML = img(side[0], 'smile') + img(mine, look.face || 'happy') + img(side[1], 'smile'); }
+  const av = document.getElementById('my-avatar');
+  if (av) { av.classList.add('char'); av.innerHTML = img(mine, look.face || 'smile'); }
+}
+document.addEventListener('DOMContentLoaded', paintFoodFriends);
 function showPage(page) {
+  if (page === 'mypage' || page === 'home') setTimeout(paintFoodFriends, 0);
   window.scrollTo(0, 0);
   if (page !== 'pocha' && window.Pocha) Pocha.close();
   if (page === 'settings') setTimeout(updateMapLabel, 0);
@@ -5447,7 +5473,7 @@ function renderHistoryPage() {
   const histEl = document.getElementById('hist-page-list');
   if (!histEl) return;
   if (hist.length === 0) {
-    histEl.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--muted)"><div style="font-size:44px;margin-bottom:14px">🕘</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">아직 추천받은 기록이 없어요</div><div style="font-size:12px">추천받기 버튼을 눌러 보세요!</div></div>`;
+    histEl.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--muted)">${emptyChar('kimbap','smile') || '<div style="font-size:44px;margin-bottom:14px">🕘</div>'}<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">아직 추천받은 기록이 없어요</div><div style="font-size:12px">추천받기 버튼을 눌러 보세요!</div></div>`;
     return;
   }
   const PAGE_SIZE = 5;
@@ -6311,7 +6337,7 @@ function renderNotifyPage() {
   const TYPE_COLOR = { like:'#ff4d6d', comment:'var(--orange)', vote:'#7878ff', vote_result:'var(--yellow)' };
 
   if (notifications.length === 0) {
-    list.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--muted);font-size:13px">아직 알림이 없어요 🔔</div>`;
+    list.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--muted);font-size:13px">${emptyChar('egg','sleepy')}아직 알림이 없어요</div>`;
     return;
   }
 
@@ -9006,7 +9032,7 @@ function renderCommFeed(tab) {
   if (displayed.length === 0) {
     feed.innerHTML = commFilterTag
       ? `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">${commFilterTag} 후기가 아직 없어요<br>첫 번째로 올려 보세요! 😊</div>`
-      : `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">아직 글이 없어요<br>첫 번째로 올려 보세요! 😊</div>`;
+      : `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">${emptyChar('mandu','wow')}아직 글이 없어요<br>첫 번째로 올려 보세요!</div>`;
     return;
   }
 

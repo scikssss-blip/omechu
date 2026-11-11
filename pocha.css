@@ -127,3 +127,13 @@
 .pc-tabs button.on { background:#ff7a1a; border-color:#ff7a1a; color:#2b1300; }
 .pc-tabs .dot { position:absolute; top:-6px; right:-4px; min-width:18px; height:18px; border-radius:9px; background:#c8102e; color:#fff; font-size:10px; line-height:18px; padding:0 4px; }
 .pc-trow .pc-ghost { background:var(--surface); color:var(--text); border:1px solid var(--border); }
+
+/* 화면에 맞춘 가게: 캐릭터·배지 다시 키우기, 등불 */
+.pc-person { transform-origin:30px 52px; }
+.pc-doorcount { transform:translateX(-50%) scale(var(--ps,1)); transform-origin:50% 0; }
+.pc-glow { position:absolute; border-radius:50%; pointer-events:none; mix-blend-mode:screen; background:radial-gradient(circle, rgba(255,196,110,.42) 0%, rgba(255,160,70,.16) 45%, transparent 70%); animation:pcFlick 3.6s ease-in-out infinite; }
+@keyframes pcFlick { 0%,100% { opacity:.55; transform:scale(1); } 40% { opacity:1; transform:scale(1.06); } 55% { opacity:.7; } 70% { opacity:.95; } }
+@media (prefers-reduced-motion: reduce) { .pc-glow { animation:none; opacity:.7; } }
+.pc-scene { padding-bottom:10px; }
+.pc-hint { margin-top:6px; font-size:11.5px; }
+.pc-body { padding-top:10px; }
