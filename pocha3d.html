@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>오메추 포차 3D 시제품</title>
+<style>
+  html, body { margin:0; height:100%; background:#120e1e; overflow:hidden; font-family:-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; color:#fff; touch-action:none; }
+  canvas { display:block; width:100%; height:100%; }
+  .top { position:fixed; left:0; right:0; top:0; padding:calc(10px + env(safe-area-inset-top)) 14px 10px; display:flex; align-items:center; gap:10px; background:linear-gradient(#120e1ee6, #120e1e00); pointer-events:none; }
+  .top a, .top button { pointer-events:auto; }
+  .back { color:#fff; text-decoration:none; font-size:26px; line-height:1; padding:4px 8px 6px 0; }
+  .title { font-weight:800; font-size:16px; }
+  .tag { font-size:11px; background:#ff7a1a; border-radius:999px; padding:3px 8px; font-weight:700; }
+  .btn { margin-left:auto; background:#241d36; color:#fff; border:1px solid #4a4063; border-radius:12px; padding:9px 12px; font-size:13px; font-weight:700; }
+  .hint { position:fixed; left:0; right:0; bottom:calc(14px + env(safe-area-inset-bottom)); text-align:center; font-size:12.5px; color:#e9e2ff; pointer-events:none; text-shadow:0 1px 3px #000; line-height:1.6; padding:0 16px; }
+  .hint b { color:#ffc27a; }
+  .toast { position:fixed; left:50%; top:76px; transform:translateX(-50%); background:#000000b0; border:1px solid #ffffff30; border-radius:999px; padding:8px 14px; font-size:13px; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; }
+  .toast.on { opacity:1; }
+  .err { position:fixed; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:30px; font-size:14px; line-height:1.7; }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="top">
+  <a class="back" href="./" aria-label="오메추로 돌아가기">‹</a>
+  <span class="title">오메추 포차</span><span class="tag">3D 시제품</span>
+  <button class="btn" id="stand" style="display:none">🚪 일어나기</button>
+</div>
+<div class="toast" id="toast"></div>
+<div class="hint"><b>드래그</b> 돌려보기 · <b>두 손가락</b> 확대 · <b>바닥</b> 누르면 걷기 · <b>테이블</b> 누르면 앉기</div>
+<div class="err" id="err">이 기기에서는 3D 화면을 열 수 없어요.<br>오메추 앱의 먹자골목은 그대로 쓸 수 있어요.</div>
+<script src="pocha-chars.js"></script>
+<script type="module">
+import * as THREE from './vendor/three.module.min.js';
+
+const cv = document.getElementById('cv');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); }
+catch (e) { document.getElementById('err').style.display = 'flex'; throw e; }
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#120e1e');
+scene.fog = new THREE.Fog('#120e1e', 16, 34);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 80);
+
+// ── 크레파스 질감: 바탕색 위에 짧은 선을 잔뜩 그어 손그림 느낌을 냄 ──
+function crayon(base, marks, opt = {}) {
+  const S = 256, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+  g.fillStyle = base; g.fillRect(0, 0, S, S);
+  if (opt.stripes) { g.fillStyle = opt.stripes; for (let x = 0; x < S; x += 64) g.fillRect(x, 0, 32, S); }
+  if (opt.checks) { g.fillStyle = opt.checks; for (let x = 0; x < 4; x++) for (let y = 0; y < 4; y++) if ((x + y) % 2) g.fillRect(x * 64, y * 64, 64, 64); }
+  g.lineCap = 'round';
+  for (let i = 0; i < (opt.n || 900); i++) {
+    g.strokeStyle = marks[i % marks.length]; g.globalAlpha = 0.10 + Math.random() * 0.22; g.lineWidth = 1 + Math.random() * 2.4;
+    const x = Math.random() * S, y = Math.random() * S, a = (opt.dir ?? -0.9) + (Math.random() - 0.5) * 0.7, l = 6 + Math.random() * 20;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  if (opt.rep) t.repeat.set(opt.rep[0], opt.rep[1]);
+  return t;
+}
+const mat = (tex, extra = {}) => new THREE.MeshLambertMaterial({ map: tex, ...extra });
+const M = {
+  ground: mat(crayon('#3b3440', ['#57505c', '#2a2530', '#6b5a4a'], { rep: [10, 10] })),
+  floor: mat(crayon('#6a5642', ['#8a7052', '#4a3a2c', '#a08462'], { rep: [4, 4] })),
+  tent: mat(crayon('#d8392c', ['#f0604a', '#a8221c', '#ff8a5c'], { stripes: '#e86a2a', rep: [5, 1], dir: 1.5 }), { side: THREE.DoubleSide }),
+  red: mat(crayon('#e23a2a', ['#ff6a4a', '#b3261c', '#ff8d6b'], { n: 600 })),
+  wood: mat(crayon('#b06a2c', ['#d48a42', '#7c4418', '#e6a25a'], { dir: 0 })),
+  dark: mat(crayon('#2a2428', ['#4a4248', '#17131a'], { n: 500 })),
+  steel: mat(crayon('#9aa3ad', ['#c4ccd4', '#6c747e'], { dir: 0 })),
+  blue: mat(crayon('#2c6fb8', ['#4f95dc', '#1c4c86'], { n: 500 })),
+  green: mat(crayon('#2f8a4a', ['#55b56e', '#1e5c30'], { n: 500 })),
+  broth: mat(crayon('#d98a2c', ['#f2b25a', '#a85c12'], { n: 400 })),
+  tteok: mat(crayon('#d8421f', ['#ff7a3a', '#9c2410'], { n: 400 })),
+  cream: mat(crayon('#f3ead8', ['#ffffff', '#d6c7a8'], { n: 400 })),
+};
+const add = (geo, m, x, y, z, parent = scene) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); parent.add(o); return o; };
+const cyl = (r, h, seg = 24, r2) => new THREE.CylinderGeometry(r2 ?? r, r, h, seg);
+const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+
+// ── 바닥, 천막 ──
+const ground = add(new THREE.PlaneGeometry(70, 70), M.ground, 0, 0, 0); ground.rotation.x = -Math.PI / 2;
+const floor = add(new THREE.PlaneGeometry(13, 12), M.floor, 0, 0.01, 0); floor.rotation.x = -Math.PI / 2;
+const HW = 6.5, HD = 6, WH = 3.1;
+const wallB = add(new THREE.PlaneGeometry(13, WH), M.tent, 0, WH / 2, -HD);
+const wallL = add(new THREE.PlaneGeometry(12, WH), M.tent, -HW, WH / 2, 0); wallL.rotation.y = Math.PI / 2;
+const wallR = add(new THREE.PlaneGeometry(12, WH), M.tent, HW, WH / 2, 0); wallR.rotation.y = -Math.PI / 2;
+
+for (const [x, z] of [[-HW, -HD], [HW, -HD], [-HW, HD], [HW, HD], ]) add(cyl(0.07, WH + 0.5, 8), M.steel, x, (WH + 0.5) / 2, z);
+// 지붕은 안이 보이게 뼈대만
+add(box(13, 0.07, 0.07), M.steel, 0, WH + 0.2, -HD);
+
+
+// ── 조명: 푸른 밤 + 따뜻한 등 ──
+scene.add(new THREE.HemisphereLight('#8f9bff', '#3a2a22', 0.75));
+const moon = new THREE.DirectionalLight('#aab8ff', 0.35); moon.position.set(-6, 12, 8); scene.add(moon);
+const lanterns = [];
+function lantern(x, y, z, color = '#ffb14a', power = 16) {
+  const g = new THREE.Group(); g.position.set(x, y, z); scene.add(g);
+  add(cyl(0.01, 0.5, 4), M.dark, 0, 0.45, 0, g);
+  const bulb = add(new THREE.SphereGeometry(0.26, 16, 12), new THREE.MeshBasicMaterial({ color }), 0, 0, 0, g); bulb.scale.y = 1.25;
+  add(cyl(0.12, 0.06, 12), M.dark, 0, 0.34, 0, g); add(cyl(0.12, 0.06, 12), M.dark, 0, -0.34, 0, g);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending })); glow.scale.set(2.6, 2.6, 1); g.add(glow);
+  const L = new THREE.PointLight(color, power, 13, 1.6); g.add(L);
+  lanterns.push({ L, glow, base: power, ph: Math.random() * 10 });
+}
+const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.4, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+lantern(-5.4, 2.7, -4.6); lantern(5.4, 2.7, -4.6); lantern(-5.4, 2.7, 3.2); lantern(5.4, 2.7, 3.2);
+lantern(0, 2.9, -1, '#ffd08a', 12);
+// ── 이모네 바 ──
+add(box(7.4, 1.0, 1.1), M.wood, 0, 0.5, -4.2);
+add(box(7.7, 0.1, 1.4), M.wood, 0, 1.05, -4.2);
+add(box(8.4, 0.9, 0.8), M.steel, 0, 0.45, -5.5);
+add(cyl(0.62, 0.34, 24), M.steel, -1.5, 1.07, -5.5); add(cyl(0.56, 0.02, 24), M.tteok, -1.5, 1.25, -5.5);       // 떡볶이 판
+add(box(1.5, 0.3, 0.9), M.steel, 0.6, 1.05, -5.5); add(box(1.38, 0.02, 0.78), M.broth, 0.6, 1.21, -5.5);          // 어묵 통
+for (let i = 0; i < 6; i++) add(cyl(0.012, 0.6, 4), M.wood, 0.05 + i * 0.22, 1.42, -5.5 + (i % 2) * 0.2 - 0.1);
+add(cyl(0.34, 0.5, 16), M.steel, 2.6, 1.15, -5.5);
+for (let i = 0; i < 5; i++) add(cyl(0.07, 0.34, 8), M.green, -3.3 + i * 0.2, 1.27, -4.25);
+add(box(1.1, 1.9, 0.7), M.blue, 5.3, 0.95, -5.4); add(box(0.95, 1.5, 0.05), M.cream, 5.3, 1.0, -5.03);            // 냉장고
+for (const [x, z, m] of [[-5.6, -3.2, M.blue], [-5.6, -2.3, M.green], [5.7, -2.9, M.red], [-5.7, 4.6, M.green], [-5.7, 3.7, M.blue]]) { add(box(0.8, 0.5, 0.8), m, x, 0.25, z); add(box(0.8, 0.5, 0.8), m, x, 0.77, z); }
+
+// ── 테이블·의자 ──
+const seats = [], tables = [];
+function stool(x, z, t) { const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g); add(cyl(0.3, 0.07, 18), M.dark, 0, 0.5, 0, g); add(cyl(0.2, 0.5, 8, 0.1), M.dark, 0, 0.25, 0, g); seats.push({ x, z, t, who: null }); }
+function roundTable(x, z, name) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
+  add(cyl(1.25, 0.08, 36), M.red, 0, 0.82, 0, g); add(cyl(0.1, 0.8, 10), M.steel, 0, 0.4, 0, g); add(cyl(0.5, 0.05, 16), M.steel, 0, 0.03, 0, g);
+  add(cyl(0.2, 0.16, 16, 0.3), M.cream, 0.25, 0.94, 0.1, g); add(cyl(0.065, 0.36, 8), M.green, -0.3, 1.04, -0.15, g); add(cyl(0.1, 0.2, 10), M.steel, -0.05, 0.96, 0.4, g);
+  const t = tables.length; tables.push({ x, z, r: 2.1, name });
+  for (let i = 0; i < 4; i++) { const a = Math.PI / 4 + i * Math.PI / 2; stool(x + Math.cos(a) * 1.75, z + Math.sin(a) * 1.75, t); }
+}
+roundTable(-3.2, -0.6, '1번 테이블'); roundTable(3.2, -0.9, '2번 테이블'); roundTable(0.3, 3.0, '3번 테이블');
+{ const t = tables.length; tables.push({ x: 0, z: -3.6, r: 0, bar: true, name: '이모네 바' }); for (const x of [-2.7, -0.9, 0.9, 2.7]) stool(x, -3.05, t); }
+
+// ── 캐릭터: 2D 그림을 항상 카메라를 보는 판(빌보드)으로 세움 ──
+function charTexture(kind, face, acc) {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const img = new Image(); img.onload = () => { c.getContext('2d').drawImage(img, 0, 0, 256, 256); t.needsUpdate = true; };
+  img.src = FoodChars.url(kind, '#ffd36b', acc || 'none', face || 'smile', false);
+  return t;
+}
+function nameTexture(text, mine) {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64; const g = c.getContext('2d');
+  g.font = '700 30px -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans CJK KR", sans-serif'; const w = Math.min(240, g.measureText(text).width + 30);
+  g.fillStyle = mine ? 'rgba(255,122,26,.92)' : 'rgba(20,14,28,.78)'; g.beginPath(); g.roundRect(128 - w / 2, 8, w, 48, 24); g.fill();
+  g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 128, 33, 220);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const shadowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const gr = g.createRadialGradient(32, 32, 2, 32, 32, 30); gr.addColorStop(0, 'rgba(0,0,0,.55)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+const people = [];
+function person(nick, kind, face, acc, mine) {
+  const g = new THREE.Group(); scene.add(g);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: charTexture(kind, face, acc), transparent: true, alphaTest: 0.08 })); sp.center.set(0.5, 0.06); sp.scale.set(1.5, 1.5, 1); g.add(sp);
+  const nm = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTexture(nick, mine), transparent: true, depthTest: false })); nm.center.set(0.5, 0); nm.scale.set(1.5, 0.375, 1); nm.position.y = 1.55; nm.renderOrder = 5; g.add(nm);
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.95), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })); sh.rotation.x = -Math.PI / 2; sh.position.y = 0.03; g.add(sh);
+  const p = { g, sp, sh, seat: null, ph: Math.random() * 6, target: null, mine }; people.push(p); return p;
+}
+function sitOn(p, s) { if (p.seat) p.seat.who = null; p.seat = s; s.who = p; p.target = null; p.g.position.set(s.x, 0.5, s.z); p.sh.visible = false; }
+let look = {}; try { look = JSON.parse(localStorage.getItem('wmjPochaLook') || '{}') || {}; } catch (e) {}
+let myNick = '나'; try { myNick = localStorage.getItem('wmjMyNick') || '나'; } catch (e) {}
+const myKind = FoodChars.BY[look.kind] ? look.kind : 'onigiri';
+const me = person(myNick.slice(0, 8), myKind, look.face || 'happy', look.acc, true); me.g.position.set(0, 0, 5.2);
+[['배고픈곰', 'mandu', 'happy', 0], ['야식요정', 'egg', 'smile', 1], ['떡볶이왕', 'tteok', 'happy', 4], ['국물파', 'eomuk', 'smile', 5], ['퇴근했다', 'kimbap', 'sleepy', 7], ['치맥러', 'chicken', 'happy', 9], ['붕어빵', 'bungeo', 'smile', 12], ['혼술중', 'salmon', 'smile', 14]]
+  .forEach(([n, k, f, s]) => sitOn(person(n, k, f), seats[s]));
+
+// ── 천막 밖에 내리는 비 ──
+const RN = 700, rainPos = new Float32Array(RN * 6), rainV = new Float32Array(RN);
+function rainReset(i, top) {
+  let x, z; do { x = (Math.random() - 0.5) * 34; z = (Math.random() - 0.5) * 34; } while (Math.abs(x) < HW + 0.2 && z > -HD - 0.2 && z < HD + 0.2);
+  const y = top ? 9 + Math.random() * 3 : Math.random() * 12; rainPos.set([x, y, z, x + 0.05, y + 0.45, z], i * 6); rainV[i] = 11 + Math.random() * 6;
+}
+for (let i = 0; i < RN; i++) rainReset(i, false);
+const rainGeo = new THREE.BufferGeometry(); rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: '#b8ccff', transparent: true, opacity: 0.38 })));
+
+// ── 카메라: 내 캐릭터를 중심으로 돌려보기 ──
+const cam = { az: 0.35, pol: 0.95, dist: 14, tx: 0, tz: 1.5 };
+function placeCamera() {
+  const y = Math.cos(cam.pol) * cam.dist, r = Math.sin(cam.pol) * cam.dist;
+  camera.position.set(cam.tx + Math.sin(cam.az) * r, 1 + y, cam.tz + Math.cos(cam.az) * r); camera.lookAt(cam.tx, 1, cam.tz);
+}
+function resize() { const w = window.innerWidth, h = window.innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < h ? 50 : 40; camera.updateProjectionMatrix(); }
+window.addEventListener('resize', resize); resize();
+
+// ── 조작: 드래그=회전, 두 손가락=확대, 짧게 누르기=걷기/앉기 ──
+const pts = new Map(); let moved = 0, pinch = 0;
+const toastEl = document.getElementById('toast'); let toastT;
+const toast = (m) => { toastEl.textContent = m; toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('on'), 1800); };
+const standBtn = document.getElementById('stand');
+cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pts.size === 1) moved = 0; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); moved = 99; } });
+cv.addEventListener('pointermove', (e) => {
+  const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+  if (pts.size === 1) { moved += Math.abs(dx) + Math.abs(dy); if (moved > 8) { cam.az -= dx * 0.008; cam.pol = Math.min(1.38, Math.max(0.3, cam.pol - dy * 0.006)); } }
+  else if (pts.size === 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch) cam.dist = Math.min(24, Math.max(6, cam.dist * pinch / d)); pinch = d; }
+});
+const up = (e) => { const had = pts.has(e.pointerId); pts.delete(e.pointerId); if (had && pts.size === 0 && moved <= 8) tap(e.clientX, e.clientY); };
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', (e) => pts.delete(e.pointerId));
+cv.addEventListener('wheel', (e) => { cam.dist = Math.min(24, Math.max(6, cam.dist * (1 + e.deltaY * 0.001))); e.preventDefault(); }, { passive: false });
+const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit = new THREE.Vector3();
+function stand() { if (!me.seat) return; const s = me.seat; s.who = null; me.seat = null; me.sh.visible = true; const t = tables[s.t]; const dx = s.x - t.x, dz = t.bar ? 1 : s.z - t.z, l = Math.hypot(dx, dz) || 1; me.g.position.set(s.x + (t.bar ? 0 : dx / l * 0.7), 0, s.z + dz / l * 0.7); standBtn.style.display = 'none'; }
+standBtn.onclick = stand;
+function tap(cx, cy) {
+  ray.setFromCamera(new THREE.Vector2(cx / window.innerWidth * 2 - 1, -(cy / window.innerHeight) * 2 + 1), camera);
+  if (!ray.ray.intersectPlane(plane, hit)) return;
+  const x = hit.x, z = hit.z;
+  // 테이블이나 의자 근처를 누르면 가장 가까운 빈자리에 바로 앉기
+  let best = null, bd = 1e9;
+  for (const s of seats) { const t = tables[s.t]; const near = t.bar ? (Math.abs(x) < 4.2 && z < -2.3 && z > -5) : Math.hypot(x - t.x, z - t.z) < t.r + 0.5; if (!near || s.who) continue; const d = Math.hypot(s.x - x, s.z - z); if (d < bd) { bd = d; best = s; } }
+  if (best) { sitOn(me, best); standBtn.style.display = ''; toast(`${tables[best.t].name}에 앉았어요`); return; }
+  for (const t of tables) if (!t.bar && Math.hypot(x - t.x, z - t.z) < t.r + 0.5) { toast('그 테이블은 자리가 꽉 찼어요'); return; }
+  if (Math.abs(x) > HW - 0.5 || z < -HD + 2.6 || z > HD + 5) return;
+  if (me.seat) stand();
+  me.target = { x, z };
+}
+// 테이블에 부딪히지 않게 살짝 밀어내기
+function avoid(p) { for (const t of tables) { if (t.bar) continue; const dx = p.x - t.x, dz = p.z - t.z, d = Math.hypot(dx, dz), min = 1.55; if (d < min && d > 0.001) { p.x = t.x + dx / d * min; p.z = t.z + dz / d * min; } } p.z = Math.max(-2.5, p.z); }
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; const T = now / 1000;
+  if (me.target) { const p = me.g.position, dx = me.target.x - p.x, dz = me.target.z - p.z, d = Math.hypot(dx, dz); if (d < 0.08) me.target = null; else { const st = Math.min(d, 4.2 * dt); p.x += dx / d * st; p.z += dz / d * st; avoid(p); me.sp.material.rotation = 0; me.sp.scale.x = (dx * Math.cos(cam.az) - dz * Math.sin(cam.az)) < 0 ? -1.5 : 1.5; } }
+  for (const p of people) { const walking = p === me && me.target; const b = walking ? Math.abs(Math.sin(T * 9)) * 0.16 : Math.sin(T * 2 + p.ph) * 0.035; p.sp.position.y = b; p.sp.scale.y = 1.5 * (1 + (walking ? 0 : Math.sin(T * 2 + p.ph) * 0.025)); }
+  cam.tx += (me.g.position.x * 0.6 - cam.tx) * Math.min(1, dt * 3); cam.tz += ((me.g.position.z * 0.6 + 0.3) - cam.tz) * Math.min(1, dt * 3);
+  for (const l of lanterns) { const f = 0.88 + Math.sin(T * 5.3 + l.ph) * 0.06 + Math.sin(T * 13.1 + l.ph * 2) * 0.04; l.L.intensity = l.base * f; l.glow.material.opacity = 0.5 * f; }
+  for (let i = 0; i < RN; i++) { const o = i * 6; rainPos[o + 1] -= rainV[i] * dt; rainPos[o + 4] -= rainV[i] * dt; if (rainPos[o + 4] < 0) rainReset(i, true); }
+  rainGeo.attributes.position.needsUpdate = true;
+  placeCamera(); renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.__p3d = { cam, me, seats, tap };
+</script>
+</body>
+</html>

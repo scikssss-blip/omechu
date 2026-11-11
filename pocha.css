@@ -137,3 +137,11 @@
 .pc-scene { padding-bottom:10px; }
 .pc-hint { margin-top:6px; font-size:11.5px; }
 .pc-body { padding-top:10px; }
+
+/* 비: 빗줄기 캔버스 + 분위기 */
+.pc-raincv { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:6; display:none; }
+.pc-rainmood { position:absolute; inset:0; pointer-events:none; z-index:5; opacity:0; transition:opacity 1.2s; background:linear-gradient(180deg, rgba(40,60,110,.30), rgba(15,20,45,.22)); }
+.pc-scene.raining .pc-raincv { display:block; }
+.pc-scene.raining .pc-rainmood { opacity:1; }
+.pc-iconbtn.on { background:#2b3f73; border-color:#7f9be0; color:#fff; }
+.pc-ver { text-align:center; font-size:11px; color:#8f88a6; margin-top:6px; }

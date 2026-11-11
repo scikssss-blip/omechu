@@ -60,6 +60,7 @@
         { x: 190, y: 600, k: 'booth', n: '3번 부스', s: [[-112, -40], [-112, 45], [100, -40], [100, 45]], by: 100 },
         { x: 560, y: 600, k: 'booth', n: '4번 부스', s: [[-100, -40], [-100, 45], [112, -40], [112, 45]], by: 100 }] },
   };
+  const BUILD = 'v11.12';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
   const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
 
   let room = 'street', R = ROOMS.street;
@@ -394,9 +395,17 @@
       if (myTable !== null) { myTable = null; mySeat = null; }
       pendingDoor = 'street'; walkTo(R.exit[0], R.exit[1]); return;
     }
-    for (let t = 0; t < T(); t++) for (let s = 0; s < SEATS; s++) {
-      const [sx, sy] = seatXY(t, s);
-      if (Math.hypot(sx - x, sy - y) < 30 && !(t === myTable && s === mySeat)) { if (!seatTaken(t, s)) { goSit(t, s); return; } }
+    // 테이블(의자·이름표 포함) 어디를 눌러도 바로 앉기 — 누른 곳에서 가장 가까운 빈자리
+    for (let t = 0; t < T(); t++) {
+      const tb = R.tables[t], dx = Math.abs(x - tb.x), dy = y - tb.y, wide = tb.k === 'bar' ? 215 : 150;
+      if (dx > wide || dy < -125 || dy > (tb.by ?? 80) + 30) continue;
+      if (t === myTable) return;
+      let bs = null, bd = 1e9;
+      for (let s2 = 0; s2 < SEATS; s2++) { if (seatTaken(t, s2)) continue; const [sx, sy] = seatXY(t, s2), d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; bs = s2; } }
+      if (bs === null) { showToast('그 테이블은 자리가 꽉 찼어요 😅'); return; }
+      if (!joined) { showToast('가게에 연결하는 중이에요. 잠시만요!'); return; }
+      const [qx, qy] = seatXY(t, bs); target = null; pendingSeat = null; pendingDoor = null; pos = { x: qx, y: qy };
+      sitNow(t, bs); return;
     }
     if (myTable !== null) { const [sx, sy] = seatXY(myTable, mySeat); myTable = null; mySeat = null; pos = { x: sx, y: sy + 34 }; }
     walkTo(x, y);
@@ -448,19 +457,83 @@
     render();
   }
 
-  // ── 비 소리 (직접 만든 잔잔한 빗소리) ──
+  // ── 빗소리 (직접 합성한 ASMR 빗소리) + 비 내리는 화면 ──
+  // 골목: 또렷한 빗소리와 빗줄기 / 포차: 천막에 톡톡 떨어지는 소리 / 가게 안: 창밖에서 들리는 먹먹한 빗소리
+  let rainNodes = null, rainTimer = null, rainRaf = null;
+  const rainProfile = () => room === 'street' ? { cut: 9000, drops: 5, vol: 0.9 } : room === 'pocha' ? { cut: 4200, drops: 11, vol: 0.8 } : { cut: 1100, drops: 1.5, vol: 0.75 };
+  function rainTune() {
+    if (!rainCtx || !rainNodes) return;
+    const p = rainProfile(), t = rainCtx.currentTime;
+    rainNodes.master.frequency.setTargetAtTime(p.cut, t, 0.6);
+    rainNodes.out.gain.setTargetAtTime(p.vol, t, 0.8);
+  }
+  function rainDrop() {
+    if (!rainCtx || !rainNodes) return;
+    const ctx = rainCtx, t = ctx.currentTime, src = ctx.createBufferSource(); src.buffer = rainNodes.white;
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = (room === 'pocha' ? 900 : 1800) + Math.random() * 2600; f.Q.value = 5 + Math.random() * 6;
+    const g = ctx.createGain(), peak = (room === 'street' ? 0.05 : room === 'pocha' ? 0.11 : 0.04) * (0.4 + Math.random());
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05 + Math.random() * 0.09);
+    let last = g; if (ctx.createStereoPanner) { const pn = ctx.createStereoPanner(); pn.pan.value = Math.random() * 1.6 - 0.8; g.connect(pn); last = pn; }
+    src.connect(f).connect(g); last.connect(rainNodes.master);
+    src.start(t, Math.random() * 3, 0.2);
+  }
+  function rainStop() {
+    clearTimeout(rainTimer); rainTimer = null; cancelAnimationFrame(rainRaf); rainRaf = null;
+    const ctx = rainCtx; rainCtx = null;
+    if (ctx && rainNodes) { try { rainNodes.out.gain.setTargetAtTime(0, ctx.currentTime, 0.25); } catch (e) {} setTimeout(() => ctx.close().catch(() => {}), 900); }
+    rainNodes = null;
+  }
   function toggleRain() {
-    if (rainCtx) { rainCtx.close(); rainCtx = null; render(); return; }
+    if (rainCtx) { rainStop(); render(); return; }
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const len = ctx.sampleRate * 2, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
-      let last = 0; for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; d[i] = last * 3.2; }
-      const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
-      const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1200;
-      const g = ctx.createGain(); g.gain.value = 0.35;
-      src.connect(f).connect(g).connect(ctx.destination); src.start();
-      rainCtx = ctx; render();
+      const sr = ctx.sampleRate, len = sr * 4;
+      const white = ctx.createBuffer(2, len, sr), brown = ctx.createBuffer(2, len, sr);
+      for (let c = 0; c < 2; c++) { const w = white.getChannelData(c), b = brown.getChannelData(c); let last = 0;
+        for (let i = 0; i < len; i++) { const n = Math.random() * 2 - 1; w[i] = n; last = (last + 0.02 * n) / 1.02; b[i] = last * 3.5; } }
+      const loop = (buf) => { const s2 = ctx.createBufferSource(); s2.buffer = buf; s2.loop = true; s2.start(0, Math.random() * 3); return s2; };
+      const master = ctx.createBiquadFilter(); master.type = 'lowpass'; master.Q.value = 0.3;
+      const out = ctx.createGain(); out.gain.value = 0;
+      const comp = ctx.createDynamicsCompressor();
+      master.connect(out).connect(comp).connect(ctx.destination);
+      const layer = (buf, type, freq, q, gain) => { const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q; const g = ctx.createGain(); g.gain.value = gain; loop(buf).connect(f).connect(g).connect(master); return g; };
+      layer(white, 'highpass', 2200, 0.5, 0.055);                 // 쏴— 하는 가는 빗줄기
+      const body = layer(white, 'bandpass', 620, 0.5, 0.20);      // 바닥에 떨어지는 굵은 비
+      layer(brown, 'lowpass', 160, 0.7, 0.55);                    // 멀리서 깔리는 낮은 울림
+      // 빗발이 아주 천천히 세졌다 약해졌다
+      const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.06; lg.gain.value = 0.045; lfo.connect(lg).connect(body.gain); lfo.start();
+      rainCtx = ctx; rainNodes = { master, out, white };
+      const p = rainProfile(); master.frequency.value = p.cut; out.gain.setTargetAtTime(p.vol, ctx.currentTime, 0.9);
+      const tick = () => { if (!rainCtx) return; rainDrop(); if (Math.random() < 0.3) rainDrop(); rainTimer = setTimeout(tick, 1000 / rainProfile().drops * (0.3 + Math.random() * 1.4)); };
+      tick(); render(); rainDraw();
     } catch (e) { showToast('이 기기에서는 소리를 낼 수 없어요'); }
+  }
+  // 화면: 골목엔 빗줄기와 물 튀김, 포차엔 천막 가장자리로 떨어지는 빗방울, 가게 안은 창가만 살짝
+  let rainDropsFx = [], rainSplash = [];
+  function rainDraw() {
+    cancelAnimationFrame(rainRaf);
+    const cv = document.getElementById('pc-raincv'); if (!cv || !rainCtx) { rainRaf = null; return; }
+    const wrap = cv.parentElement, W = wrap.clientWidth, H = wrap.clientHeight, dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); rainDropsFx = []; }
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const kind = room === 'street' ? 2 : room === 'pocha' ? 1 : 0;
+    const want = kind === 2 ? 110 : kind === 1 ? 26 : 12;
+    while (rainDropsFx.length < want) { const z = Math.random(); rainDropsFx.push({ x: Math.random() * (W + 60), y: Math.random() * H, z, v: 520 + z * 620, l: 9 + z * 16 }); }
+    rainDropsFx.length = want;
+    const dt = 1 / 60, slant = 0.16;
+    g.lineCap = 'round';
+    for (const d of rainDropsFx) {
+      d.y += d.v * dt; d.x -= d.v * dt * slant;
+      // 포차·가게 안은 가장자리(천막 틈, 창가)에만
+      const edge = kind === 2 ? true : (d.x < W * 0.09 || d.x > W * 0.93);
+      if (d.y > H + 20 || d.x < -20) { if (kind === 2 && Math.random() < 0.5) rainSplash.push({ x: d.x + (d.y - H * (0.35 + Math.random() * 0.6)) * slant, y: H * (0.35 + Math.random() * 0.6), a: 1 }); d.y = -20 - Math.random() * 60; d.x = kind === 2 ? Math.random() * (W + 60) : (Math.random() < 0.5 ? Math.random() * W * 0.09 : W * (0.93 + Math.random() * 0.09)); }
+      if (!edge) continue;
+      g.strokeStyle = `rgba(200,220,255,${0.16 + d.z * 0.34})`; g.lineWidth = 0.7 + d.z * 0.9;
+      g.beginPath(); g.moveTo(d.x, d.y); g.lineTo(d.x + d.l * slant, d.y - d.l); g.stroke();
+    }
+    for (const sp of rainSplash) { sp.a -= 0.06; g.strokeStyle = `rgba(210,228,255,${Math.max(0, sp.a) * 0.5})`; g.lineWidth = 1; g.beginPath(); g.ellipse(sp.x, sp.y, (1 - sp.a) * 9 + 1, (1 - sp.a) * 3.2 + 0.5, 0, 0, Math.PI * 2); g.stroke(); }
+    rainSplash = rainSplash.filter(sp => sp.a > 0).slice(-60);
+    rainRaf = requestAnimationFrame(rainDraw);
   }
 
   // ── 꾸미기 ──
@@ -631,9 +704,9 @@
         </div>
         <div class="pc-viewwrap"><div class="pc-view" id="pc-view">
           <div class="pc-sizer" id="pc-sizer"><div class="pc-world" id="pc-world" style="width:${R.w}px;height:${R.h}px">${room === 'street' ? streetSVG() : roomSVG()}<div id="pc-doors"></div><div id="pc-dishes"></div><div id="pc-people"></div></div></div>
-        </div><div class="pc-rain"></div></div>
+        <canvas class="pc-raincv" id="pc-raincv"></canvas><div class="pc-rainmood"></div></div></div>
         <div class="pc-emobar">${EMOTES.map(e => `<button aria-label="감정 표현 ${e}" onclick="Pocha.emote('${e}')">${e}</button>`).join('')}</div>
-        <div class="pc-hint" id="pc-hint"></div>
+        <div class="pc-hint" id="pc-hint"></div><div class="pc-ver">먹자골목 ${BUILD}</div>
       </div>
       <div class="pc-body" id="pc-panel"></div>`;
     const world = document.getElementById('pc-world');
@@ -717,7 +790,8 @@
     if (live) live.innerHTML = room === 'street'
       ? (lobby ? `🏮 골목에 <b>${lobbyN}</b>명` : '연결 중...')
       : (joined ? `${esc(R.name)} · <b>${Object.keys(state).length}</b>명` : '연결 중...');
-    const rb = document.getElementById('pc-rainbtn'); if (rb) rb.textContent = rainCtx ? '🔇' : '🌧️';
+    const rb = document.getElementById('pc-rainbtn'); if (rb) { rb.textContent = rainCtx ? '🌧️ 빗소리 끄기' : '🌧️ 빗소리'; rb.classList.toggle('on', !!rainCtx); }
+    if (rainCtx) { rainTune(); if (!rainRaf) rainDraw(); }
     document.querySelector('.pc-scene')?.classList.toggle('raining', !!rainCtx);
     const hint = document.getElementById('pc-hint');
     if (hint) hint.style.display = room === 'street' ? '' : 'none';
@@ -784,7 +858,7 @@
   window.Pocha = { findWinner,
     open(startRoom) { isOpen = true; checkNewFriends(); connectLobby(); trackLobby(); if (startRoom && ROOMS[startRoom] && startRoom !== room) enterRoom(startRoom); else { connectRoom(); render(); } },
     // 다른 화면으로 나가면 골목으로 돌아가고, 인원 집계에서도 빠진다
-    close() { isOpen = false; if (room !== 'street') enterRoom('street'); if (lobby) { try { lobby.untrack(); } catch (e) {} } },
+    close() { isOpen = false; if (rainCtx) rainStop(); if (room !== 'street') enterRoom('street'); if (lobby) { try { lobby.untrack(); } catch (e) {} } },
     back() { if (room !== 'street') enterRoom('street'); else showPage('fun'); },
     go(id) { if (room !== 'street') return; const d = ROOMS[id]?.door; if (!d) return; pendingSeat = null; pendingDoor = id; walkTo(d[0], d[1]); },
     emote, say, sendTab, setTab, quickSit, quickGo, leave, sit, sitAny, stand, goSit, walkTo, send, cheers, startVote, vote, mute, toggleRain, openDress, closeDress, setLook, render,
