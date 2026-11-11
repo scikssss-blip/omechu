@@ -60,7 +60,7 @@
         { x: 190, y: 600, k: 'booth', n: '3번 부스', s: [[-112, -40], [-112, 45], [100, -40], [100, 45]], by: 100 },
         { x: 560, y: 600, k: 'booth', n: '4번 부스', s: [[-100, -40], [-100, 45], [112, -40], [112, 45]], by: 100 }] },
   };
-  const BUILD = 'v11.12c';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
+  const BUILD = 'v11.12d';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
   const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
 
   let room = 'street', R = ROOMS.street;
@@ -308,7 +308,7 @@
     if (gl3d === null) { try { const c = document.createElement('canvas'); gl3d = !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { gl3d = false; } }
     return gl3d;
   }
-  function toggle3d() { try { localStorage.setItem('wmjPocha2d', localStorage.getItem('wmjPocha2d') === '1' ? '0' : '1'); } catch (e) {} const rootEl = document.getElementById('pocha-root'); if (rootEl) rootEl.innerHTML = ''; render(); }
+  function toggle3d() { try { localStorage.setItem('wmjPocha2d', localStorage.getItem('wmjPocha2d') === '1' ? '0' : '1'); } catch (e) {} if (use3d()) { location.href = 'pocha3d.html?room=street'; return; } const rootEl = document.getElementById('pocha-root'); if (rootEl) rootEl.innerHTML = ''; render(); }
   function enterRoom(id, from) {
     if (!ROOMS[id] || id === room) return;
     if (id !== 'street' && use3d()) { const q = pendingQuick ? '&sit=1' : ''; pendingQuick = false; location.href = `pocha3d.html?room=${id}${q}`; return; }
@@ -547,7 +547,7 @@
 
   // ── 꾸미기 ──
   function openDress() { document.getElementById('pc-dress').style.display = 'flex'; renderDress(); }
-  function closeDress() { document.getElementById('pc-dress').style.display = 'none'; }
+  function closeDress() { document.getElementById('pc-dress').style.display = 'none'; if (window.__pocha2dOnce) location.href = 'pocha3d.html?room=street'; }
   function setLook(k, v) {
     if (k === 'kind' && !(window.FoodChars && FoodChars.isOpen(v))) { const pr = FoodChars.progress(v); showToast(`🔒 ${pr.label}에 좋아요를 ${pr.need}번 누르면 열려요 (지금 ${pr.have}번)`); return; }
     me[k] = v; const { face_dir, ...save } = me; localStorage.setItem('wmjPochaLook', JSON.stringify(save)); renderDress(); track(); render();
@@ -715,7 +715,7 @@
           <div class="pc-sizer" id="pc-sizer"><div class="pc-world" id="pc-world" style="width:${R.w}px;height:${R.h}px">${room === 'street' ? streetSVG() : roomSVG()}<div id="pc-doors"></div><div id="pc-dishes"></div><div id="pc-people"></div></div></div>
         <canvas class="pc-raincv" id="pc-raincv"></canvas><div class="pc-rainmood"></div></div></div>
         <div class="pc-emobar">${EMOTES.map(e => `<button aria-label="감정 표현 ${e}" onclick="Pocha.emote('${e}')">${e}</button>`).join('')}</div>
-        <div class="pc-hint" id="pc-hint"></div><div class="pc-ver">먹자골목 ${BUILD} · <a href="#" onclick="Pocha.toggle3d();return false" style="color:#ffb37a;font-weight:700;text-decoration:none">${use3d() ? '가게를 2D로 보기' : '가게를 3D로 보기'}</a></div>
+        <div class="pc-hint" id="pc-hint"></div><div class="pc-ver">먹자골목 ${BUILD} · <a href="#" onclick="Pocha.toggle3d();return false" style="color:#ffb37a;font-weight:700;text-decoration:none">3D로 보기</a></div>
       </div>
       <div class="pc-body" id="pc-panel"></div>`;
     const world = document.getElementById('pc-world');
@@ -865,7 +865,7 @@
   setInterval(() => { if (myTable !== null && votes[myTable] && !votes[myTable].done) render(); }, 1000);
 
   window.Pocha = { findWinner,
-    open(startRoom) { isOpen = true; checkNewFriends(); connectLobby(); trackLobby(); if (startRoom && ROOMS[startRoom] && startRoom !== room) enterRoom(startRoom); else { connectRoom(); render(); } },
+    open(startRoom) { if (use3d() && !window.__pocha2dOnce) { location.href = 'pocha3d.html?room=street'; return; } isOpen = true; checkNewFriends(); connectLobby(); trackLobby(); if (startRoom && ROOMS[startRoom] && startRoom !== room) enterRoom(startRoom); else { connectRoom(); render(); } },
     // 다른 화면으로 나가면 골목으로 돌아가고, 인원 집계에서도 빠진다
     close() { isOpen = false; if (rainCtx) rainStop(); if (room !== 'street') enterRoom('street'); if (lobby) { try { lobby.untrack(); } catch (e) {} } },
     back() { if (room !== 'street') enterRoom('street'); else showPage('fun'); },

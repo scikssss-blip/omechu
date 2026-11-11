@@ -4977,7 +4977,14 @@ function paintFoodFriends() {
 }
 document.addEventListener('DOMContentLoaded', paintFoodFriends);
 // 3D 가게에서 돌아오면 먹자골목 화면으로 바로 엶
-window.addEventListener('load', () => { if (location.hash === '#meokja') { history.replaceState(null, '', location.pathname); setTimeout(() => showPage('pocha'), 80); } });
+window.addEventListener('load', () => {
+  const h = location.hash, v2d = new URLSearchParams(location.search).get('v2d');
+  if (h !== '#meokja' && h !== '#dress') return;
+  history.replaceState(null, '', location.pathname);
+  if (h === '#meokja' && v2d === '1') { try { localStorage.setItem('wmjPocha2d', '1'); } catch (e) {} }
+  if (h === '#dress') window.__pocha2dOnce = true;          // 3D 골목에서 꾸미기만 하러 온 경우: 닫으면 3D로 돌아감
+  setTimeout(() => { showPage('pocha'); if (h === '#dress' && window.Pocha) Pocha.openDress(); }, 80);
+});
 function showPage(page) {
   if (page === 'mypage' || page === 'home') setTimeout(paintFoodFriends, 0);
   window.scrollTo(0, 0);
