@@ -378,14 +378,14 @@ const owners = TH.owners.map((o, i) => { const p = makePerson('npc' + i, o, fals
 let ownerT = owners.length && setTimeout(function chat() { const o = owners[Math.floor(Math.random() * owners.length)]; bubble(o, o.lines[1 + Math.floor(Math.random() * (o.lines.length - 1))], '', 3600); ownerT = setTimeout(chat, 9000 + Math.random() * 9000); }, 7000);
 
 // ═══ 천막 밖 비 ═══
-const RN = STREET ? 1300 : 900, rainPos = new Float32Array(RN * 6), rainV = new Float32Array(RN);
+const RN = STREET ? 800 : 550, rainPos = new Float32Array(RN * 6), rainV = new Float32Array(RN);
 function rainReset(i, top) {
   let x, z; do { x = (Math.random() - 0.5) * 46; z = (Math.random() - 0.5) * 42; } while (!STREET && Math.abs(x) < HW + 0.2 && z > -HD - 0.2 && z < HD + 0.2);
-  const y = top ? 9 + Math.random() * 3 : Math.random() * 12; rainPos.set([x, y, z, x + 0.05, y + 0.45, z], i * 6); rainV[i] = 11 + Math.random() * 6;
+  const y = top ? 9 + Math.random() * 3 : Math.random() * 12; rainPos.set([x, y, z, x + 0.05, y + 0.45, z], i * 6); rainV[i] = 9 + Math.random() * 5;
 }
 for (let i = 0; i < RN; i++) rainReset(i, false);
 const rainGeo = new THREE.BufferGeometry(); rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
-scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: '#b8ccff', transparent: true, opacity: 0.4 })));
+scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: '#b8ccff', transparent: true, opacity: 0.32 })));
 
 // ═══ 접속 (Supabase Realtime) ═══
 // 가게 채널: 누가 어디 있는지 + "말하는 중" 표시만 오감. 대화 내용은 테이블 채널로만 보내서 같은 테이블 사람만 받음.
@@ -551,11 +551,11 @@ function soundOn() {
   const filt = (type, f, q) => { const n = ctx.createBiquadFilter(); n.type = type; n.frequency.value = f; n.Q.value = q; return n; };
   const gain = (v) => { const g = ctx.createGain(); g.gain.value = v; return g; };
   // 비: 천막 위로 떨어지는 소리
-  const rainBus = filt('lowpass', TH.indoor ? 1300 : 4200, 0.3); rainBus.connect(gain(0.8)).connect(out);
-  loop(white).connect(filt('highpass', 2200, 0.5)).connect(gain(0.05)).connect(rainBus);
-  const body = gain(0.19); loop(white).connect(filt('bandpass', 620, 0.5)).connect(body).connect(rainBus);
-  loop(brown).connect(filt('lowpass', 160, 0.7)).connect(gain(0.5)).connect(rainBus);
-  const lfo = ctx.createOscillator(), lg = gain(0.04); lfo.frequency.value = 0.06; lfo.connect(lg).connect(body.gain); lfo.start();
+  const rainBus = filt('lowpass', TH.indoor ? 1300 : 4200, 0.3); rainBus.connect(gain(0.7)).connect(out);
+  loop(white).connect(filt('highpass', 2200, 0.5)).connect(gain(0.042)).connect(rainBus);
+  const body = gain(0.10); loop(white).connect(filt('bandpass', 620, 0.5)).connect(body).connect(rainBus);
+  loop(brown).connect(filt('lowpass', 160, 0.7)).connect(gain(0.2)).connect(rainBus);
+  const lfo = ctx.createOscillator(), lg = gain(0.025); lfo.frequency.value = 0.06; lfo.connect(lg).connect(body.gain); lfo.start();
   // 주방: 지글지글
   loop(white).connect(filt('highpass', 5200, 0.7)).connect(gain(0.012)).connect(out);
   // 왁자지껄: 목소리 12개를 미리 만들어 두고, 사람 수에 따라 켜는 개수와 크기를 바꿈
@@ -584,8 +584,8 @@ function soundOn() {
   }, 140);
   // 천막에 떨어지는 빗방울
   const drop = () => { if (!au) return; const t = ctx.currentTime, s = ctx.createBufferSource(); s.buffer = white; const f = filt('bandpass', 900 + Math.random() * 2600, 5 + Math.random() * 6), g = gain(0.0001);
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime((TH.indoor ? 0.035 : 0.09) * (0.4 + Math.random()), t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05 + Math.random() * 0.09);
-    s.connect(f).connect(g).connect(rainBus); s.start(t, Math.random() * 3, 0.2); au.dropT = setTimeout(drop, (TH.indoor ? 160 : 40) + Math.random() * (TH.indoor ? 500 : 170)); };
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime((TH.indoor ? 0.025 : 0.055) * (0.4 + Math.random()), t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05 + Math.random() * 0.09);
+    s.connect(f).connect(g).connect(rainBus); s.start(t, Math.random() * 3, 0.2); au.dropT = setTimeout(drop, (TH.indoor ? 320 : 110) + Math.random() * (TH.indoor ? 900 : 380)); };
   drop(); crowdTune();
 }
 function soundOff() { if (!au) return; clearInterval(au.timer); clearTimeout(au.dropT); const c = au.ctx; au.out.gain.setTargetAtTime(0, c.currentTime, 0.2); au = null; setTimeout(() => c.close().catch(() => {}), 800); }

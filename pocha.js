@@ -60,7 +60,7 @@
         { x: 190, y: 600, k: 'booth', n: '3번 부스', s: [[-112, -40], [-112, 45], [100, -40], [100, 45]], by: 100 },
         { x: 560, y: 600, k: 'booth', n: '4번 부스', s: [[-100, -40], [-100, 45], [112, -40], [112, 45]], by: 100 }] },
   };
-  const BUILD = 'v11.12d';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
+  const BUILD = 'v11.12e';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
   const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
 
   let room = 'street', R = ROOMS.street;
@@ -469,7 +469,7 @@
   // ── 빗소리 (직접 합성한 ASMR 빗소리) + 비 내리는 화면 ──
   // 골목: 또렷한 빗소리와 빗줄기 / 포차: 천막에 톡톡 떨어지는 소리 / 가게 안: 창밖에서 들리는 먹먹한 빗소리
   let rainNodes = null, rainTimer = null, rainRaf = null;
-  const rainProfile = () => room === 'street' ? { cut: 9000, drops: 5, vol: 0.9 } : room === 'pocha' ? { cut: 4200, drops: 11, vol: 0.8 } : { cut: 1100, drops: 1.5, vol: 0.75 };
+  const rainProfile = () => room === 'street' ? { cut: 9000, drops: 2.5, vol: 0.8 } : room === 'pocha' ? { cut: 4200, drops: 5, vol: 0.7 } : { cut: 1100, drops: 0.8, vol: 0.7 };
   function rainTune() {
     if (!rainCtx || !rainNodes) return;
     const p = rainProfile(), t = rainCtx.currentTime;
@@ -480,7 +480,7 @@
     if (!rainCtx || !rainNodes) return;
     const ctx = rainCtx, t = ctx.currentTime, src = ctx.createBufferSource(); src.buffer = rainNodes.white;
     const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = (room === 'pocha' ? 900 : 1800) + Math.random() * 2600; f.Q.value = 5 + Math.random() * 6;
-    const g = ctx.createGain(), peak = (room === 'street' ? 0.05 : room === 'pocha' ? 0.11 : 0.04) * (0.4 + Math.random());
+    const g = ctx.createGain(), peak = (room === 'street' ? 0.035 : room === 'pocha' ? 0.06 : 0.025) * (0.4 + Math.random());
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05 + Math.random() * 0.09);
     let last = g; if (ctx.createStereoPanner) { const pn = ctx.createStereoPanner(); pn.pan.value = Math.random() * 1.6 - 0.8; g.connect(pn); last = pn; }
     src.connect(f).connect(g); last.connect(rainNodes.master);
@@ -506,11 +506,11 @@
       const comp = ctx.createDynamicsCompressor();
       master.connect(out).connect(comp).connect(ctx.destination);
       const layer = (buf, type, freq, q, gain) => { const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q; const g = ctx.createGain(); g.gain.value = gain; loop(buf).connect(f).connect(g).connect(master); return g; };
-      layer(white, 'highpass', 2200, 0.5, 0.055);                 // 쏴— 하는 가는 빗줄기
-      const body = layer(white, 'bandpass', 620, 0.5, 0.20);      // 바닥에 떨어지는 굵은 비
-      layer(brown, 'lowpass', 160, 0.7, 0.55);                    // 멀리서 깔리는 낮은 울림
+      layer(white, 'highpass', 2200, 0.5, 0.045);                 // 쏴— 하는 가는 빗줄기
+      const body = layer(white, 'bandpass', 620, 0.5, 0.11);      // 바닥에 떨어지는 굵은 비
+      layer(brown, 'lowpass', 160, 0.7, 0.22);                    // 멀리서 깔리는 낮은 울림
       // 빗발이 아주 천천히 세졌다 약해졌다
-      const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.06; lg.gain.value = 0.045; lfo.connect(lg).connect(body.gain); lfo.start();
+      const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.06; lg.gain.value = 0.025; lfo.connect(lg).connect(body.gain); lfo.start();
       rainCtx = ctx; rainNodes = { master, out, white };
       const p = rainProfile(); master.frequency.value = p.cut; out.gain.setTargetAtTime(p.vol, ctx.currentTime, 0.9);
       const tick = () => { if (!rainCtx) return; rainDrop(); if (Math.random() < 0.3) rainDrop(); rainTimer = setTimeout(tick, 1000 / rainProfile().drops * (0.3 + Math.random() * 1.4)); };
@@ -526,8 +526,8 @@
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); rainDropsFx = []; }
     const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const kind = room === 'street' ? 2 : room === 'pocha' ? 1 : 0;
-    const want = kind === 2 ? 110 : kind === 1 ? 26 : 12;
-    while (rainDropsFx.length < want) { const z = Math.random(); rainDropsFx.push({ x: Math.random() * (W + 60), y: Math.random() * H, z, v: 520 + z * 620, l: 9 + z * 16 }); }
+    const want = kind === 2 ? 60 : kind === 1 ? 16 : 8;
+    while (rainDropsFx.length < want) { const z = Math.random(); rainDropsFx.push({ x: Math.random() * (W + 60), y: Math.random() * H, z, v: 420 + z * 480, l: 9 + z * 16 }); }
     rainDropsFx.length = want;
     const dt = 1 / 60, slant = 0.16;
     g.lineCap = 'round';
