@@ -60,7 +60,7 @@
         { x: 190, y: 600, k: 'booth', n: '3번 부스', s: [[-112, -40], [-112, 45], [100, -40], [100, 45]], by: 100 },
         { x: 560, y: 600, k: 'booth', n: '4번 부스', s: [[-100, -40], [-100, 45], [112, -40], [112, 45]], by: 100 }] },
   };
-  const BUILD = 'v11.12g';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
+  const BUILD = 'v11.12h';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
   const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
 
   let room = 'street', R = ROOMS.street;

@@ -70,7 +70,14 @@
   .hero-emoji.chars img:nth-child(2) { width:92px; height:92px; animation-delay:-1s; }
   .hero-emoji.chars img:nth-child(3) { animation-delay:-2s; }
   .my-avatar.char { background:#fff6e6; font-size:0; overflow:hidden; }
-  .my-avatar.char img { width:58px; height:58px; margin-top:4px; }
+  .my-avatar.char img { width:58px; height:58px; margin-top:4px; border-radius:50%; }
+  .my-avatar-cam { position:absolute; right:-2px; bottom:-2px; width:22px; height:22px; border-radius:50%; background:var(--card); border:1px solid var(--border); font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .my-avatar-cam img { width:13px !important; height:13px !important; margin:0 !important; }
+  .avatar-upload { display:block; text-align:center; background:var(--orange); color:#fff; font-weight:700; font-size:14px; border-radius:12px; padding:11px; cursor:pointer; }
+  .avatar-sub { font-size:11.5px; color:var(--muted); margin:12px 0 6px; }
+  .avatar-grid { display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; }
+  .avatar-grid button { aspect-ratio:1/1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:2px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .avatar-grid button img { width:100%; height:100%; }
   .empty-char { display:block; width:84px; height:84px; margin:0 auto 10px; opacity:.95; }
   @media (prefers-reduced-motion: reduce) { .hero-emoji.chars img { animation:none; } }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
@@ -562,6 +569,12 @@
   }
   .comm-vote-btn:hover { border-color:var(--orange); }
   .comm-vote-btn.voted { background:rgba(255,71,87,0.1); border-color:var(--orange); color:var(--orange); }
+  .comm-vote-wrap > div > .comm-vote-btn { width:100%; }
+  .comm-vote-btn.pend { background:rgba(255,122,26,0.14); border-color:var(--orange); color:var(--orange); }
+  .comm-vote-btn:disabled { opacity:.85; }
+  .comm-vote-img { width:100%; aspect-ratio:1/1; border-radius:12px; overflow:hidden; margin-bottom:6px; border:2px solid transparent; background:var(--surface); cursor:pointer; }
+  .comm-vote-img.pend { border-color:var(--orange); }
+  .comm-vote-img img { width:100%; height:100%; object-fit:cover; display:block; }
   .comm-post-modal-wrap {
     display:none; position:fixed; inset:0;
     background:rgba(0,0,0,0.65); z-index:750;
@@ -608,6 +621,17 @@
   .similar-wrap.open { display:flex; }
   .similar-chip { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:11px; color:var(--text); cursor:pointer; transition:all 0.15s; }
   .similar-chip:hover { border-color:var(--orange); color:var(--orange); }
+  .menu-peek { position:fixed; inset:0; z-index:880; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; padding:24px; }
+  .menu-peek.open { display:flex; }
+  .menu-peek-box { width:100%; max-width:340px; background:var(--card); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+  .menu-peek-img { width:100%; aspect-ratio:4/3; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:72px; }
+  .menu-peek-img img { width:100%; height:100%; object-fit:cover; display:block; }
+  .menu-peek-name { font-family:'Jua',sans-serif; font-size:20px; color:var(--text); padding:14px 16px 6px; }
+  .menu-peek-tags { display:flex; flex-wrap:wrap; gap:6px; padding:0 16px; }
+  .menu-peek-tags span { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:3px 9px; }
+  .menu-peek-btns { display:flex; gap:8px; padding:14px 16px 16px; }
+  .menu-peek-btns button { flex:1; padding:11px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+  .menu-peek-btns button.primary { background:var(--orange); border-color:var(--orange); color:#fff; }
   .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:6px 4px; min-height:40px; font-size:11.5px; line-height:1.25; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:3px; text-align:center; font-weight:600; }
   .result-btn:hover { border-color:var(--orange-soft); color:var(--orange-soft); }
   .result-btn.like-btn { border-color:var(--red) !important; color:var(--red); }
@@ -984,8 +1008,9 @@
   </div>
 
   <div id="filter-area" style="display:none">
-    <div class="section-title">
-      2. 조건 고르기
+    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span>2. 조건 고르기</span>
+      <button id="clear-all-tags" onclick="clearAllConditions()" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:999px;color:var(--muted);font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">↺ 선택 전체 취소 <span id="clear-all-count"></span></button>
     </div>
 
     <div id="filter-tags" class="crave-mode">
@@ -1928,8 +1953,8 @@
               📷<input type="file" accept="image/*" style="display:none" onchange="attachVoteImg(this,0)">
             </label>
           </div>
-          <div id="vote-img-preview-0" style="display:none;position:relative;width:60px;height:60px">
-            <img id="vote-img-0" style="width:60px;height:60px;object-fit:cover;border-radius:8px" src="" alt="">
+          <div id="vote-img-preview-0" style="display:none;position:relative;width:96px;height:96px">
+            <img id="vote-img-0" style="width:96px;height:96px;object-fit:cover;border-radius:10px" src="" alt="">
             <button onclick="removeVoteImg(0)" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:11px;cursor:pointer;line-height:1">×</button>
           </div>
         </div>
@@ -1941,8 +1966,8 @@
               📷<input type="file" accept="image/*" style="display:none" onchange="attachVoteImg(this,1)">
             </label>
           </div>
-          <div id="vote-img-preview-1" style="display:none;position:relative;width:60px;height:60px">
-            <img id="vote-img-1" style="width:60px;height:60px;object-fit:cover;border-radius:8px" src="" alt="">
+          <div id="vote-img-preview-1" style="display:none;position:relative;width:96px;height:96px">
+            <img id="vote-img-1" style="width:96px;height:96px;object-fit:cover;border-radius:10px" src="" alt="">
             <button onclick="removeVoteImg(1)" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:11px;cursor:pointer;line-height:1">×</button>
           </div>
         </div>
@@ -2343,6 +2368,9 @@
     <div class="my-setting-row" onclick="toggleTheme();this.querySelector('span:last-child').textContent=localStorage.getItem('wmjTheme')==='light'?'라이트':'다크'">
       <span>🌙 다크/라이트 모드</span><span style="font-size:11px;color:var(--orange)" id="theme-label">다크</span>
     </div>
+    <div class="my-setting-row" onclick="TapSound.set(!TapSound.isOn());document.getElementById('tap-sound-label').textContent=TapSound.isOn()?'켜짐':'꺼짐'">
+      <span>🔔 버튼 누를 때 소리</span><span style="font-size:11px;color:var(--orange)" id="tap-sound-label">켜짐</span>
+    </div>
     <div class="my-setting-row" onclick="showOnboarding()">
       <span>👋 앱 소개 다시 보기</span><span class="my-setting-arrow">›</span>
     </div>
@@ -2422,7 +2450,7 @@
   <!-- 프로필 -->
   <div class="my-profile-card">
     <div class="my-profile-top">
-      <div class="my-avatar" id="my-avatar">😋</div>
+      <div class="my-avatar" id="my-avatar" onclick="openAvatarPicker()" role="button" aria-label="프로필 사진 바꾸기" style="cursor:pointer;position:relative">😋</div>
       <div class="my-profile-info">
         <div class="my-nickname" id="my-profile-nick">로딩중...</div>
         <div class="my-join">오메추 회원</div>
@@ -2706,7 +2734,7 @@ function renderFavSection() {
   wrap.innerHTML = '<div class="fav-chips-row">' + chipTags.map(tag => {
     const isActive = activeTags.includes(tag);
     const pureTagText = tag.replace(/\s/g,'').length <= 4 ? true : false;
-    return `<span class="fav-chip ${isActive ? 'active' : ''}" onclick="applyFavTag('${tag.replace(/'/g,"\\'")}')">
+    return `<span class="fav-chip ${isActive ? 'active' : ''}" data-tag="${tag.replace(/"/g,'&quot;')}" onclick="applyFavTag(this.dataset.tag)">
       <span>${tag}</span>
       ${useQuick ? '' : `<button class="fav-chip-star ${pureTagText ? 'wide' : ''}" onclick="event.stopPropagation();toggleFavTag('${tag.replace(/'/g,"\\'")}', null)" title="즐겨찾기 해제">★</button>`}
     </span>`;
@@ -2768,6 +2796,16 @@ function applyHatePreset(key) {
   updateCandidateCount();
 }
 
+function clearAllConditions() {
+  clearPreset(); syncFavChips(); updateClearAllBtn();
+  showToast('고른 조건을 모두 취소했어요');
+}
+function updateClearAllBtn() {
+  const b = document.getElementById('clear-all-tags'); if (!b) return;
+  const n = new Set(getActiveTags()).size;
+  b.style.display = n ? 'inline-block' : 'none';
+  const c = document.getElementById('clear-all-count'); if (c) c.textContent = n ? `(${n})` : '';
+}
 function clearPreset() {
   document.querySelectorAll('.tag.active').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
@@ -3665,12 +3703,13 @@ function applyFavTag(tagText) {
 function syncFavChips() {
   const activeTags = getActiveTags();
   document.querySelectorAll('.fav-chip').forEach(chip => {
-    const chipTag = chip.querySelector('span')?.textContent?.trim();
+    const chipTag = chip.dataset.tag || chip.querySelector('span')?.textContent?.trim();
     if (chipTag) chip.classList.toggle('active', activeTags.includes(chipTag));
   });
 }
 
 function updateSummary() {
+  setTimeout(updateClearAllBtn, 0);
   const activeTags = [...document.querySelectorAll('.tag.active')];
   const bar = document.getElementById('summary-bar');
   if (activeTags.length === 0) { bar.classList.remove('show'); return; }
@@ -4973,7 +5012,46 @@ function paintFoodFriends() {
   const hero = document.getElementById('hero-chars');
   if (hero) { const side = ['mandu', 'egg', 'kimbap', 'onigiri'].filter(k => k !== mine); hero.classList.add('chars'); hero.innerHTML = img(side[0], 'smile') + img(mine, look.face || 'happy') + img(side[1], 'smile'); }
   const av = document.getElementById('my-avatar');
-  if (av) { av.classList.add('char'); av.innerHTML = img(mine, look.face || 'smile'); }
+  if (av) {
+    let a = {}; try { a = JSON.parse(localStorage.getItem('wmjAvatar') || '{}') || {}; } catch (e) {}
+    const cam = '<span class="my-avatar-cam">📷</span>';
+    if (a.type === 'photo' && typeof a.src === 'string' && a.src.startsWith('data:image/')) { av.classList.add('char'); av.innerHTML = `<img src="${a.src}" alt="" style="width:100%;height:100%;object-fit:cover;margin:0">` + cam; }
+    else if (a.type === 'emoji' && a.v) { av.classList.remove('char'); av.textContent = a.v; av.insertAdjacentHTML('beforeend', cam); }
+    else { const k = a.type === 'char' && FoodChars.BY[a.v] ? a.v : mine; av.classList.add('char'); av.innerHTML = img(k, k === mine ? (look.face || 'smile') : 'smile') + cam; }
+  }
+}
+// 프로필 사진: 내 캐릭터 / 다른 음식 친구 / 이모지 / 내 사진 (사진은 이 기기에만 저장)
+const AVATAR_EMOJIS = ['😋', '🍜', '🍕', '🍣', '🍗', '🍰', '🍺', '☕', '🐻', '🐱', '🐶', '🦊'];
+function saveAvatar(a) { try { localStorage.setItem('wmjAvatar', JSON.stringify(a)); } catch (e) { showToast('저장 공간이 부족해요'); return; } paintFoodFriends(); closeAvatarPicker(); showToast('프로필 사진을 바꿨어요'); }
+function openAvatarPicker() {
+  let el = document.getElementById('avatar-picker');
+  if (!el) { el = document.createElement('div'); el.id = 'avatar-picker'; el.className = 'menu-peek'; el.onclick = (e) => { if (e.target === el) closeAvatarPicker(); }; document.body.appendChild(el); }
+  const ch = window.FoodChars ? FoodChars.IDS.filter(k => FoodChars.isOpen(k)) : [];
+  el.innerHTML = `<div class="menu-peek-box" style="padding:16px">
+    <div class="menu-peek-name" style="padding:0 0 10px">프로필 사진 바꾸기</div>
+    <label class="avatar-upload">📷 내 사진 올리기<input type="file" accept="image/*" style="display:none" onchange="pickAvatarPhoto(this)"></label>
+    <div class="avatar-sub">음식 친구</div>
+    <div class="avatar-grid">${ch.map(k => `<button onclick="saveAvatar({type:'char',v:'${k}'})"><img src="${FoodChars.url(k, '#ffd36b', 'none', 'smile', false)}" alt="${escHtml(FoodChars.name(k))}"></button>`).join('')}</div>
+    <div class="avatar-sub">이모지</div>
+    <div class="avatar-grid">${AVATAR_EMOJIS.map(e => `<button onclick="saveAvatar({type:'emoji',v:'${e}'})" style="font-size:26px">${e}</button>`).join('')}</div>
+    <div class="menu-peek-btns" style="padding:14px 0 0"><button onclick="localStorage.removeItem('wmjAvatar');paintFoodFriends();closeAvatarPicker()">내 꾸미기 캐릭터로</button><button onclick="closeAvatarPicker()">닫기</button></div>
+    <div class="avatar-sub" style="text-align:center;margin-top:10px">올린 사진은 이 기기에만 저장되고, 다른 사람에게는 보이지 않아요</div>
+  </div>`;
+  if (typeof twemoji !== 'undefined' && twemoji.parse) try { twemoji.parse(el); } catch (e) {}
+  el.classList.add('open');
+}
+function closeAvatarPicker() { const el = document.getElementById('avatar-picker'); if (el) el.classList.remove('open'); }
+function pickAvatarPhoto(input) {
+  const f = input.files && input.files[0]; if (!f) return;
+  if (!/^image\//.test(f.type)) { showToast('사진 파일만 올릴 수 있어요'); return; }
+  const url = URL.createObjectURL(f), im = new Image();
+  im.onload = () => {
+    const S = 192, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+    const side = Math.min(im.width, im.height); g.drawImage(im, (im.width - side) / 2, (im.height - side) / 2, side, side, 0, 0, S, S);   // 가운데를 정사각형으로
+    URL.revokeObjectURL(url); saveAvatar({ type: 'photo', src: c.toDataURL('image/jpeg', 0.82) });
+  };
+  im.onerror = () => { URL.revokeObjectURL(url); showToast('사진을 열 수 없어요'); };
+  im.src = url;
 }
 document.addEventListener('DOMContentLoaded', paintFoodFriends);
 // 3D 가게에서 돌아오면 먹자골목 화면으로 바로 엶
@@ -4992,6 +5070,7 @@ window.addEventListener('load', () => {
   setTimeout(() => { showPage('pocha'); if (h === '#dress' && window.Pocha) Pocha.openDress(); }, 80);
 });
 function showPage(page) {
+  if (page === 'settings') setTimeout(() => { const l = document.getElementById('tap-sound-label'); if (l && window.TapSound) l.textContent = TapSound.isOn() ? '켜짐' : '꺼짐'; }, 0);
   if (page === 'mypage' || page === 'home') setTimeout(paintFoodFriends, 0);
   window.scrollTo(0, 0);
   if (page !== 'pocha' && window.Pocha) Pocha.close();
@@ -5450,10 +5529,28 @@ function renderSimilarChips(menuName, cardIdx) {
     return;
   }
   wrap.innerHTML = similars.map(m =>
-    `<span class="similar-chip">${m.emoji} ${m.name}</span>`
+    `<span class="similar-chip" data-menu="${m.name.replace(/"/g,'&quot;')}" onclick="openMenuPeek(this.dataset.menu)">${m.emoji} ${m.name}</span>`
   ).join('');
   wrap.classList.add('open');
 }
+
+// 메뉴 한눈에 보기: 사진(없으면 이모지) + 근처 찾기
+function openMenuPeek(name) {
+  const m = menuDB.find(x => x.name === name); if (!m) return;
+  let el = document.getElementById('menu-peek');
+  if (!el) { el = document.createElement('div'); el.id = 'menu-peek'; el.className = 'menu-peek'; el.onclick = (e) => { if (e.target === el) closeMenuPeek(); }; document.body.appendChild(el); }
+  const img = getMenuImg(m.name), safe = escHtml(m.name), js = m.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  const tags = (m.tags || []).filter(t => /한식|중식|일식|양식|매운|국물|면|밥|고기|해산물|채소|튀김|담백|달달/.test(t)).slice(0, 4);
+  el.innerHTML = `<div class="menu-peek-box">
+    <div class="menu-peek-img">${img ? `<img src="${img}" alt="${safe}" onerror="this.outerHTML='<span>${m.emoji}</span>'">` : `<span>${m.emoji}</span>`}</div>
+    <div class="menu-peek-name">${m.emoji} ${safe}</div>
+    <div class="menu-peek-tags">${tags.map(t => `<span>${t}</span>`).join('')}</div>
+    <div class="menu-peek-btns"><button class="primary" onclick="closeMenuPeek();openNearbyMap('${js}')">📍 근처에서 찾기</button><button onclick="closeMenuPeek()">닫기</button></div>
+  </div>`;
+  if (typeof twemoji !== 'undefined' && twemoji.parse) try { twemoji.parse(el); } catch (e) {}
+  el.classList.add('open');
+}
+function closeMenuPeek() { const el = document.getElementById('menu-peek'); if (el) el.classList.remove('open'); }
 
 function toggleSimilar(menuName, cardIdx) {
   const wrap = document.getElementById('similar-' + cardIdx);
@@ -9074,14 +9171,16 @@ function renderCommFeed(tab) {
           options.map((opt, i) => {
             const pct = total ? Math.round(counts[i]/total*100) : Math.round(100/options.length);
             const showResult = voted !== undefined || isClosed;
-            const vImg = p.voteImgs && p.voteImgs[i] ? `<img src="${p.voteImgs[i]}" style="width:100%;height:70px;object-fit:cover;border-radius:8px;margin-bottom:4px;display:block">` : '';
+            const pend = pendingVotes[p.id] === i;
+            const vImg = p.voteImgs && p.voteImgs[i] ? `<div class="comm-vote-img ${pend ? 'pend' : ''}" ${!isClosed && voted === undefined ? `onclick="voteComm('${p.id}',${i})"` : ''}><img src="${p.voteImgs[i]}" alt=""></div>` : '';
             return `<div style="flex:1;min-width:80px">
               ${vImg}
-              <button class="comm-vote-btn ${voted===String(i)?'voted':''}" ${isClosed?'disabled style="opacity:0.7;cursor:default"':''} onclick="voteComm('${p.id}',${i})">${opt}</button>
+              <button class="comm-vote-btn ${voted===String(i)?'voted':''} ${pend?'pend':''}" ${isClosed||voted!==undefined?'disabled style="cursor:default"':''} onclick="voteComm('${p.id}',${i})">${pend ? '✓ ' : ''}${opt}</button>
               ${showResult ? `<div class="comm-vote-bar"><div class="comm-vote-bar-fill" style="width:${pct}%"></div></div><div style="font-size:11px;color:var(--muted);text-align:center;margin-top:2px">${pct}%</div>` : ''}
             </div>`;
           }).join('') +
         `</div>` +
+        (!isClosed && voted === undefined && pendingVotes[p.id] !== undefined ? `<button onclick="confirmVoteComm('${p.id}')" style="width:100%;margin-top:8px;padding:11px;background:var(--orange);border:none;border-radius:12px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">✅ '${options[pendingVotes[p.id]]}'(으)로 확정하기</button><div style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">확정하기 전에는 다른 걸 눌러 바꾸거나, 같은 걸 다시 눌러 취소할 수 있어요</div>` : '') +
         (isClosed ? `<button onclick="revoteComm('${p.id}')" style="width:100%;margin-top:8px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif">🔄 다시 투표하기</button>` : '');
       }
     }
@@ -9160,7 +9259,18 @@ function likeCommPost(id) {
   renderCommFeed();
 }
 
-async function voteComm(id, choiceIdx) {
+// 고르기만 하고(바꾸기·취소 가능) 확정하기를 눌러야 실제로 투표됨
+const pendingVotes = {};
+function voteComm(id, choiceIdx) {
+  if (votedPosts[id] !== undefined) { showToast('이미 투표했어요!'); return; }
+  if (pendingVotes[id] === choiceIdx) delete pendingVotes[id]; else pendingVotes[id] = choiceIdx;
+  renderCommFeed();
+}
+function confirmVoteComm(id) {
+  const c = pendingVotes[id]; if (c === undefined) return;
+  delete pendingVotes[id]; submitVoteComm(id, c);
+}
+async function submitVoteComm(id, choiceIdx) {
   const post = commPosts.find(p => p.id === id);
   if (!post) return;
 
@@ -9302,8 +9412,8 @@ function openCommWrite() {
           📷<input type="file" accept="image/*" style="display:none" onchange="attachVoteImg(this,${n-1})">
         </label>
       </div>
-      <div id="vote-img-preview-${n-1}" style="display:none;position:relative;width:60px;height:60px">
-        <img id="vote-img-${n-1}" style="width:60px;height:60px;object-fit:cover;border-radius:8px" src="" alt="">
+      <div id="vote-img-preview-${n-1}" style="display:none;position:relative;width:96px;height:96px">
+        <img id="vote-img-${n-1}" style="width:96px;height:96px;object-fit:cover;border-radius:10px" src="" alt="">
         <button onclick="removeVoteImg(${n-1})" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:11px;cursor:pointer;line-height:1">×</button>
       </div>
     </div>`
@@ -9391,8 +9501,8 @@ function addVoteOption() {
       </label>
       <button onclick="this.closest('.comm-vote-option-row').remove();updateVoteAddBtn()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;flex-shrink:0;line-height:1">×</button>
     </div>
-    <div id="vote-img-preview-${n}" style="display:none;position:relative;width:60px;height:60px">
-      <img id="vote-img-${n}" style="width:60px;height:60px;object-fit:cover;border-radius:8px" src="" alt="">
+    <div id="vote-img-preview-${n}" style="display:none;position:relative;width:96px;height:96px">
+      <img id="vote-img-${n}" style="width:96px;height:96px;object-fit:cover;border-radius:10px" src="" alt="">
       <button onclick="removeVoteImg(${n})" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;width:16px;height:16px;font-size:11px;cursor:pointer;line-height:1">×</button>
     </div>`;
   wrap.appendChild(div);
@@ -10009,6 +10119,7 @@ img.twemoji {
   display: inline-block;
 }
 </style>
+<script src="tap-sound.js"></script>
 <script src="pocha-chars.js"></script>
 <script src="pocha.js"></script>
 </body>

@@ -16,6 +16,7 @@
   .count { font-size:12px; background:#00000070; border:1px solid #ffffff2e; border-radius:999px; padding:4px 9px; white-space:nowrap; }
   .btn { background:#241d36; color:#fff; border:1px solid #4a4063; border-radius:12px; padding:9px 11px; font-size:13px; font-weight:700; white-space:nowrap; }
   .btn.on { background:#2b3f73; border-color:#7f9be0; }
+  .btn.ico { padding:9px 10px; font-size:15px; line-height:1; }
   .btn.hot { background:#ff7a1a; border-color:#ff7a1a; }
   .sp { margin-left:auto; }
   .panel { position:fixed; left:0; right:0; bottom:0; padding:26px 12px calc(12px + env(safe-area-inset-bottom)); background:linear-gradient(#120e1e00, #120e1ee8 34%); z-index:5; pointer-events:none; }
@@ -42,12 +43,14 @@
   .game .gt { font-size:13px; font-weight:800; margin-bottom:8px; display:flex; justify-content:space-between; gap:8px; }
   .game .gt small { font-weight:400; color:#cfc6e6; }
   .game .go { display:flex; gap:8px; }
-  .game .go button { flex:1; min-width:0; background:#2a2240; border:2px solid #4a4063; border-radius:12px; color:#fff; padding:6px 6px 8px; font-size:13px; font-weight:700; }
-  .game .go button img, .game .go button .em { display:block; width:100%; height:64px; object-fit:cover; border-radius:8px; margin-bottom:6px; background:#120e1e; font-size:34px; line-height:64px; }
+  .game .go button { flex:1; min-width:0; background:#2a2240; border:2px solid #4a4063; border-radius:12px; color:#fff; padding:0 0 8px; font-size:13px; font-weight:700; overflow:hidden; }
+  .game .go button img, .game .go button .em { display:block; width:100%; aspect-ratio:1/1; height:auto; max-height:118px; object-fit:cover; margin-bottom:7px; background:#120e1e; font-size:40px; line-height:96px; }
   .game .go button.mine { border-color:#ff7a1a; background:#3a2616; }
+  .game .go button.sel { border-color:#ffc27a; box-shadow:0 0 0 2px #ffc27a55 inset; }
+  .game .ok { width:100%; margin-top:8px; }
   .game .go button:disabled { opacity:.75; }
   .game .vs { align-self:center; font-weight:800; color:#ffc27a; font-size:13px; }
-  .game .win { text-align:center; font-size:15px; font-weight:800; } .game .win img { width:120px; height:84px; object-fit:cover; border-radius:10px; display:block; margin:0 auto 8px; }
+  .game .win { text-align:center; font-size:15px; font-weight:800; } .game .win img { width:100%; max-height:150px; aspect-ratio:16/9; object-fit:cover; border-radius:10px; display:block; margin:0 auto 8px; }
   .sheet { position:fixed; inset:0; background:#000a; z-index:8; display:none; align-items:flex-end; }
   .sheet .box { background:#1b1529; width:100%; max-height:78vh; overflow-y:auto; border-radius:20px 20px 0 0; padding:16px 14px calc(18px + env(safe-area-inset-bottom)); box-sizing:border-box; }
   .sheet h3 { margin:14px 0 8px; font-size:13px; color:#cfc6e6; font-weight:700; } .sheet h3:first-child { margin-top:0; }
@@ -78,7 +81,7 @@
 <div class="top">
   <a class="back" id="back" href="./" aria-label="돌아가기">‹</a>
   <span class="title" id="title">오메추 포차</span><span class="count" id="count">연결 중…</span>
-  <button class="btn sp" id="dressbtn" aria-label="캐릭터 꾸미기">👕</button><button class="btn" id="snd">🔈 소리</button>
+  <button class="btn sp ico" id="dressbtn" aria-label="캐릭터 꾸미기">👕</button><button class="btn ico" id="setbtn" aria-label="설정">⚙️</button><button class="btn" id="snd" aria-label="빗소리 켜기">🔈</button>
 </div>
 <div id="bubbles"></div>
 <div class="toast" id="toast"></div>
@@ -87,6 +90,7 @@
 <div class="ask" id="ask"></div>
 <div class="err" id="err">이 기기에서는 3D 화면을 열 수 없어요.<br>오메추 앱의 먹자골목은 그대로 쓸 수 있어요.</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+<script src="tap-sound.js"></script>
 <script src="menu-lite.js"></script>
 <script src="pocha-chars.js"></script>
 <script type="module">
@@ -533,9 +537,9 @@ function leaveTable() { endGame(); if (tch && sb) { try { sb.removeChannel(tch);
 
 // ═══ 같이 고르기: 메뉴 투표(3개 중 하나) / 음식 월드컵(8강) ═══
 // 시작한 사람이 진행자: 모두 골랐거나 시간이 지나면 진행자가 결과를 알림 → 테이블 모두 같은 결과를 봄
-let game = null, gameTimer = null, gameWatch = null, lastGame = 0;
+let game = null, gameTimer = null, gameWatch = null, lastGame = 0, gameSel = null;
 const tableSids = () => [...people.values()].filter(p => p.t === me.t && me.t !== null).map(p => p.sid);
-function endGame() { clearTimeout(gameTimer); clearTimeout(gameWatch); game = null; const el = $('game'); if (el) el.innerHTML = ''; }
+function endGame() { gameSel = null; clearTimeout(gameTimer); clearTimeout(gameWatch); game = null; const el = $('game'); if (el) el.innerHTML = ''; }
 function startGame(kind) {
   if (me.t === null || tables[me.t].solo) return;
   if (game && !game.done) { toast('지금 고르는 중이에요'); return; }
@@ -553,7 +557,7 @@ function onGame(ev, m) {
   if (ev === 'g_start') {
     if (game && !game.done) return;
     const n = m.kind === 'wc' ? 8 : m.kind === 'vote' ? 3 : 0; if (!n || !Array.isArray(m.opts) || m.opts.length !== n || new Set(m.opts).size !== n || !m.opts.every(o => MENU_NAMES.has(o))) return;
-    endGame(); game = { id: m.id, kind: m.kind, host: m.sid, hostNick: from.d.nick, opts: m.opts, alive: m.opts.slice(), next: [], k: 0, picks: {}, done: false, winner: null };
+    endGame(); gameSel = null; game = { id: m.id, kind: m.kind, host: m.sid, hostNick: from.d.nick, opts: m.opts, alive: m.opts.slice(), next: [], k: 0, picks: {}, done: false, winner: null };
     log.push({ sys: true, text: `${from.d.nick}님이 ${m.kind === 'wc' ? '음식 월드컵' : '메뉴 투표'}을 시작했어요` }); armGame(); ui();
   } else if (ev === 'g_pick') {
     if (!game || game.done || m.id !== game.id || m.m !== game.k || !Number.isInteger(m.c) || m.c < 0 || m.c >= gameChoices().length || game.picks[m.sid] !== undefined) return;
@@ -563,7 +567,7 @@ function onGame(ev, m) {
     if (!game || game.done || m.id !== game.id || m.sid !== game.host || m.m !== game.k || !Number.isInteger(m.win) || m.win < 0 || m.win >= gameChoices().length) return;
     const won = gameChoices()[m.win];
     if (game.kind === 'vote') { game.done = true; game.winner = won; game.votes = Object.values(game.picks).filter(c => c === m.win).length; }
-    else { game.next.push(won); game.k++; game.picks = {}; if (game.k * 2 >= game.alive.length) { game.alive = game.next; game.next = []; game.k = 0; } if (game.alive.length === 1) { game.done = true; game.winner = game.alive[0]; } }
+    else { game.next.push(won); game.k++; game.picks = {}; gameSel = null; if (game.k * 2 >= game.alive.length) { game.alive = game.next; game.next = []; game.k = 0; } if (game.alive.length === 1) { game.done = true; game.winner = game.alive[0]; } }
     if (game.done) { clearTimeout(gameTimer); clearTimeout(gameWatch); log.push({ sys: true, text: `🍽️ 우리 테이블의 선택은 '${game.winner}'!` }); ui(true); }
     else armGame();
     renderGame();
@@ -572,7 +576,7 @@ function onGame(ev, m) {
 // 진행자는 제한 시간 뒤에 결과를 내고, 나머지는 진행자가 나가 버렸는지 지켜봄
 function armGame() {
   clearTimeout(gameTimer); clearTimeout(gameWatch); if (!game || game.done) return;
-  if (game.host === SID) gameTimer = setTimeout(resolveGame, game.kind === 'vote' ? 20000 : 10000);
+  if (game.host === SID) gameTimer = setTimeout(resolveGame, game.kind === 'vote' ? 30000 : 15000);
   else gameWatch = setTimeout(() => { if (game && !game.done) { endGame(); log.push({ sys: true, text: '진행하던 분이 자리를 떠서 고르기가 끝났어요' }); ui(true); } }, 40000);
 }
 function resolveGame() {
@@ -593,8 +597,11 @@ function renderGame() {
   if (game.done) { el.innerHTML = `<div class="game"><div class="win">${pic(game.winner)}🎉 ${esc(game.winner)}</div><div class="row" style="margin-top:10px;justify-content:center"><a class="btn hot" href="./#find=${encodeURIComponent(game.winner)}">📍 근처에서 찾기</a><button class="btn" id="gx">닫기</button></div></div>`; $('gx').onclick = endGame; return; }
   const ch2 = gameChoices(), mine = game.picks[SID], total = tableSids().length, done = Object.keys(game.picks).length;
   const title = game.kind === 'vote' ? '🗳️ 메뉴 투표' : `🏆 음식 월드컵 · ${game.alive.length === 2 ? '결승' : game.alive.length + '강'} ${game.k + 1}/${game.alive.length / 2}`;
-  el.innerHTML = `<div class="game"><div class="gt"><span>${title}</span><small>${done}/${total}명 선택</small></div><div class="go">${ch2.map((o, i) => `${i && game.kind === 'wc' ? '<span class="vs">VS</span>' : ''}<button data-c="${i}" class="${mine === i ? 'mine' : ''}" ${mine !== undefined ? 'disabled' : ''}>${pic(o)}${esc(o)}</button>`).join('')}</div></div>`;
-  el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => pickGame(+b.dataset.c));
+  const okBtn = mine !== undefined ? `<div style="text-align:center;font-size:12px;color:#cfc6e6;margin-top:8px">확정했어요 · 다른 분을 기다리는 중</div>`
+    : gameSel !== null ? `<button class="btn hot ok" id="gok">✅ '${esc(ch2[gameSel])}'(으)로 확정하기</button>` : `<div style="text-align:center;font-size:12px;color:#cfc6e6;margin-top:8px">고른 뒤 확정하기를 눌러요 · 확정 전엔 바꿀 수 있어요</div>`;
+  el.innerHTML = `<div class="game"><div class="gt"><span>${title}</span><small>${done}/${total}명 확정</small></div><div class="go">${ch2.map((o, i) => `${i && game.kind === 'wc' ? '<span class="vs">VS</span>' : ''}<button data-c="${i}" class="${mine === i ? 'mine' : gameSel === i && mine === undefined ? 'sel' : ''}" ${mine !== undefined ? 'disabled' : ''}>${pic(o)}${mine === i || (gameSel === i && mine === undefined) ? '✓ ' : ''}${esc(o)}</button>`).join('')}</div>${okBtn}</div>`;
+  el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { gameSel = gameSel === +b.dataset.c ? null : +b.dataset.c; renderGame(); });
+  if ($('gok')) $('gok').onclick = () => { const c = gameSel; gameSel = null; pickGame(c); };
 }
 
 // ═══ 앉기 / 일어나기 / 말하기 ═══
@@ -685,14 +692,28 @@ function renderSheet() {
     <h3>취향 효과 <small style="font-weight:400">· 머리 위로 떠올라요</small></h3><div class="grid">${Object.keys(FX).map(k => { const pr = fxProgress(k), f = FX[k]; return `<button data-k="fx" data-v="${k}" class="${myLook.fx === k ? 'on' : ''} ${pr.open ? '' : 'lock'}"><span class="fxe" style="${pr.open ? '' : 'filter:grayscale(1);opacity:.5'}">${f.e || '∅'}</span>${f.name}${pr.open ? '' : `<span class="lk">🔒 ${pr.have}/${pr.need}</span>`}</button>`; }).join('')}</div>
     <h3>표정</h3><div class="opts">${FACE_KEYS.map(k => `<button data-k="face" data-v="${k}" class="${myLook.face === k ? 'on' : ''}">${FACE_NAMES[k]}</button>`).join('')}</div>
     <h3>장식</h3><div class="opts">${ACC_KEYS.map(k => `<button data-k="acc" data-v="${k}" class="${myLook.acc === k ? 'on' : ''}">${ACC_NAMES[k]}</button>`).join('')}</div>
-    <h3>화면 품질</h3><div class="opts"><button id="ql" class="${lowQ ? '' : 'on'}">보통</button><button id="qh" class="${lowQ ? 'on' : ''}">가볍게</button></div>
     <div class="row" style="margin-top:16px"><button class="btn hot" id="sx" style="flex:1">완료</button></div>`;
   box.scrollTop = keep;
   $('sheetbox').querySelectorAll('[data-k]').forEach(b => b.onclick = () => setLook(b.dataset.k, b.dataset.v));
   $('sx').onclick = () => { $('sheet').style.display = 'none'; };
-  $('ql').onclick = () => { setQuality(false, true); renderSheet(); }; $('qh').onclick = () => { setQuality(true, true); renderSheet(); };
 }
-$('dressbtn').onclick = () => { renderSheet(); $('sheet').style.display = 'flex'; };
+let sheetMode = '';
+$('dressbtn').onclick = () => { sheetMode = 'dress'; renderSheet(); $('sheet').style.display = 'flex'; };
+// ⚙️ 설정: 빗소리 · 버튼 소리 · 화면 품질 · 2D 보기
+function renderSettings() {
+  const tap = window.TapSound ? TapSound.isOn() : false;
+  $('sheetbox').innerHTML = `<h3 style="font-size:15px;color:#fff">⚙️ 설정</h3>
+    <h3>빗소리</h3><div class="opts"><button id="s-on" class="${au ? 'on' : ''}">🔊 켜기</button><button id="s-off" class="${au ? '' : 'on'}">🔈 끄기</button></div>
+    <h3>버튼 누를 때 소리</h3><div class="opts"><button id="t-on" class="${tap ? 'on' : ''}">켜기</button><button id="t-off" class="${tap ? '' : 'on'}">끄기</button></div>
+    <h3>화면 품질 <small style="font-weight:400">· 버벅이면 '가볍게'</small></h3><div class="opts"><button id="ql" class="${lowQ ? '' : 'on'}">보통</button><button id="qh" class="${lowQ ? 'on' : ''}">가볍게</button></div>
+    <h3>보기 방식</h3><div class="opts"><a class="btn" href="./?v2d=1#meokja" style="border-radius:999px;padding:7px 12px;font-weight:400">2D 화면으로 보기</a></div>
+    <div class="row" style="margin-top:16px"><button class="btn hot" id="sx" style="flex:1">완료</button></div>`;
+  $('s-on').onclick = () => { if (!au) toggleSound(); renderSettings(); }; $('s-off').onclick = () => { if (au) toggleSound(); renderSettings(); };
+  $('t-on').onclick = () => { TapSound.set(true); renderSettings(); }; $('t-off').onclick = () => { TapSound.set(false); renderSettings(); };
+  $('ql').onclick = () => { setQuality(false, true); renderSettings(); }; $('qh').onclick = () => { setQuality(true, true); renderSettings(); };
+  $('sx').onclick = () => { $('sheet').style.display = 'none'; };
+}
+$('setbtn').onclick = () => { sheetMode = 'set'; renderSettings(); $('sheet').style.display = 'flex'; };
 $('sheet').onclick = (e) => { if (e.target === $('sheet')) $('sheet').style.display = 'none'; };
 
 // ═══ 느린 기기 대응: 초당 화면 수가 낮으면 자동으로 가볍게, 그래도 느리면 2D를 권함 ═══
@@ -708,7 +729,7 @@ function setQuality(low, byUser) {
 function watchFps(raw, T) {
   if (document.visibilityState !== 'visible' || raw > 0.5 || T < 3) return;
   fpsT += raw; fpsN++; if (fpsT < 4) return; const fps = fpsN / fpsT; fpsT = 0; fpsN = 0;
-  if (fps < 24 && !lowQ) { setQuality(true); toast('기기에 맞춰 화면을 가볍게 바꿨어요'); }
+  if (fps < 24 && !lowQ) { setQuality(true); toast('화면을 가볍게 바꿨어요 · ⚙️ 설정에서 되돌릴 수 있어요'); }
   else if (fps < 13 && lowQ && !slowAsked) { slowAsked = true; const a = $('ask'); a.style.display = 'block';
     a.innerHTML = `이 기기에서는 3D 화면이 느려요. 2D 화면으로 볼까요?<div class="row"><a class="btn hot" href="./?v2d=1#meokja">2D로 보기</a><button class="btn" id="askx">계속 3D로</button></div>`; $('askx').onclick = () => { a.style.display = 'none'; }; }
 }
@@ -729,48 +750,28 @@ function soundOn() {
   const body = gain(0.10); loop(white).connect(filt('bandpass', 620, 0.5)).connect(body).connect(rainBus);
   loop(brown).connect(filt('lowpass', 160, 0.7)).connect(gain(0.2)).connect(rainBus);
   const lfo = ctx.createOscillator(), lg = gain(0.025); lfo.frequency.value = 0.06; lfo.connect(lg).connect(body.gain); lfo.start();
-  // 주방: 지글지글
-  loop(white).connect(filt('highpass', 5200, 0.7)).connect(gain(0.012)).connect(out);
-  // 왁자지껄: 목소리 12개를 미리 만들어 두고, 사람 수에 따라 켜는 개수와 크기를 바꿈
-  const crowd = gain(0), crowdLP = filt('lowpass', 1700, 0.4); crowdLP.connect(crowd).connect(out);
-  const voices = [];
-  for (let i = 0; i < 12; i++) {
-    const osc = ctx.createOscillator(); osc.type = 'sawtooth'; const f0 = 95 + Math.random() * 150; osc.frequency.value = f0; osc.start();
-    const f1 = filt('bandpass', 500, 4), f2 = filt('bandpass', 1500, 5), mix = gain(0);
-    osc.connect(f1); osc.connect(f2); loop(white).connect(gain(0.25)).connect(f1); f1.connect(mix); f2.connect(gain(0.45)).connect(mix);
-    let dst = mix; if (ctx.createStereoPanner) { const pn = ctx.createStereoPanner(); pn.pan.value = Math.random() * 1.8 - 0.9; mix.connect(pn); dst = pn; }
-    dst.connect(crowdLP); voices.push({ osc, f0, f1, f2, mix, talk: 0, rest: Math.random() * 3 });
-  }
-  au = { ctx, out, rainBus, crowd, voices, white, active: 0 };
-  // 말소리 흉내: 0.14초마다 음절처럼 크기·입모양(포먼트)·높낮이를 바꿈. 한참 말하다 잠깐 쉼.
-  au.timer = setInterval(() => {
-    const t = ctx.currentTime;
-    voices.forEach((v, i) => {
-      if (i >= au.active) { v.mix.gain.setTargetAtTime(0, t, 0.1); return; }
-      if (v.rest > 0) { v.rest -= 0.14; v.mix.gain.setTargetAtTime(0, t, 0.08); if (v.rest <= 0) v.talk = 0.8 + Math.random() * 2.6; return; }
-      v.talk -= 0.14; if (v.talk <= 0) { v.rest = 0.3 + Math.random() * 2.2; return; }
-      v.mix.gain.setTargetAtTime(Math.random() < 0.18 ? 0.02 : 0.35 + Math.random() * 0.65, t, 0.03);
-      v.f1.frequency.setTargetAtTime(300 + Math.random() * 520, t, 0.04); v.f2.frequency.setTargetAtTime(900 + Math.random() * 1300, t, 0.04);
-      v.osc.frequency.setTargetAtTime(v.f0 * (0.88 + Math.random() * 0.3), t, 0.05);
-    });
-    if (Math.random() < 0.004 * (1 + au.active)) clink(0.5);
-  }, 140);
+  au = { ctx, out, rainBus, white };
   // 천막에 떨어지는 빗방울
   const drop = () => { if (!au) return; const t = ctx.currentTime, s = ctx.createBufferSource(); s.buffer = white; const f = filt('bandpass', 900 + Math.random() * 2600, 5 + Math.random() * 6), g = gain(0.0001);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime((TH.indoor ? 0.025 : 0.055) * (0.4 + Math.random()), t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05 + Math.random() * 0.09);
     s.connect(f).connect(g).connect(rainBus); s.start(t, Math.random() * 3, 0.2); au.dropT = setTimeout(drop, (TH.indoor ? 320 : 110) + Math.random() * (TH.indoor ? 900 : 380)); };
   drop(); crowdTune();
+  try { localStorage.setItem('wmj3dSound', '1'); } catch (e) {}
+  if (ctx.state === 'suspended') { const go = () => { ctx.resume(); removeEventListener('pointerdown', go, true); }; addEventListener('pointerdown', go, true); toast('화면을 한 번 누르면 빗소리가 이어져요'); }
 }
-function soundOff() { if (!au) return; clearInterval(au.timer); clearTimeout(au.dropT); const c = au.ctx; au.out.gain.setTargetAtTime(0, c.currentTime, 0.2); au = null; setTimeout(() => c.close().catch(() => {}), 800); }
+function soundOff() { if (!au) return; try { localStorage.setItem('wmj3dSound', '0'); } catch (e) {} clearInterval(au.timer); clearTimeout(au.dropT); const c = au.ctx; au.out.gain.setTargetAtTime(0, c.currentTime, 0.2); au = null; setTimeout(() => c.close().catch(() => {}), 800); }
 // 사람 수 → 왁자지껄 크기. 혼자여도 옆 가게에서 넘어오는 정도는 깔림. 혼술존에서는 조금 멀게 들림.
-function crowdTune() {
-  if (!au) return; const n = Math.max(0, STREET ? Math.round((lobbyTotal - 1) * 0.6) : people.size - 1), t = au.ctx.currentTime, inSolo = me.t !== null && tables[me.t].solo;
-  au.active = Math.min(12, 2 + n * 2);
-  au.crowd.gain.setTargetAtTime(Math.min(0.5, 0.05 + n * 0.045) * (inSolo ? 0.6 : 1), t, 1.2);
-  au.rainBus.frequency.setTargetAtTime(STREET ? 9000 : TH.indoor ? (inSolo ? 2800 : 1300) : (inSolo ? 6500 : 4200), t, 0.8);     // 창가는 빗소리가 더 또렷
+function crowdTune() {      // 빗소리 결: 골목은 또렷하게, 가게 안은 창밖처럼, 창가 자리는 조금 더 가깝게
+  if (!au) return; const t = au.ctx.currentTime, inSolo = me.t !== null && tables[me.t].solo;
+  au.rainBus.frequency.setTargetAtTime(STREET ? 9000 : TH.indoor ? (inSolo ? 2800 : 1300) : (inSolo ? 6500 : 4200), t, 0.8);
 }
+
 function clink(v = 1) { if (!au) return; const c = au.ctx, t = c.currentTime; for (const f of [2100 + Math.random() * 500, 3300 + Math.random() * 700]) { const o = c.createOscillator(), g = c.createGain(); o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.06 * v, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5); o.connect(g).connect(au.out); o.start(t); o.stop(t + 0.55); } }
-$('snd').onclick = () => { try { if (au) soundOff(); else soundOn(); } catch (e) { toast('이 기기에서는 소리를 낼 수 없어요'); } $('snd').textContent = au ? '🔊 소리 끄기' : '🔈 소리'; $('snd').classList.toggle('on', !!au); };
+function sndBtn() { $('snd').textContent = au ? '🔊' : '🔈'; $('snd').setAttribute('aria-label', au ? '빗소리 끄기' : '빗소리 켜기'); $('snd').classList.toggle('on', !!au); }
+function toggleSound() { try { if (au) soundOff(); else soundOn(); } catch (e) { toast('이 기기에서는 소리를 낼 수 없어요'); } sndBtn(); if ($('sheet').style.display === 'flex' && sheetMode === 'set') renderSettings(); }
+$('snd').onclick = toggleSound;
+// 전에 소리를 켜 두었으면 가게를 옮겨도 이어서 켬
+try { if (localStorage.getItem('wmj3dSound') === '1') { soundOn(); sndBtn(); } } catch (e) {}
 setInterval(crowdTune, 1500);
 
 // ═══ 카메라·조작 ═══
