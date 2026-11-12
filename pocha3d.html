@@ -945,7 +945,7 @@ try { if (localStorage.getItem('wmj3dLow') === '1') setQuality(true); } catch (e
 ui(); connect(); requestAnimationFrame(frame);
 addEventListener('pagehide', () => { try { if (ch) ch.untrack(); if (lobby) lobby.untrack(); } catch (e) {} });
 $('title').textContent = TH.name; $('back').href = STREET ? './' : `pocha3d.html?room=street&from=${RID}`;
-window.__p3d = { renderer, scene, cam, humanSVG, HUMANS, owners, me, people, seats, tables, tap, sit, stand, quick, say, soundOn, SID, startGame, pickGame, onGame, setLook, setQuality, watchFps, get game() { return game; }, get lowQ() { return lowQ; }, get au() { return au; }, get log() { return log; } };
+window.__p3d = { renderer, scene, cam, humanSVG, HUMANS, owners, get sb() { return sb; }, get ch() { return ch; }, get tch() { return tch; }, get lobby() { return lobby; }, me, people, seats, tables, tap, sit, stand, quick, say, soundOn, SID, startGame, pickGame, onGame, setLook, setQuality, watchFps, get game() { return game; }, get lowQ() { return lowQ; }, get au() { return au; }, get log() { return log; } };
 </script>
 </body>
 </html>
