@@ -51,6 +51,15 @@
   .sheet { position:fixed; inset:0; background:#000a; z-index:8; display:none; align-items:flex-end; }
   .sheet .box { background:#1b1529; width:100%; max-height:78vh; overflow-y:auto; border-radius:20px 20px 0 0; padding:16px 14px calc(18px + env(safe-area-inset-bottom)); box-sizing:border-box; }
   .sheet h3 { margin:14px 0 8px; font-size:13px; color:#cfc6e6; font-weight:700; } .sheet h3:first-child { margin-top:0; }
+  .pv { position:sticky; top:-16px; z-index:2; margin:-16px -14px 10px; padding:14px 14px 10px; background:linear-gradient(#2a2040, #1b1529); display:flex; align-items:center; gap:14px; border-bottom:1px solid #3a3152; }
+  .pv .stage { position:relative; width:110px; height:110px; flex:none; border-radius:50%; background:radial-gradient(circle at 50% 60%, #4a3a6a, #1b1529 70%); }
+  .pv .stage img { position:absolute; left:5px; top:2px; width:100px; height:100px; animation:pvbob 2.4s ease-in-out infinite; filter:drop-shadow(0 6px 6px #0008); }
+  .pv .stage .f { position:absolute; font-size:20px; bottom:58px; opacity:0; animation:pvfx 2.6s ease-out infinite; pointer-events:none; }
+  .pv .stage .f:nth-child(3) { left:18px; animation-delay:-.9s; } .pv .stage .f:nth-child(4) { left:48px; animation-delay:-1.8s; } .pv .stage .f:nth-child(2) { left:76px; }
+  .pv .nm { font-size:16px; font-weight:800; } .pv .sub { font-size:12px; color:#cfc6e6; margin-top:4px; line-height:1.5; }
+  @keyframes pvbob { 0%,100% { transform:translateY(0) scaleY(1); } 50% { transform:translateY(-4px) scaleY(1.03); } }
+  @keyframes pvfx { 0% { transform:translateY(0) scale(.7); opacity:0; } 20% { opacity:1; } 100% { transform:translateY(-52px) scale(1.15); opacity:0; } }
+  @media (prefers-reduced-motion: reduce) { .pv .stage img, .pv .stage .f { animation:none; } .pv .stage .f { opacity:.9; } }
   .grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
   .grid button { background:#2a2240; border:2px solid #3a3152; border-radius:12px; color:#fff; padding:6px 2px; font-size:11.5px; position:relative; }
   .grid button img { width:52px; height:52px; display:block; margin:0 auto 2px; } .grid button.on { border-color:#ff7a1a; background:#3a2616; }
@@ -669,12 +678,16 @@ function setLook(k, v) {
 }
 function renderSheet() {
   const img = (k) => FoodChars.url(k, '#ffd36b', 'none', 'smile', false);
-  $('sheetbox').innerHTML = `<h3>캐릭터 <small style="font-weight:400">· 좋아요한 메뉴 취향에 따라 열려요</small></h3><div class="grid">${FoodChars.IDS.map(k => { const pr = FoodChars.progress(k); return `<button data-k="kind" data-v="${k}" class="${myLook.kind === k ? 'on' : ''} ${pr.open ? '' : 'lock'}"><img src="${img(k)}" alt="">${esc(FoodChars.name(k))}${pr.open ? '' : `<span class="lk">🔒 ${pr.have}/${pr.need}</span>`}</button>`; }).join('')}</div>
+  const box = $('sheetbox'), keep = box.scrollTop, f = FX[myLook.fx] || FX.none;
+  const pv = `<div class="pv"><div class="stage"><img src="${FoodChars.url(myLook.kind, '#ffd36b', myLook.acc, myLook.face, false)}" alt="내 캐릭터">${f.e ? `<span class="f">${f.e}</span><span class="f">${f.e}</span><span class="f">${f.e}</span>` : ''}</div>
+    <div><div class="nm">${esc(myNick)}</div><div class="sub">${esc(FoodChars.name(myLook.kind))} · ${FACE_NAMES[myLook.face]}${myLook.acc !== 'none' ? ' · ' + ACC_NAMES[myLook.acc] : ''}${f.e ? '<br>' + f.e + ' ' + f.name : ''}</div><div class="sub">바꾸면 가게 손님들에게도 바로 보여요</div></div></div>`;
+  box.innerHTML = pv + `<h3>캐릭터 <small style="font-weight:400">· 좋아요한 메뉴 취향에 따라 열려요</small></h3><div class="grid">${FoodChars.IDS.map(k => { const pr = FoodChars.progress(k); return `<button data-k="kind" data-v="${k}" class="${myLook.kind === k ? 'on' : ''} ${pr.open ? '' : 'lock'}"><img src="${img(k)}" alt="">${esc(FoodChars.name(k))}${pr.open ? '' : `<span class="lk">🔒 ${pr.have}/${pr.need}</span>`}</button>`; }).join('')}</div>
     <h3>취향 효과 <small style="font-weight:400">· 머리 위로 떠올라요</small></h3><div class="grid">${Object.keys(FX).map(k => { const pr = fxProgress(k), f = FX[k]; return `<button data-k="fx" data-v="${k}" class="${myLook.fx === k ? 'on' : ''} ${pr.open ? '' : 'lock'}"><span class="fxe" style="${pr.open ? '' : 'filter:grayscale(1);opacity:.5'}">${f.e || '∅'}</span>${f.name}${pr.open ? '' : `<span class="lk">🔒 ${pr.have}/${pr.need}</span>`}</button>`; }).join('')}</div>
     <h3>표정</h3><div class="opts">${FACE_KEYS.map(k => `<button data-k="face" data-v="${k}" class="${myLook.face === k ? 'on' : ''}">${FACE_NAMES[k]}</button>`).join('')}</div>
     <h3>장식</h3><div class="opts">${ACC_KEYS.map(k => `<button data-k="acc" data-v="${k}" class="${myLook.acc === k ? 'on' : ''}">${ACC_NAMES[k]}</button>`).join('')}</div>
     <h3>화면 품질</h3><div class="opts"><button id="ql" class="${lowQ ? '' : 'on'}">보통</button><button id="qh" class="${lowQ ? 'on' : ''}">가볍게</button></div>
     <div class="row" style="margin-top:16px"><button class="btn hot" id="sx" style="flex:1">완료</button></div>`;
+  box.scrollTop = keep;
   $('sheetbox').querySelectorAll('[data-k]').forEach(b => b.onclick = () => setLook(b.dataset.k, b.dataset.v));
   $('sx').onclick = () => { $('sheet').style.display = 'none'; };
   $('ql').onclick = () => { setQuality(false, true); renderSheet(); }; $('qh').onclick = () => { setQuality(true, true); renderSheet(); };
