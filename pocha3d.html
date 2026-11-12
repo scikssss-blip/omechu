@@ -124,7 +124,7 @@ const pxX = (x) => (x - 210) * 0.05, pxZ = (y) => (y - 416) * 0.05, toPx = (x, z
 const DOOR3 = Object.fromEntries(SHOPS.map(id => [id, { x: pxX(THEMES[id].door[0]), z: pxZ(THEMES[id].door[1]) }]));
 document.title = TH.name + ' 3D';
 const ROOM_CH = `omechu-${RID}3d-v1`, TABLE_CH = (t) => `omechu-${RID}3d-t${t}-v1`, LOBBY_CH = 'omechu-street-v1';
-const SID = Math.random().toString(36).slice(2, 10);            // 이번 접속용 임시 ID (개인 식별 X)
+const SID = Math.random().toString(36).slice(2, 10), JOINED = Date.now();            // 이번 접속용 임시 ID (개인 식별 X)
 const BAD = /(시발|씨발|씨빨|ㅅㅂ|ㅆㅂ|병신|ㅂㅅ|좆|존나|개새|새끼|꺼져|닥쳐|섹스|자살|죽어|느금|애미|애비)/g;
 const clean = (t) => String(t || '').slice(0, 60).replace(BAD, (m) => '♡'.repeat(m.length));
 const ACC_KEYS = ['none', 'towel', 'beanie', 'glasses', 'ribbon', 'chef'], FACE_KEYS = ['smile', 'happy', 'sleepy', 'wow'], EMOTES = ['👋', '😋', '😂', '🔥', '👍'];
@@ -545,7 +545,7 @@ function safe(p) {
   const s = t !== null && Number.isInteger(p.s) && p.s >= 0 && p.s < tables[t].cap ? p.s : null;
   const num = (v, lo, hi, d) => (typeof v === 'number' && isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d);
   return { nick: String(p.nick ?? '손님').slice(0, 12) || '손님', kind: FoodChars.BY[p.kind] ? p.kind : 'onigiri', face: FACE_KEYS.includes(p.face) ? p.face : 'smile', acc: ACC_KEYS.includes(p.acc) ? p.acc : 'none', fx: Object.prototype.hasOwnProperty.call(FX, p.fx) ? p.fx : 'none',
-    t: s === null ? null : t, s, x: STREET ? num(p.x, -3.4, 4.0, 0.25) : num(p.x, -HW + 0.6, HW - 0.6, 0), z: STREET ? num(p.z, -12.8, 20.4, 18) : num(p.z, -3.9, HD + 4, HD - 1), at: num(p.at, 0, 9e15, 0) };
+    j: num(p.j, 0, 9e15, 0), t: s === null ? null : t, s, x: STREET ? num(p.x, -3.4, 4.0, 0.25) : num(p.x, -HW + 0.6, HW - 0.6, 0), z: STREET ? num(p.z, -12.8, 20.4, 18) : num(p.z, -3.9, HD + 4, HD - 1), at: num(p.at, 0, 9e15, 0) };
 }
 // ── 골목: 골목 채널 하나로 위치·가게별 인원수를 주고받음 (2D 골목과 같은 채널·같은 좌표) ──
 let shopCount = {}, lobbyTotal = 0, goDoor = null;
@@ -555,7 +555,8 @@ function streetSync() {
     const q = arr && arr[0]; if (!okSid(k) || !q || typeof q !== 'object') continue; lobbyTotal++;
     const r = k === SID ? 'street' : SHOPS.includes(q.room) ? q.room : 'street'; shopCount[r] = (shopCount[r] || 0) + 1;
     if (k === SID || r !== 'street') continue;
-    const d = safe({ nick: q.nick, kind: q.kind, face: q.face, acc: q.acc, fx: q.fx, x: pxX(+q.x), z: pxZ(+q.y) }); if (!d) continue; seen.add(k);
+    const d = safe({ nick: q.nick, kind: q.kind, face: q.face, acc: q.acc, fx: q.fx, j: q.j, x: pxX(+q.x), z: pxZ(+q.y) }); if (!d) continue;
+    const dup = Object.entries(raw).some(([k2, a2]) => k2 !== k && a2 && a2[0] && a2[0].nick === q.nick && a2[0].kind === q.kind && (+a2[0].j || 0) > (+q.j || 0)); if (dup) continue; seen.add(k);
     let p = people.get(k); const lk = lookKey(d);
     if (p && p.look !== lk) restyle(p, d);
     if (!p) { p = makePerson(k, d, false); p.g.position.set(d.x, 0, d.z); } else if (Math.hypot(p.g.position.x - d.x, p.g.position.z - d.z) > 0.15) p.target = { x: d.x, z: d.z };
@@ -572,11 +573,18 @@ function connectStreet() {
   setInterval(track, 30000);
 }
 function track() { if (!ch || !joined) return;
-  if (STREET) { const d = me.target || me.g.position, [x, y] = toPx(d.x, d.z); return ch.track({ nick: myNick, kind: myLook.kind, color: '#ffd36b', acc: myLook.acc, face: myLook.face, fx: myLook.fx, room: 'street', x, y }); } const d = me.target || me.g.position; return ch.track({ ...myLook, t: me.t, s: me.s, at: seatAt, x: +d.x.toFixed(2), z: +d.z.toFixed(2) }); }
+  if (STREET) { const d = me.target || me.g.position, [x, y] = toPx(d.x, d.z); return ch.track({ nick: myNick, kind: myLook.kind, color: '#ffd36b', acc: myLook.acc, face: myLook.face, fx: myLook.fx, j: JOINED, room: 'street', x, y }); } const d = me.target || me.g.position; return ch.track({ ...myLook, j: JOINED, t: me.t, s: me.s, at: seatAt, x: +d.x.toFixed(2), z: +d.z.toFixed(2) }); }
+// 새로고침·앱 재시작 직후엔 이전 접속이 서버에 1분 가까이 남음 → 같은 닉네임+캐릭터는 가장 최근 접속 하나만 보여줌
+function latestOnly(entries, myKey) {
+  const best = new Map();
+  for (const [k, d] of entries) { const id = d.nick + '|' + d.kind; if (id === myKey) continue; const b = best.get(id); if (!b || d.j > b[1].j) best.set(id, [k, d]); }
+  return [...best.values()];
+}
 function sync() {
   const raw = ch.presenceState(), seen = new Set();
-  for (const [k, arr] of Object.entries(raw)) {
-    if (!okSid(k) || k === SID) continue; const d = safe(arr && arr[0]); if (!d) continue; seen.add(k);
+  const list = latestOnly(Object.entries(raw).filter(([k]) => okSid(k) && k !== SID).map(([k, arr]) => [k, safe(arr && arr[0])]).filter(([, d]) => d), myLook.nick + '|' + myLook.kind);   // 내 이전 접속(유령)도 숨김
+  for (const [k, d] of list) {
+    seen.add(k);
     let p = people.get(k); const lk = lookKey(d);
     if (p && p.look !== lk) restyle(p, d);
     if (!p) { p = makePerson(k, d, false); p.g.position.set(d.x, 0, d.z); }
