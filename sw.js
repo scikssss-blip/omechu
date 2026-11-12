@@ -1,5 +1,5 @@
 // 오메추 서비스 워커 — 앱 화면만 캐시하고, Supabase 등 외부 요청은 건드리지 않음
-const CACHE = 'omechu-v4';
+const CACHE = 'omechu-v5';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png', '/pocha.js', '/pocha-chars.js', '/pocha.css', '/tap-sound.js'];
 
 self.addEventListener('install', e => {

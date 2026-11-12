@@ -102,19 +102,19 @@ const SUPABASE_URL = 'https://arodifxcwdehcezybhrh.supabase.co', SUPABASE_KEY = 
 const THEMES = {
   pocha: { name: '오메추 포차', door: [215, 172], wall: 'tent', wallS: 'tentS', floor: 'floor', table: 'round', seat: 'dark', seatY: 0.5, bar: '이모네 바', tags: ['🍺 술안주', '🌙 야식'],  solo: '혼술존', soloSub: '조용히 쉬어가요', sign: ['#c8102e', '#fff3d6'], lamp: '#ffb14a', indoor: false,
     menu: ['떡볶이  4,000', '어묵탕  5,000', '계란말이 7,000', '닭똥집  9,000'], menu2: ['오늘의 안주', '골뱅이무침'],
-    owners: [{ nick: '포차 사장님', kind: 'chicken', face: 'happy', acc: 'chef', x: 2.2, lines: ['어서 와요!', '닭똥집 금방 나가요~', '오늘 비 와서 손님 많네', '뜨거우니까 조심해요'] }, { nick: '포차 이모', kind: 'tteok', face: 'happy', acc: 'towel', x: -1.4, lines: ['떡볶이 국물 더 줄까?', '어묵 국물은 서비스야~', '천천히 먹고 가요', '많이 먹어요~'] }] },
+    owners: [{ nick: '포차 사장님', human: 'pochaBoss', x: 2.2, lines: ['어서 와요!', '닭똥집 금방 나가요~', '오늘 비 와서 손님 많네', '뜨거우니까 조심해요'] }, { nick: '포차 이모', human: 'pochaImo', x: -1.4, lines: ['떡볶이 국물 더 줄까?', '어묵 국물은 서비스야~', '천천히 먹고 가요', '많이 먹어요~'] }] },
   korean: { name: '오메추 밥상', tags: ['🍱 한식'], door: [160, 322], wall: 'hanji', wallS: 'hanjiS', floor: 'plank', table: 'low', seat: 'cushion', seatY: 0.14, bar: '주방 앞자리', solo: '혼밥존', soloSub: '편하게 한 끼', sign: ['#3a2a22', '#f6e7c8'], lamp: '#ffd9a0', indoor: true,
     menu: ['된장찌개  8,000', '제육볶음  9,000', '비빔밥   8,500', '계란찜   5,000'], menu2: ['오늘의 반찬', '겉절이·나물'],
-    owners: [{ nick: '밥상 사장님', kind: 'kimbap', face: 'smile', acc: 'towel', x: 0.8, lines: ['어서 오세요~', '밥은 더 드려요', '찌개 끓고 있어요', '반찬 모자라면 말해요'] }] },
+    owners: [{ nick: '밥상 사장님', human: 'hanbok', x: 0.8, lines: ['어서 오세요~', '밥은 더 드려요', '찌개 끓고 있어요', '반찬 모자라면 말해요'] }] },
   japanese: { name: '오메추 스시야', door: [276, 332], wall: 'dwood', wallS: 'dwoodS', floor: 'tatami', table: 'low', seat: 'cushion', seatY: 0.14, bar: '스시 카운터', tags: ['🍣 일식'],  solo: '혼밥존', soloSub: '조용히 한 점', sign: ['#1f2a44', '#f3ead8'], lamp: '#ff9a6a', indoor: true,
     menu: ['모둠초밥 15,000', '연어덮밥 12,000', '우동    7,000', '타코야키  5,000'], menu2: ['오늘의 생선', '연어·광어'],
-    owners: [{ nick: '스시야 사장님', kind: 'salmon', face: 'smile', acc: 'chef', x: 0.4, lines: ['어서 오세요', '오늘 연어가 좋아요', '한 점씩 천천히 드세요', '된장국 나갑니다'] }] },
+    owners: [{ nick: '스시야 사장님', human: 'itamae', x: 0.4, lines: ['어서 오세요', '오늘 연어가 좋아요', '한 점씩 천천히 드세요', '된장국 나갑니다'] }] },
   chinese: { name: '오메추 반점', tags: ['🥢 중식'], door: [152, 622], wall: 'cred', wallS: 'credS', floor: 'tile', table: 'lazy', seat: 'red', seatY: 0.5, bar: '주방 앞자리', solo: '혼밥존', soloSub: '짜장면 한 그릇', sign: ['#b3121f', '#ffd76a'], lamp: '#ff6a3a', indoor: true,
     menu: ['짜장면   7,000', '짬뽕    8,000', '탕수육  18,000', '군만두   6,000'], menu2: ['오늘의 요리', '마파두부'],
-    owners: [{ nick: '반점 사장님', kind: 'mandu', face: 'happy', acc: 'chef', x: 1.0, lines: ['어서 오세요!', '탕수육 나왔습니다~', '불맛 제대로 냈어요', '단무지 더 드릴까요?'] }] },
+    owners: [{ nick: '반점 사장님', human: 'wokChef', x: 1.0, lines: ['어서 오세요!', '탕수육 나왔습니다~', '불맛 제대로 냈어요', '단무지 더 드릴까요?'] }] },
   western: { name: '오메추 비스트로', door: [280, 622], wall: 'brick', wallS: 'brickS', floor: 'check', table: 'cloth', seat: 'wood', seatY: 0.5, bar: '바 자리', tags: ['🍝 양식'],  solo: '혼밥존', soloSub: '창가 한 접시', sign: ['#23402e', '#f6ecd6'], lamp: '#ffe0a8', indoor: true,
     menu: ['토마토 파스타 13,000', '마르게리타  15,000', '함박스테이크 14,000', '수프     6,000'], menu2: ['오늘의 디저트', '푸딩'],
-    owners: [{ nick: '비스트로 사장님', kind: 'pizza', face: 'smile', acc: 'chef', x: 0.6, lines: ['어서 오세요', '파스타 곧 나와요', '빵은 계속 드려요', '오늘 수프가 맛있어요'] }] },
+    owners: [{ nick: '비스트로 사장님', human: 'bistro', x: 0.6, lines: ['어서 오세요', '파스타 곧 나와요', '빵은 계속 드려요', '오늘 수프가 맛있어요'] }] },
 };
 THEMES.street = { name: '오메추 먹자골목', wall: 'dwood', floor: 'floor', seat: 'dark', sign: ['#c8102e', '#fff3d6'], lamp: '#ffb14a', indoor: false, owners: [] };
 const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
@@ -154,7 +154,7 @@ const cv = $('cv');
 let renderer;
 try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); }
 catch (e) { $('err').style.display = 'flex'; throw e; }
-renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio || 1));
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#120e1e');
 scene.fog = new THREE.Fog('#120e1e', 22, QS.get('room') === 'street' ? 62 : 46);
@@ -236,7 +236,7 @@ const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 
 // ═══ 조명·공통 부품 ═══
 const ground = add(new THREE.PlaneGeometry(110, 110), M.ground, 0, 0, 0); ground.rotation.x = -Math.PI / 2;
-scene.add(new THREE.HemisphereLight('#8f9bff', '#3a2a22', 0.8));
+scene.add(new THREE.HemisphereLight('#a3adff', '#4a3428', 1.05));
 const moon = new THREE.DirectionalLight('#aab8ff', 0.35); moon.position.set(-6, 12, 8); scene.add(moon);
 const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.4, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
 const lanterns = [], steams = [], seats = [], tables = [];
@@ -390,9 +390,84 @@ function buildStreet() {
   for (const [x, z, m] of [[-3.5, 1.0, M.blue], [4.1, 7.2, M.green], [-3.5, 14.8, M.yellow]]) { add(box(0.7, 0.45, 0.7), m, x, 0.23, z); add(box(0.7, 0.45, 0.7), m, x, 0.7, z); }
 }
 if (STREET) buildStreet(); else buildRoom();
+// 성능: 같은 재료로 된 고정 물건을 한 덩어리로 합쳐 그리는 횟수를 크게 줄임 (휴대폰에서 버벅임 원인)
+function mergeStatic() {
+  scene.updateMatrixWorld(true);
+  const groups = new Map(), drop = [];
+  scene.traverse(o => { if (!o.isMesh || o.userData.keep) return; const m = o.material; if (!groups.has(m)) groups.set(m, []); groups.get(m).push(o); });
+  for (const [m, list] of groups) {
+    if (list.length < 2) continue;
+    let n = 0; const parts = list.map(o => { const g = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()); g.applyMatrix4(o.matrixWorld); n += g.attributes.position.count; return g; });
+    const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2); let k = 0;
+    for (const g of parts) { const c = g.attributes.position.count; pos.set(g.attributes.position.array, k * 3); if (g.attributes.normal) nor.set(g.attributes.normal.array, k * 3); if (g.attributes.uv) uv.set(g.attributes.uv.array, k * 2); k += c; g.dispose(); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    geo.computeBoundingSphere(); const big = new THREE.Mesh(geo, m); big.matrixAutoUpdate = false; scene.add(big);
+    for (const o of list) drop.push(o);
+  }
+  for (const o of drop) { o.parent && o.parent.remove(o); o.geometry.dispose(); }
+}
+mergeStatic();
+// 조명: 점 조명은 휴대폰에서 아주 무거움 → 가운데 가까운 4개만 진짜 빛, 나머지는 빛무리 그림만
+{ const lit = lanterns.filter(l => l.L); lit.sort((a, b) => a.L.parent.position.length() - b.L.parent.position.length());
+  lit.slice(4).forEach(l => { l.L.parent.remove(l.L); l.L = null; }); }
+scene.children.filter(o => o.isGroup && o.children.length === 0).forEach(o => scene.remove(o));
 
 // ═══ 캐릭터 (2D 그림을 세운 판) ═══
 const texCache = new Map();
+// 사장님은 사람 모양 (크레파스 손그림 느낌으로 직접 그림)
+const HUMANS = {
+  pochaBoss: { skin: '#f2c49a', hair: '#2a1d16', hairStyle: 'short', top: '#7a8592', apron: '#c8392c', hat: 'towel', hatC: '#ffffff', brows: 1, beard: 1 },
+  pochaImo: { skin: '#f4c9a4', hair: '#4a2a1e', hairStyle: 'perm', top: '#e8739a', apron: '#f2d36b', apronDots: '#e0563a', hat: 'none', blush: 1, lips: 1 },
+  hanbok: { skin: '#f6d0ae', hair: '#1f1612', hairStyle: 'bun', top: '#f6b3c6', skirt: '#4a6bd0', ribbon: '#d8304a', hat: 'none', blush: 1, lips: 1, hanbok: 1 },
+  itamae: { skin: '#f0c49c', hair: '#1a1410', hairStyle: 'buzz', top: '#fbf8f0', apron: '#24304a', hat: 'hachimaki', hatC: '#ffffff', hatC2: '#d8304a', brows: 1 },
+  wokChef: { skin: '#f0c094', hair: '#1a1410', hairStyle: 'short', top: '#c8202e', knots: '#ffd76a', hat: 'toque', hatC: '#ffffff', mustache: 1, brows: 1 },
+  bistro: { skin: '#f6cda8', hair: '#6a3a1e', hairStyle: 'short', top: '#fbf8f0', scarf: '#d8304a', buttons: 1, hat: 'toque', hatC: '#ffffff', mustache: 2 },
+};
+function humanSVG(h) {
+  const o = (c) => `stroke="#2a1d16" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" fill="${c}"`;
+  let hairBack = '', hairFront = '', hat = '', body = '', face = '';
+  // 몸통·팔
+  body += h.hanbok
+    ? `<path d="M74 252 Q72 182 128 170 Q184 182 182 252Z" ${o(h.skirt)}/><path d="M86 196 Q128 160 170 196 L162 214 Q128 200 94 214Z" ${o(h.top)}/><path d="M112 178 L128 206 L144 178" fill="none" stroke="#2a1d16" stroke-width="4"/><path d="M128 198 q-20 4 -26 22 M128 198 q20 6 22 26" fill="none" stroke="${h.ribbon}" stroke-width="7" stroke-linecap="round"/>`
+    : `<path d="M70 252 Q68 186 128 172 Q188 186 186 252Z" ${o(h.top)}/>`;
+  body += `<path d="M76 206 Q56 222 66 244" fill="none" stroke="#2a1d16" stroke-width="20" stroke-linecap="round"/><path d="M76 206 Q56 222 66 244" fill="none" stroke="${h.hanbok ? h.top : h.top}" stroke-width="12" stroke-linecap="round"/>
+    <path d="M180 206 Q200 222 190 244" fill="none" stroke="#2a1d16" stroke-width="20" stroke-linecap="round"/><path d="M180 206 Q200 222 190 244" fill="none" stroke="${h.top}" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="66" cy="246" r="10" ${o(h.skin)}/><circle cx="190" cy="246" r="10" ${o(h.skin)}/>`;
+  if (h.apron) body += `<path d="M96 196 L160 196 L166 254 L90 254Z" ${o(h.apron)}/><path d="M104 196 Q128 186 152 196" fill="none" stroke="#2a1d16" stroke-width="4"/>${h.apronDots ? [[110, 214], [140, 222], [120, 238], [150, 244], [104, 246]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="${h.apronDots}"/>`).join('') : ''}`;
+  if (h.knots) body += [196, 214, 232].map(y => `<path d="M118 ${y} h20" stroke="${h.knots}" stroke-width="5" stroke-linecap="round"/><circle cx="128" cy="${y}" r="4" fill="${h.knots}" stroke="#2a1d16" stroke-width="2"/>`).join('') + `<path d="M108 178 Q128 190 148 178" fill="none" stroke="${h.knots}" stroke-width="5"/>`;
+  if (h.buttons) body += [[114, 200], [142, 200], [114, 222], [142, 222], [114, 244], [142, 244]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.5" fill="#cfc6b0" stroke="#2a1d16" stroke-width="2"/>`).join('');
+  if (h.scarf) body += `<path d="M106 176 Q128 192 150 176 L146 188 Q128 200 110 188Z" ${o(h.scarf)}/><path d="M138 190 l10 16 l-14 -2z" ${o(h.scarf)}/>`;
+  // 머리카락(뒤)
+  if (h.hairStyle === 'perm') hairBack = [[86, 90], [80, 116], [90, 140], [170, 90], [176, 116], [166, 140], [100, 66], [128, 58], [156, 66]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="20" ${o(h.hair)}/>`).join('');
+  if (h.hairStyle === 'bun') hairBack = `<circle cx="128" cy="52" r="20" ${o(h.hair)}/><path d="M122 46 l-28 -10" stroke="#e0a92e" stroke-width="5" stroke-linecap="round"/>`;
+  // 얼굴
+  face += `<path d="M90 70 Q90 160 128 166 Q166 160 166 70 Q128 46 90 70Z" ${o(h.skin)}/>`;
+  face += `<circle cx="88" cy="112" r="9" ${o(h.skin)}/><circle cx="168" cy="112" r="9" ${o(h.skin)}/>`;
+  face += `<circle cx="112" cy="110" r="6.5" fill="#2a1d16"/><circle cx="144" cy="110" r="6.5" fill="#2a1d16"/><circle cx="114" cy="108" r="2" fill="#fff"/><circle cx="146" cy="108" r="2" fill="#fff"/>`;
+  if (h.brows) face += `<path d="M102 96 q10 -6 20 0 M134 96 q10 -6 20 0" fill="none" stroke="#2a1d16" stroke-width="5" stroke-linecap="round"/>`;
+  face += `<ellipse cx="100" cy="128" rx="9" ry="5.5" fill="#ff8f8f" opacity="${h.blush ? .75 : .45}"/><ellipse cx="156" cy="128" rx="9" ry="5.5" fill="#ff8f8f" opacity="${h.blush ? .75 : .45}"/>`;
+  face += h.mustache ? `<path d="M128 128 q-14 -6 -26 6 q12 2 26 -2 q14 4 26 2 q-12 -12 -26 -6Z" fill="${h.hair}" stroke="#2a1d16" stroke-width="2.5"/>${h.mustache === 2 ? `<path d="M102 134 q-6 -2 -6 -8 M154 134 q6 -2 6 -8" fill="none" stroke="${h.hair}" stroke-width="4" stroke-linecap="round"/>` : ''}<path d="M118 142 q10 8 20 0" fill="none" stroke="#2a1d16" stroke-width="4" stroke-linecap="round"/>`
+    : `<path d="M114 134 q14 14 28 0" fill="${h.lips ? '#e0564a' : 'none'}" stroke="#2a1d16" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if (h.beard) face += `<path d="M104 146 q24 22 48 0" fill="none" stroke="#2a1d16" stroke-width="2" stroke-dasharray="2 5" opacity=".6"/>`;
+  // 머리카락(앞)
+  if (h.hairStyle === 'short') hairFront = `<path d="M90 86 Q86 50 128 46 Q170 50 166 86 Q150 70 128 72 Q104 70 90 86Z" ${o(h.hair)}/>`;
+  if (h.hairStyle === 'buzz') hairFront = `<path d="M92 80 Q92 52 128 50 Q164 52 164 80 Q128 66 92 80Z" ${o(h.hair)}/>`;
+  if (h.hairStyle === 'perm') hairFront = `<path d="M92 84 Q96 56 128 56 Q160 56 164 84 Q150 74 140 80 Q128 70 116 80 Q104 74 92 84Z" ${o(h.hair)}/>`;
+  if (h.hairStyle === 'bun') hairFront = `<path d="M90 92 Q88 54 128 52 Q168 54 166 92 Q150 66 128 68 Q106 66 90 92Z" ${o(h.hair)}/><path d="M128 54 V72" stroke="#2a1d16" stroke-width="3"/>`;
+  // 모자
+  if (h.hat === 'towel') hat = `<path d="M88 80 Q128 62 168 80 L166 94 Q128 78 90 94Z" ${o(h.hatC)}/><path d="M166 84 q14 -4 18 8 q-10 4 -16 0" ${o(h.hatC)}/>`;
+  if (h.hat === 'hachimaki') hat = `<path d="M88 82 Q128 66 168 82 L166 96 Q128 82 90 96Z" ${o(h.hatC)}/><circle cx="128" cy="84" r="7" fill="${h.hatC2}"/><path d="M166 88 l18 -10 M166 92 l20 4" stroke="#2a1d16" stroke-width="7" stroke-linecap="round"/><path d="M166 88 l18 -10 M166 92 l20 4" stroke="${h.hatC}" stroke-width="3" stroke-linecap="round"/>`;
+  if (h.hat === 'toque') hat = `<path d="M94 78 L96 50 Q76 28 100 16 Q112 0 128 10 Q146 -2 158 16 Q182 28 160 50 L162 78 Q128 70 94 78Z" ${o(h.hatC)}/><path d="M96 66 Q128 58 160 66" fill="none" stroke="#2a1d16" stroke-width="3" opacity=".6"/>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><defs><filter id="cr" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+    <filter id="tx"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="7" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -0.45 1.08" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter></defs>
+    <g filter="url(#cr)"><g filter="url(#tx)">${hairBack}${body}${face}${hairFront}${hat}</g></g></svg>`;
+}
+function humanTexture(key) {
+  const k = 'human|' + key; if (texCache.has(k)) return texCache.get(k);
+  const c = document.createElement('canvas'); c.width = c.height = 256; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const img = new Image(); img.onload = () => { c.getContext('2d').drawImage(img, 0, 0, 256, 256); t.needsUpdate = true; };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(humanSVG(HUMANS[key] || HUMANS.pochaBoss)); texCache.set(k, t); return t;
+}
 function charTexture(kind, face, acc) {
   const k = [kind, face, acc].join('|'); if (texCache.has(k)) return texCache.get(k);
   const c = document.createElement('canvas'); c.width = c.height = 256; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
@@ -410,7 +485,7 @@ const shadowTex = (() => { const c = document.createElement('canvas'); c.width =
 const people = new Map();   // sid → 사람
 function makePerson(sid, d, mine) {
   const g = new THREE.Group(); scene.add(g);
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: charTexture(d.kind, d.face, d.acc), transparent: true, alphaTest: 0.08 })); sp.center.set(0.5, 0.06); sp.scale.set(1.5, 1.5, 1); g.add(sp);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: d.human ? humanTexture(d.human) : charTexture(d.kind, d.face, d.acc), transparent: true, alphaTest: 0.08 })); sp.center.set(0.5, 0.06); sp.scale.set(1.5, 1.5, 1); g.add(sp);
   const nm = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTexture(d.nick, mine), transparent: true, depthTest: false })); nm.center.set(0.5, 0); nm.scale.set(1.5, 0.375, 1); nm.position.y = 1.55; nm.renderOrder = 5; g.add(nm);
   const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.95), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })); sh.rotation.x = -Math.PI / 2; sh.position.y = 0.03; g.add(sh);
   const p = { sid, g, sp, nm, sh, d, t: null, s: null, target: null, ph: Math.random() * 6, mine, look: lookKey(d), bubble: null, at: 0, fx: [] };
@@ -437,7 +512,7 @@ if (STREET) { const d = DOOR3[QS.get('from')]; if (d) me.g.position.set(d.x * 0.
 else me.g.position.set((Math.random() - 0.5) * 3, 0, HD - 1.2);
 let seatAt = 0;
 // 사장님 (가게 주인): 주방에서 가끔 한마디씩 함
-const owners = TH.owners.map((o, i) => { const p = makePerson('npc' + i, o, false); people.delete('npc' + i); p.g.position.set(o.x, 0.35, -6.9); p.lines = o.lines; p.home = o.x; return p; });
+const owners = TH.owners.map((o, i) => { const p = makePerson('npc' + i, o, false); people.delete('npc' + i); p.g.position.set(o.x, 0.25, -6.9); p.sp.scale.set(1.75, 1.75, 1); p.nm.position.y = 1.8; p.lines = o.lines; p.home = o.x; return p; });
 let ownerT = owners.length && setTimeout(function chat() { const o = owners[Math.floor(Math.random() * owners.length)]; bubble(o, o.lines[1 + Math.floor(Math.random() * (o.lines.length - 1))], '', 3600); ownerT = setTimeout(chat, 9000 + Math.random() * 9000); }, 7000);
 
 // ═══ 천막 밖 비 ═══
@@ -454,6 +529,14 @@ scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: '
 // 가게 채널: 누가 어디 있는지 + "말하는 중" 표시만 오감. 대화 내용은 테이블 채널로만 보내서 같은 테이블 사람만 받음.
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 const muted = new Set();
+let greeted = false, linkOk = false;
+function onStatus(st) {
+  if (st === 'SUBSCRIBED') { joined = true; linkOk = true; track(); ui(true); }
+  else if (st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') { linkOk = false; ui(true); }
+}
+let lobbyTrackFn = null;
+// 앱을 잠깐 나갔다 오면 바로 내 위치를 다시 알림 (안 하면 최대 30초 동안 상대에게 안 보일 수 있음)
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { track(); if (lobbyTrackFn) lobbyTrackFn(); } });
 let ch = null, tch = null, lobby = null, joined = false, lastSend = 0, lastMove = 0, log = [];
 const okSid = (v) => typeof v === 'string' && /^[a-z0-9]{1,24}$/i.test(v);
 function safe(p) {
@@ -485,7 +568,7 @@ function connectStreet() {
   ch.on('presence', { event: 'sync' }, streetSync);
   ch.on('broadcast', { event: 'move' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (!p || p.mine || !isFinite(m.x) || !isFinite(m.y)) return; const d = safe({ x: pxX(+m.x), z: pxZ(+m.y) }); if (d) p.target = { x: d.x, z: d.z }; });
   ch.on('broadcast', { event: 'emote' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && EMOTES.includes(m.e)) bubble(p, m.e, 'emote', 2200); });
-  ch.subscribe((st) => { if (st === 'SUBSCRIBED' && !joined) { joined = true; track(); ui(); } });
+  ch.subscribe(onStatus);
   setInterval(track, 30000);
 }
 function track() { if (!ch || !joined) return;
@@ -515,11 +598,11 @@ function connect() {
   ch.on('broadcast', { event: 'move' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (!p || p.mine || p.t !== null) return; const d = safe(m); if (d) p.target = { x: d.x, z: d.z }; });
   ch.on('broadcast', { event: 'talk' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && p.t !== me.t && !muted.has(p.sid)) bubble(p, '…', 'dots', 1800); });
   ch.on('broadcast', { event: 'emote' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && EMOTES.concat('🍻').includes(m.e)) { bubble(p, m.e, 'emote', 2200); if (m.e === '🍻') clink(); } });
-  ch.subscribe((st) => { if (st === 'SUBSCRIBED' && !joined) { joined = true; track(); ui(); if (owners[0]) bubble(owners[0], `${owners[0].lines[0]} ${myNick}님`, '', 3800); if (QS.get('sit') === '1') setTimeout(() => { if (me.t === null) quick(false); }, 1200); } });
+  ch.subscribe((st) => { onStatus(st); if (st === 'SUBSCRIBED' && !greeted) { greeted = true; if (owners[0]) bubble(owners[0], `${owners[0].lines[0]} ${myNick}님`, '', 3800); if (QS.get('sit') === '1') setTimeout(() => { if (me.t === null) quick(false); }, 1200); } });
   // 골목 채널에도 '어느 가게에 있는지' 알려서 골목 문 앞 인원수에 잡히게 함
   lobby = sb.channel(LOBBY_CH, { config: { presence: { key: SID } } });
   const lobbyTrack = () => lobby.track({ nick: myNick, kind: myLook.kind, color: '#ffd36b', acc: myLook.acc, face: myLook.face, room: RID, x: TH.door[0], y: TH.door[1] });
-  lobby.subscribe((st) => { if (st === 'SUBSCRIBED') lobbyTrack(); }); setInterval(lobbyTrack, 30000);
+  lobbyTrackFn = lobbyTrack; lobby.subscribe((st) => { if (st === 'SUBSCRIBED') lobbyTrack(); }); setInterval(lobbyTrack, 30000);
   setInterval(track, 30000);
 }
 function joinTable(t) {
@@ -646,7 +729,7 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&
 const whereText = () => me.t === null ? '' : `${tables[me.t].name} · ${seatedAt(me.t)}/${tables[me.t].cap}명`;
 let panelMode = '';
 function ui(logOnly) {
-  $('count').textContent = !sb ? '혼자 보기' : joined ? `👥 ${STREET ? lobbyTotal || 1 : people.size}명` : '연결 중…';
+  $('count').textContent = !sb ? '혼자 보기' : joined && linkOk ? `👥 ${STREET ? lobbyTotal || 1 : people.size}명` : joined ? '다시 연결 중…' : '연결 중…';
   if (STREET) {
     const P = $('panel'), cnt = SHOPS.map(id => shopCount[id] || 0).join(',');
     if (panelMode === 'street') { SHOPS.forEach(id => { const el = $('n-' + id); if (el) el.textContent = shopCount[id] || 0; }); return; }
@@ -721,9 +804,9 @@ let lowQ = false, fpsT = 0, fpsN = 0, slowAsked = false;
 const pointLights = () => lanterns.filter(l => l.L).map(l => l.L);
 function setQuality(low, byUser) {
   lowQ = low; try { localStorage.setItem('wmj3dLow', low ? '1' : '0'); } catch (e) {}
-  renderer.setPixelRatio(low ? 1 : Math.min(2, window.devicePixelRatio || 1)); resize();
+  renderer.setPixelRatio(low ? 1 : Math.min(1.5, window.devicePixelRatio || 1)); resize();
   rainGeo.setDrawRange(0, low ? Math.floor(RN * 0.35) * 2 : RN * 2);
-  pointLights().forEach((L, i) => { L.visible = !low || i < 3; });
+  pointLights().forEach((L, i) => { L.visible = !low || i < 2; });
   if (byUser) { fpsT = 0; fpsN = 0; }
 }
 function watchFps(raw, T) {
@@ -815,8 +898,10 @@ function tap(cx, cy) {
   if (me.t !== null) stand();
   me.target = { x, z }; sendMove();
 }
+let moveLater = null;
 function sendMove() {
-  if (!ch || !joined || !me.target || Date.now() - lastMove < 300) return; lastMove = Date.now();
+  if (!ch || !joined || !me.target) return;
+  const wait = 250 - (Date.now() - lastMove); if (wait > 0) { clearTimeout(moveLater); moveLater = setTimeout(sendMove, wait); return; } lastMove = Date.now();
   const payload = STREET ? (([x, y]) => ({ sid: SID, x, y }))(toPx(me.target.x, me.target.z)) : { sid: SID, x: +me.target.x.toFixed(2), z: +me.target.z.toFixed(2) };
   ch.send({ type: 'broadcast', event: 'move', payload });
 }
@@ -827,16 +912,16 @@ function avoid(p) { if (STREET) { p.x = Math.min(4.0, Math.max(-3.4, p.x)); p.z 
 // ═══ 매 프레임 ═══
 let last = performance.now();
 function frame(now) {
-  const raw = (now - last) / 1000, dt = Math.min(0.05, raw); last = now; const T = now / 1000; watchFps(raw, T);
+  const raw = (now - last) / 1000, dt = Math.min(0.05, raw), mdt = Math.min(0.25, raw); last = now; const T = now / 1000; watchFps(raw, T);
   for (const p of people.values()) {
     let walking = false;
     if (p.target && p.t === null) { const q = p.g.position, dx = p.target.x - q.x, dz = p.target.z - q.z, d = Math.hypot(dx, dz);
-      if (d < 0.08) { p.target = null; if (p.mine) { track(); if (goDoor) { const id = goDoor; goDoor = null; enterShop(id); } } } else { walking = true; const st = Math.min(d, 4.2 * dt), ox = q.x, oz = q.z; q.x += dx / d * st; q.z += dz / d * st; avoid(q); if (Math.hypot(q.x - ox, q.z - oz) < st * 0.2) { p.target = null; if (p.mine) { track(); if (goDoor) { const id = goDoor; goDoor = null; enterShop(id); } } } p.sp.scale.x = (dx * Math.cos(cam.az) - dz * Math.sin(cam.az)) < 0 ? -1.5 : 1.5; } }
+      if (d < 0.08) { p.target = null; if (p.mine) { track(); if (goDoor) { const id = goDoor; goDoor = null; enterShop(id); } } } else { walking = true; const st = Math.min(d, (p.mine ? 4.2 : 4.2 + Math.min(4, d * 0.6)) * mdt), ox = q.x, oz = q.z; q.x += dx / d * st; q.z += dz / d * st; avoid(q); if (Math.hypot(q.x - ox, q.z - oz) < st * 0.2) { p.target = null; if (p.mine) { track(); if (goDoor) { const id = goDoor; goDoor = null; enterShop(id); } } } p.sp.scale.x = (dx * Math.cos(cam.az) - dz * Math.sin(cam.az)) < 0 ? -1.5 : 1.5; } }
     p.sp.position.y = walking ? Math.abs(Math.sin(T * 9 + p.ph)) * 0.16 : Math.sin(T * 2 + p.ph) * 0.035;
     p.sp.scale.y = 1.5 * (1 + (walking ? 0 : Math.sin(T * 2 + p.ph) * 0.025));
     for (let i = 0; i < p.fx.length; i++) { const k = (T * 0.42 + i / 3 + p.ph) % 1, f = p.fx[i]; f.position.set(Math.sin(i * 2.1 + p.ph) * 0.5 + Math.sin(k * 5) * 0.08, 1.05 + k * 0.95, 0.02); f.material.opacity = Math.sin(k * Math.PI) * 0.95; const sc = 0.3 + k * 0.2; f.scale.set(sc, sc, 1); }
   }
-  for (const o of owners) { o.g.position.x = o.home + Math.sin(T * 0.35 + o.ph) * 1.1; o.sp.position.y = Math.abs(Math.sin(T * 3 + o.ph)) * 0.05; }
+  for (const o of owners) { const nx = o.home + Math.sin(T * 0.35 + o.ph) * 1.1; o.sp.scale.x = (nx < o.g.position.x ? -1.75 : 1.75); o.g.position.x = nx; o.sp.position.y = Math.abs(Math.sin(T * 3 + o.ph)) * 0.05; }
   cam.tx += (me.g.position.x * 0.8 - cam.tx) * Math.min(1, dt * 3); cam.tz += ((me.g.position.z * 0.75 + 0.3) - cam.tz) * Math.min(1, dt * 3);
   for (const l of lanterns) { const f = 0.88 + Math.sin(T * 5.3 + l.ph) * 0.06 + Math.sin(T * 13.1 + l.ph * 2) * 0.04; if (l.L) l.L.intensity = l.base * f; l.glow.material.opacity = 0.5 * f; if (!l.L && l.base === 1) l.glow.material.opacity = 0.35 + Math.abs(Math.sin(T * 9 + l.ph)) * 0.4; }
   for (const s of steams) { const k = (T * 0.35 + s.ph) % 1; s.s.position.set(s.x + Math.sin(k * 6 + s.ph * 9) * 0.15, s.y + k * 1.5, s.z); const sc = 0.5 + k * 1.1; s.s.scale.set(sc, sc, 1); s.s.material.opacity = Math.sin(k * Math.PI) * 0.22; }
@@ -849,7 +934,7 @@ try { if (localStorage.getItem('wmj3dLow') === '1') setQuality(true); } catch (e
 ui(); connect(); requestAnimationFrame(frame);
 addEventListener('pagehide', () => { try { if (ch) ch.untrack(); if (lobby) lobby.untrack(); } catch (e) {} });
 $('title').textContent = TH.name; $('back').href = STREET ? './' : `pocha3d.html?room=street&from=${RID}`;
-window.__p3d = { cam, me, people, seats, tables, tap, sit, stand, quick, say, soundOn, SID, startGame, pickGame, onGame, setLook, setQuality, watchFps, get game() { return game; }, get lowQ() { return lowQ; }, get au() { return au; }, get log() { return log; } };
+window.__p3d = { renderer, scene, cam, humanSVG, HUMANS, owners, me, people, seats, tables, tap, sit, stand, quick, say, soundOn, SID, startGame, pickGame, onGame, setLook, setQuality, watchFps, get game() { return game; }, get lowQ() { return lowQ; }, get au() { return au; }, get log() { return log; } };
 </script>
 </body>
 </html>

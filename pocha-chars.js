@@ -77,9 +77,11 @@
     liked.forEach(n => { const m = db.find(x => x.name === n); if (m) m.tags.forEach(t => { cnt[t] = (cnt[t] || 0) + 1; }); });
     return cnt;
   }
+  // 대부분은 처음부터 열림. 아래 4개만 좋아요 2번으로 열림 (모으는 재미용)
+  const LOCKED = { pudding: 2, icecream: 2, burger: 2, takoyaki: 2 };
   function progress(id) {
-    const c = BY[id]; if (!c || !c[8]) return { open: true };
-    const [tags, need, label] = c[8]; const cnt = likedTagCounts();
+    const c = BY[id]; if (!c || !c[8] || !LOCKED[id]) return { open: true };
+    const [tags, , label] = c[8], need = LOCKED[id], cnt = likedTagCounts();
     const have = Math.max(...tags.map(t => cnt[t] || 0));
     return { open: have >= need, have, need, label };
   }

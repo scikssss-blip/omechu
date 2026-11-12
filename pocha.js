@@ -60,7 +60,7 @@
         { x: 190, y: 600, k: 'booth', n: '3번 부스', s: [[-112, -40], [-112, 45], [100, -40], [100, 45]], by: 100 },
         { x: 560, y: 600, k: 'booth', n: '4번 부스', s: [[-100, -40], [-100, 45], [112, -40], [112, 45]], by: 100 }] },
   };
-  const BUILD = 'v11.12h';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
+  const BUILD = 'v11.13';   // 화면 아래에 보여서, 새 버전이 적용됐는지 바로 알 수 있음
   const SHOPS = ['pocha', 'korean', 'japanese', 'chinese', 'western'];
 
   let room = 'street', R = ROOMS.street;
@@ -304,14 +304,20 @@
   // 가게는 3D 화면으로 엶. 3D가 안 되는 기기이거나 '2D로 보기'를 고르면 예전 2D 가게로 들어감.
   let gl3d = null;
   function use3d() {
-    try { if (localStorage.getItem('wmjPocha2d') === '1') return false; } catch (e) {}
+    try { const v = localStorage.getItem('wmjPocha2d'); if (v === '1' || v === 'slow') { if (gl3d === null) { try { const c = document.createElement('canvas'); gl3d = !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { gl3d = false; } } return false; } } catch (e) {}
     if (gl3d === null) { try { const c = document.createElement('canvas'); gl3d = !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { gl3d = false; } }
+    return gl3d;
+  }
+  // 가게 안은 늘 3D로 열어 3D 손님끼리 서로 보이게 함. 느려서 2D를 고른 기기와 3D가 아예 안 되는 기기만 2D 가게
+  function use3dShop() {
+    try { if (localStorage.getItem('wmjPocha2d') === 'slow') return false; } catch (e) {}
+    if (gl3d === null) use3d();
     return gl3d;
   }
   function toggle3d() { try { localStorage.setItem('wmjPocha2d', localStorage.getItem('wmjPocha2d') === '1' ? '0' : '1'); } catch (e) {} if (use3d()) { location.href = 'pocha3d.html?room=street'; return; } const rootEl = document.getElementById('pocha-root'); if (rootEl) rootEl.innerHTML = ''; render(); }
   function enterRoom(id, from) {
     if (!ROOMS[id] || id === room) return;
-    if (id !== 'street' && use3d()) { const q = pendingQuick ? '&sit=1' : ''; pendingQuick = false; location.href = `pocha3d.html?room=${id}${q}`; return; }
+    if (id !== 'street' && use3dShop()) { const q = pendingQuick ? '&sit=1' : ''; pendingQuick = false; location.href = `pocha3d.html?room=${id}${q}`; return; }
     leaveRoomChannel();
     const prev = room;
     room = id; R = ROOMS[id];
