@@ -532,13 +532,16 @@ scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: '
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 const muted = new Set();
 let greeted = false, linkOk = false;
-function onStatus(st) {
+function onStatus(st, c) {
+  if (c && c !== ch) return;            // 이미 버린 예전 채널 소식은 무시
   if (st === 'SUBSCRIBED') { joined = true; linkOk = true; track(); ui(true); }
-  else if (st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') { linkOk = false; ui(true); }
+  else if (st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') { linkOk = false; ui(true); heal(); }
 }
 let lobbyTrackFn = null;
 // 앱을 잠깐 나갔다 오면 바로 내 위치를 다시 알림 (안 하면 최대 30초 동안 상대에게 안 보일 수 있음)
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { track(); if (lobbyTrackFn) lobbyTrackFn(); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible') return; track(); if (lobbyTrackFn) lobbyTrackFn();
+  if (!linkOk || (ch && ch.state !== 'joined') || (sb && !sb.realtime.isConnected())) { linkOk = false; ui(true); heal(true); } });
+addEventListener('online', () => { linkOk = false; heal(true); });
 let ch = null, tch = null, lobby = null, joined = false, lastSend = 0, lastMove = 0, log = [];
 const okSid = (v) => typeof v === 'string' && /^[a-z0-9]{1,24}$/i.test(v);
 function safe(p) {
@@ -572,8 +575,7 @@ function connectStreet() {
   ch.on('presence', { event: 'sync' }, streetSync);
   ch.on('broadcast', { event: 'move' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (!p || p.mine || !isFinite(m.x) || !isFinite(m.y)) return; const d = safe({ x: pxX(+m.x), z: pxZ(+m.y) }); if (d) p.target = { x: d.x, z: d.z }; });
   ch.on('broadcast', { event: 'emote' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && EMOTES.includes(m.e)) bubble(p, m.e, 'emote', 2200); });
-  ch.subscribe(onStatus);
-  setInterval(track, 30000);
+  const c = ch; ch.subscribe((st) => onStatus(st, c));
 }
 function track() { if (!ch || !joined) return;
   if (STREET) { const d = me.target || me.g.position, [x, y] = toPx(d.x, d.z); return ch.track({ nick: myNick, kind: myLook.kind, color: '#ffd36b', acc: myLook.acc, face: myLook.face, fx: myLook.fx, j: JOINED, tb: TAB, room: 'street', x, y }); } const d = me.target || me.g.position; return ch.track({ ...myLook, j: JOINED, tb: TAB, t: me.t, s: me.s, at: seatAt, x: +d.x.toFixed(2), z: +d.z.toFixed(2) }); }
@@ -609,12 +611,26 @@ function connect() {
   ch.on('broadcast', { event: 'move' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (!p || p.mine || p.t !== null) return; const d = safe(m); if (d) p.target = { x: d.x, z: d.z }; });
   ch.on('broadcast', { event: 'talk' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && p.t !== me.t && !muted.has(p.sid)) bubble(p, '…', 'dots', 1800); });
   ch.on('broadcast', { event: 'emote' }, ({ payload: m }) => { const p = m && okSid(m.sid) && people.get(m.sid); if (p && !p.mine && EMOTES.concat('🍻').includes(m.e)) { bubble(p, m.e, 'emote', 2200); if (m.e === '🍻') clink(); } });
-  ch.subscribe((st) => { onStatus(st); if (st === 'SUBSCRIBED' && !greeted) { greeted = true; if (owners[0]) bubble(owners[0], `${owners[0].lines[0]} ${myNick}님`, '', 3800); if (QS.get('sit') === '1') setTimeout(() => { if (me.t === null) quick(false); }, 1200); } });
+  const c = ch; ch.subscribe((st) => { onStatus(st, c); if (c !== ch) return; if (st === 'SUBSCRIBED' && !greeted) { greeted = true; if (owners[0]) bubble(owners[0], `${owners[0].lines[0]} ${myNick}님`, '', 3800); if (QS.get('sit') === '1') setTimeout(() => { if (me.t === null) quick(false); }, 1200); } });
   // 골목 채널에도 '어느 가게에 있는지' 알려서 골목 문 앞 인원수에 잡히게 함
   lobby = sb.channel(LOBBY_CH, { config: { presence: { key: SID } } });
   const lobbyTrack = () => lobby.track({ nick: myNick, kind: myLook.kind, color: '#ffd36b', acc: myLook.acc, face: myLook.face, room: RID, x: TH.door[0], y: TH.door[1] });
-  lobbyTrackFn = lobbyTrack; lobby.subscribe((st) => { if (st === 'SUBSCRIBED') lobbyTrack(); }); setInterval(lobbyTrack, 30000);
-  setInterval(track, 30000);
+  lobbyTrackFn = lobbyTrack; lobby.subscribe((st) => { if (st === 'SUBSCRIBED') lobbyTrack(); });
+}
+// 30초마다 위치 다시 알리기 (한 번만 시작)
+setInterval(() => { track(); if (lobbyTrackFn) lobbyTrackFn(); }, 30000);
+// 끊긴 연결 되살리기: 3초 안에 저절로 안 붙으면 채널을 새로 만들어 다시 들어감 (앉은 자리·테이블 대화방도 다시 연결)
+let fixT = null;
+function heal(now) {
+  clearTimeout(fixT);
+  fixT = setTimeout(() => {
+    if (linkOk || !sb) return;
+    try { if (ch) sb.removeChannel(ch); if (lobby) sb.removeChannel(lobby); } catch (e) {}
+    ch = null; lobby = null; lobbyTrackFn = null;
+    try { if (!sb.realtime.isConnected()) sb.realtime.connect(); } catch (e) {}
+    connect(); if (me.t !== null && !tables[me.t].solo && !(tch && tch.state === 'joined')) { const keep = log; joinTable(me.t); log = keep; }
+    heal();
+  }, now ? 600 : 3000);
 }
 function joinTable(t) {
   leaveTable(); log = []; if (!sb || tables[t].solo) return;
