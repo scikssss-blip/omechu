@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>오메추</title>
+<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#120e1e;color:#fff;font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;text-align:center;padding:24px;box-sizing:border-box}a{display:inline-block;margin-top:16px;background:#ff7a1a;color:#fff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:12px}p{color:#cfc6e6;line-height:1.6}</style>
+<script>
+// 주소를 잘못 쳤을 때(대문자, .html 빠짐 등) 알맞은 페이지로 보내 줌
+(function () {
+  var p = location.pathname.toLowerCase().replace(/\/+$/, '').replace(/\.html$/, ''), q = location.search, h = location.hash;
+  var known = { '': '/', '/index': '/', '/pocha3d': '/pocha3d.html', '/3d': '/pocha3d.html?room=street', '/street': '/pocha3d.html?room=street', '/meokja': '/pocha3d.html?room=street', '/privacy': '/privacy.html', '/terms': '/terms.html', '/admin': '/admin.html' };
+  var to = known[p] || (p.indexOf('pocha') >= 0 ? '/pocha3d.html?room=street' : null);
+  if (to) { location.replace(to + (to.indexOf('?') < 0 ? q : '') + h); }
+})();
+</script>
+</head>
+<body>
+<div>
+  <div style="font-size:44px">🍙</div>
+  <h2 style="margin:10px 0 6px">길을 잃었어요</h2>
+  <p>주소가 조금 달라요.<br>아래 버튼으로 오메추에 들어가 주세요.</p>
+  <a href="/">오메추로 가기</a>
+</div>
+</body>
+</html>

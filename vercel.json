@@ -1,5 +1,11 @@
 {
   "outputDirectory": ".",
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/3d", "destination": "/pocha3d.html?room=street", "permanent": false },
+    { "source": "/street", "destination": "/pocha3d.html?room=street", "permanent": false },
+    { "source": "/meokja", "destination": "/pocha3d.html?room=street", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/images/:path*", "destination": "/public/images/:path*" }
   ]
