@@ -301,7 +301,7 @@ function kitchen() {
     [M.orange, M.white, M.tteok, M.orange, M.yellow, M.white].forEach((m, i) => add(box(0.42, 0.13, 0.28), m, -3.1 + i * 0.6, 1.18, -6.2));
     add(box(1.4, 0.06, 0.7), M.woodL, 1.6, 0.94, K); add(box(0.55, 0.02, 0.07), M.steel, 1.9, 0.98, K); add(box(0.4, 0.1, 0.2), M.orange, 1.3, 1.02, K);
     add(cyl(0.55, 0.42, 18), M.woodL, -2.4, 1.11, K); add(cyl(0.5, 0.02, 18), M.white, -2.4, 1.33, K); steam(-2.4, K, 1.4); pot(-0.4, 0.4, 0.4, M.dark, M.broth); steam(-0.4, K, 1.4);
-    for (const x of [-3.2, 0, 3.2]) add(box(2.4, 0.75, 0.03), M.cushion, x, 2.75, -6.65);                                                              // 노렌(천 가림막)
+    for (const x of [-3.2, 0, 3.2]) add(box(2.4, 0.75, 0.03), M.cushion, x, 2.85, -8.25);       // 노렌은 사장님 뒤쪽 벽에                                                              // 노렌(천 가림막)
     for (let i = 0; i < 4; i++) add(cyl(0.08, 0.12, 10), M.green, 2.6 + i * 0.4, 1.16, -6.1); }
   else if (RID === 'chinese') { for (const x of [-2.6, -0.7]) { add(cyl(0.3, 0.28, 20, 0.75), M.dark, x, 1.04, K); add(cyl(0.68, 0.02, 20), x < -1 ? M.brown : M.tteok, x, 1.15, K); fire(x, 0.98, K + 0.5, 1.5); fire(x, 1.35, K, 1.0, '#ffb04a'); }
     for (let i = 0; i < 3; i++) add(cyl(0.48, 0.2, 18), M.woodL, 2.4, 1.0 + i * 0.21, K); add(cyl(0.5, 0.05, 18), M.woodL, 2.4, 1.63, K); steam(2.4, K, 1.7); steam(-2.6, K, 1.4);
@@ -334,12 +334,16 @@ function buildRoom() {
   add(box(HW * 2, 0.08, 0.08), TH.indoor ? M.wood : M.steel, 0, WH + 0.2, -HD);
   const sign = board([TH.name], 6.2, 1.25, TH.sign[0], TH.sign[1]); sign.position.set(0, WH + 0.75, -HD + 0.05); scene.add(sign);
   const mat1 = add(new THREE.PlaneGeometry(3.4, 1.5), M.red, 0, 0.02, HD + 0.9); mat1.rotation.x = -Math.PI / 2;
+  const ex = board(['🚪 나가기'], 2.6, 0.7, '#2b1d14', '#ffe2a8'); ex.rotation.x = -Math.PI / 2; ex.position.set(0, 0.03, HD + 0.95); scene.add(ex);   // 입구 발판 글씨
+  for (const x of [-1.9, 1.9]) add(box(0.22, WH, 0.22), TH.indoor ? M.wood : M.steel, x, WH / 2, HD);                                      // 문틀
+  add(box(4.0, 0.24, 0.24), TH.indoor ? M.wood : M.steel, 0, WH, HD);
   const menu = board(TH.menu, 2.9, 2.1, '#f3ead8', '#3a2a22'); menu.position.set(-7.4, 1.95, -HD + 0.04); scene.add(menu);
   const menu2 = board(TH.menu2, 2.2, 1.2, '#2f5d3a', '#fff3d6'); menu2.position.set(7.2, 2.1, -HD + 0.04); scene.add(menu2);
   const soloSign = board([TH.solo, TH.soloSub], 2.6, 1.05, '#23406e', '#e8f0ff'); soloSign.position.set(HW - 0.04, WH - 0.36, 0.8); soloSign.rotation.y = -Math.PI / 2; scene.add(soloSign);
-  lantern(-9.6, 2.7, -6.6); lantern(9.6, 2.7, -6.6); lantern(-9.6, 2.7, 5.6); lantern(-4.5, 2.9, -0.5, '#ffd08a', 13); lantern(4.2, 2.9, -0.5, '#ffd08a', 13); lantern(0, 2.9, 4.2, '#ffd08a', 13); lantern(0, 2.8, -5.4, '#ffc070', 14);
+  lantern(-9.6, 2.7, -6.6); lantern(9.6, 2.7, -6.6); lantern(-9.6, 2.7, 5.6); lantern(-4.5, 2.9, -0.5, '#ffd08a', 13); lantern(4.2, 2.9, -0.5, '#ffd08a', 13); lantern(0, 2.9, 4.2, '#ffd08a', 13); lantern(0, 2.9, -3.9, '#ffc070', 14);          // 사장님 머리를 가리지 않게 앞쪽으로
   for (const z of [-5.2, -1.2, 2.8]) lantern(HW - 0.9, 2.35, z + 1, '#ffe0a8', 7, z === -1.2);
   for (const z of [-4.2, 0.2, 4.6]) for (let i = 0; i <= 16; i++) { const x = -HW + i * (HW * 2 / 16); add(new THREE.SphereGeometry(0.06, 8, 6), bulbMat, x, WH + 0.25 - Math.sin(i / 16 * Math.PI) * 0.5, z); }
+  add(box(10.6, 0.7, 1.2), M.dark, 0, 0.35, -6.95);        // 주방 바닥(한 단 높게)
   add(box(9.6, 1.0, 1.1), M.wood, 0, 0.5, -6.0); add(box(9.9, 0.1, 1.4), M.wood, 0, 1.05, -6.0); add(box(11, 0.9, 0.9), M.steel, 0, 0.45, -7.7);
   kitchen();
   add(box(1.2, 2.0, 0.8), M.blue, -9.9, 1.0, -7.6); add(box(1.0, 1.6, 0.05), M.cream, -9.9, 1.05, -7.18);
@@ -357,20 +361,78 @@ function buildRoom() {
 // ═══ 골목 ═══
 const SHOPZ = { korean: { side: -1 }, japanese: { side: 1 }, chinese: { side: -1 }, western: { side: 1 } };
 const FRONT = { '-1': -4.1, '1': 4.7 };                       // 가게 앞면이 있는 x
+// ═══ 골목 가게 외관 ═══
+// 지붕: 가운데가 높고 처마 끝이 살짝 들린 곡선 (rise: 높이, lift: 처마 들림, curve: 오목한 정도)
+function roofGeo(w, d, rise, lift, curve, thick = 0.22) {
+  const N = 28, top = [];
+  for (let i = 0; i <= N; i++) { const x = -w / 2 + w * i / N, u = Math.abs(x) / (w / 2); top.push([x, rise * Math.pow(1 - u, curve) + lift * Math.pow(Math.max(0, (u - 0.78) / 0.22), 2)]); }
+  const sh = new THREE.Shape(); sh.moveTo(top[0][0], top[0][1]); for (const [x, y] of top.slice(1)) sh.lineTo(x, y);
+  for (const [x, y] of top.slice().reverse()) sh.lineTo(x, y - thick);
+  const g = new THREE.ExtrudeGeometry(sh, { depth: d, bevelEnabled: false, steps: 1 }); g.translate(0, 0, -d / 2); return g;
+}
+const tileTex = (base, line) => mat(crayon(base, [line, base, '#ffffff'], { grid: line, gs: 32, gw: 3, n: 400, rep: [4, 4] }), { side: THREE.DoubleSide });
+function shopFront(id, sd, fx, z, lit) {
+  const T2 = THEMES[id], cx = fx + sd * 3.6, out = (dx) => fx - sd * dx, face = sd === -1 ? Math.PI / 2 : -Math.PI / 2;
+  const plane = (w, h, m, dx, y, dz) => { const o = add(new THREE.PlaneGeometry(w, h), m, out(dx), y, z + dz); o.rotation.y = face; return o; };
+  const sign = (lines, w, h, bg, fg, y, dx = 0.12) => { const b = board(lines, w, h, bg, fg); b.position.set(out(dx), y, z); b.rotation.y = face; scene.add(b); };
+  const roof = (w, d, rise, lift, curve, m, y) => { const r = add(roofGeo(w, d, rise, lift, curve), m, cx, y, z); return r; };
+  if (id === 'korean') {                     // 한옥: 돌 기단, 나무 기둥, 흰 회벽, 창호, 기와지붕
+    const white = mat(crayon('#efe6d2', ['#ffffff', '#d6c8a8'], { n: 400 })), roofM = tileTex('#3c424c', '#22262c');
+    add(box(7.6, 0.45, 8.0), M.stone, cx, 0.22, z);
+    add(box(7.2, 3.0, 7.6), white, cx, 1.95, z);
+    for (const dz of [-3.6, -1.2, 1.2, 3.6]) add(box(0.32, 3.0, 0.32), M.wood, out(0.05), 1.95, z + dz);
+    add(box(0.34, 0.34, 7.9), M.wood, out(0.05), 3.35, z); add(box(0.3, 0.22, 7.9), M.wood, out(0.05), 0.6, z);
+    for (const dz of [-2.4, 2.4]) { plane(1.9, 1.5, WALLS.hanji(false), 0.08, 1.95, dz); }
+    plane(1.6, 2.3, WALLS.hanji(false), 0.08, 1.6, 0);                                   // 창호 문
+    add(box(0.12, 2.4, 0.1), M.wood, out(0.1), 1.65, z - 0.82); add(box(0.12, 2.4, 0.1), M.wood, out(0.1), 1.65, z + 0.82);
+    roof(9.6, 9.0, 1.7, 0.55, 1.35, roofM, 3.45); add(box(0.42, 0.34, 9.2), M.white, cx, 5.2, z);                    // 용마루
+    sign([T2.name], 2.8, 0.7, '#3a2a22', '#f6e7c8', 3.0, 0.3);
+    add(cyl(0.34, 0.5, 12, 0.42), M.brown, out(0.7), 0.25, z + 3.0); ball(0.36, M.brown, out(0.7), 0.75, z + 3.0, scene, 1.0);   // 장독
+    lantern(out(0.9), 2.6, z - 1.5, '#ffe0b0', 12); lantern(out(0.9), 2.6, z + 1.5, '#ffe0b0', 0, false);
+  } else if (id === 'japanese') {            // 일본 마치야: 어두운 나무 격자, 아래 처마, 노렌, 붉은 초롱
+    const slats = mat(crayon('#4a2e1e', ['#6a4430', '#2c1a10'], { planks: '#1c100a', dir: 1.57, rep: [10, 1] }));
+    add(box(7.2, 4.4, 7.6), WALLS.dwood(false), cx, 2.2, z);
+    for (let k = -3.4; k <= 3.4; k += 0.24) if (Math.abs(k) > 1.0) add(box(0.08, 1.9, 0.07), M.brown, out(0.08), 1.25, z + k);   // 1층 격자
+    add(box(0.1, 1.9, 7.4), lit, out(-0.02), 1.25, z);
+    roof(1.7, 8.2, 0.42, 0.04, 1, tileTex('#2e3440', '#1a1e26'), 2.72).position.x = out(0.72);                           // 1층 앞 처마
+    for (let k = -3.0; k <= 3.0; k += 1.5) { const w = plane(1.0, 0.8, lit, 0.06, 3.5, k); }
+    for (let k = -3.4; k <= 3.4; k += 0.3) add(box(0.06, 0.9, 0.05), M.brown, out(0.1), 3.5, z + k);
+    roof(9.0, 8.8, 1.5, 0.12, 1.05, tileTex('#2e3440', '#1a1e26'), 4.4); add(box(0.3, 0.3, 9.0), M.dark, cx, 5.92, z);
+    for (const dz of [-0.6, 0, 0.6]) plane(0.56, 0.8, M.cushion, 0.12, 1.8, dz);                                           // 노렌
+    sign([T2.name], 2.6, 0.44, '#f3ead8', '#1f2a44', 2.44, 1.5);
+    for (const dz of [-1.6, 1.6]) { ball(0.32, M.red, out(1.0), 1.9, z + dz, scene, 1.4); add(cyl(0.2, 0.08, 10), M.dark, out(1.0), 2.38, z + dz); add(cyl(0.2, 0.08, 10), M.dark, out(1.0), 1.43, z + dz); fire(out(1.0), 1.9, z + dz, 1.6, '#ff6a3a'); }
+  } else if (id === 'chinese') {             // 중국 누각: 붉은 기둥 회랑, 금색 현판, 처마가 크게 들린 황금 기와
+    const gold = M.gold, roofM = tileTex('#d9a12a', '#9a6a12');
+    add(box(0.5, 0.4, 8.4), M.stone, out(-0.4), 0.2, z); add(box(7.2, 4.0, 7.6), WALLS.cred(false), cx, 2.0, z);
+    for (const dz of [-3.6, -1.2, 1.2, 3.6]) { add(cyl(0.2, 3.6, 14), M.red, out(1.2), 1.8, z + dz); add(cyl(0.26, 0.2, 14), gold, out(1.2), 3.55, z + dz); }
+    add(box(1.6, 0.3, 8.2), M.red, out(1.0), 3.7, z); add(box(1.6, 0.12, 8.2), gold, out(1.0), 3.88, z);
+    plane(1.8, 2.4, M.red, 0.06, 1.3, 0); for (const k of [-0.45, 0.45]) for (const y of [0.6, 1.1, 1.6, 2.1]) add(new THREE.SphereGeometry(0.05, 6, 5), gold, out(0.1), y, z + k);
+    for (const dz of [-2.5, 2.5]) { plane(1.4, 1.4, lit, 0.06, 2.0, dz); for (let k = -0.6; k <= 0.6; k += 0.3) add(box(0.06, 1.4, 0.05), gold, out(0.1), 2.0, z + dz + k); }
+    roof(10.4, 9.6, 1.8, 0.95, 1.6, roofM, 4.0); add(box(0.4, 0.4, 9.8), M.green, cx, 5.82, z);
+    for (const dz of [-4.6, 4.6]) { const o = ball(0.3, M.green, cx, 6.1, z + dz, scene, 1.4); }                           // 용마루 끝 장식
+    sign([T2.name], 2.8, 0.85, '#b3121f', '#ffd76a', 3.0, 1.12);
+    for (const dz of [-2.4, 0, 2.4]) { ball(0.34, M.red, out(1.0), 3.0 - (dz === 0 ? 0.0 : 0.15), z + dz + (dz === 0 ? 0.0 : 0), scene, 1.2); add(cyl(0.12, 0.2, 8), gold, out(1.0), 2.55 - (dz === 0 ? 0 : 0.15), z + dz); fire(out(1.0), 2.9, z + dz, 1.3, '#ff4a2a'); }
+  } else {                                   // 유럽 비스트로: 벽돌, 아치 창, 줄무늬 차양, 꽃 화분, 경사 슬레이트 지붕과 굴뚝
+    const brick = WALLS.brick(false), slate = tileTex('#4a4f5a', '#2c3038'), cream = M.cream;
+    add(box(7.2, 4.4, 7.6), brick, cx, 2.2, z); add(box(0.2, 0.3, 7.8), cream, out(0.05), 4.3, z); add(box(0.2, 0.25, 7.8), cream, out(0.05), 0.15, z);
+    const arch = (dz, w, h, y) => { plane(w, h, lit, 0.06, y, dz); const a = add(new THREE.CylinderGeometry(w / 2, w / 2, 0.1, 18, 1, false, 0, Math.PI), lit, out(0.06), y + h / 2, z + dz); a.rotation.z = Math.PI / 2; a.rotation.y = sd === -1 ? 0 : Math.PI;
+      add(box(0.12, h + 0.2, 0.12), cream, out(0.1), y, z + dz - w / 2); add(box(0.12, h + 0.2, 0.12), cream, out(0.1), y, z + dz + w / 2); add(box(0.12, 0.12, w), cream, out(0.1), y, z + dz); };
+    for (const dz of [-2.6, 2.6]) { arch(dz, 1.5, 1.6, 1.75); add(box(0.5, 0.3, 1.7), M.wood, out(0.3), 0.85, z + dz); for (let k = -0.6; k <= 0.6; k += 0.3) ball(0.13, k % 0.6 ? M.red : M.yellow, out(0.35), 1.08, z + dz + k, scene, 1); }
+    plane(1.3, 2.3, M.green, 0.06, 1.15, 0); add(box(0.06, 0.06, 0.06), M.gold, out(0.12), 1.15, z + 0.45);             // 초록 문
+    for (let k = 0; k < 6; k++) { const st = add(box(1.5, 0.1, 0.62), k % 2 ? M.white : M.red, out(0.75), 2.72 - 0.0, z - 1.55 + k * 0.62); st.rotation.z = sd * -0.35; }   // 줄무늬 차양
+    for (const dz of [-2.4, 0, 2.4]) arch(dz, 1.0, 1.1, 3.4);
+    roof(8.6, 8.4, 1.8, 0, 1, slate, 4.4); add(box(0.9, 1.6, 0.9), brick, cx + sd * 1.5, 6.0, z + 2.6); add(box(1.0, 0.15, 1.0), M.dark, cx + sd * 1.5, 6.85, z + 2.6);
+    sign([T2.name], 3.0, 0.62, '#23402e', '#f6ecd6', 3.05, 0.14);
+    lantern(out(0.9), 2.3, z - 1.6, '#ffe0a8', 12); lantern(out(0.9), 2.3, z + 1.6, '#ffe0a8', 0, false);
+  }
+  add(cyl(0.28, 0.45, 12, 0.34), M.wood, out(0.5), 0.23, z + 3.3); ball(0.45, M.leaf, out(0.5), 0.8, z + 3.3, scene, 1.2);
+}
+
 function buildStreet() {
   const road = add(new THREE.PlaneGeometry(9.4, 48), M.stone, 0.3, 0.012, 3); road.rotation.x = -Math.PI / 2;
   const lit = new THREE.MeshBasicMaterial({ color: '#ffd596' }), litB = new THREE.MeshBasicMaterial({ color: '#a8c8ff' });
-  // 가게 건물
-  for (const id of Object.keys(SHOPZ)) {
-    const T2 = THEMES[id], sd = SHOPZ[id].side, fx = FRONT[sd], z = DOOR3[id].z, cx = fx + sd * 3.6, wm = WALLS[T2.wall](false);
-    add(box(7.2, 4.6, 7.6), wm, cx, 2.3, z); add(box(8.0, 0.35, 8.4), M.dark, cx - sd * 0.3, 4.78, z); add(box(6.4, 0.5, 6.8), M.dark, cx, 5.2, z);
-    add(box(0.12, 2.3, 1.6), M.wood, fx - sd * 0.02, 1.15, z); add(box(0.14, 2.5, 0.12), M.dark, fx - sd * 0.03, 1.25, z - 0.86); add(box(0.14, 2.5, 0.12), M.dark, fx - sd * 0.03, 1.25, z + 0.86);
-    for (const dz of [-2.5, 2.5]) { add(box(0.08, 1.2, 1.5), lit, fx - sd * 0.03, 1.8, z + dz); add(box(0.1, 1.3, 0.08), M.dark, fx - sd * 0.05, 1.8, z + dz); add(box(0.1, 0.08, 1.6), M.dark, fx - sd * 0.05, 1.8, z + dz); }
-    add(box(1.5, 0.12, 3.6), mat(crayon(T2.sign[0], ['#ffffff', '#000000'], { n: 300 })), fx - sd * 0.7, 2.75, z);                         // 차양
-    const sg = board([T2.name], 3.6, 0.85, T2.sign[0], T2.sign[1]); sg.position.set(fx - sd * 0.08, 3.6, z); sg.rotation.y = sd === -1 ? Math.PI / 2 : -Math.PI / 2; scene.add(sg);
-    lantern(fx - sd * 0.9, 2.3, z - 1.5, T2.lamp, 12); lantern(fx - sd * 0.9, 2.3, z + 1.5, T2.lamp, 0, false);
-    add(cyl(0.28, 0.45, 12, 0.34), M.wood, fx - sd * 0.5, 0.23, z + 3.2); ball(0.45, M.leaf, fx - sd * 0.5, 0.8, z + 3.2, scene, 1.2);
-  }
+  // 가게 건물: 나라별 전통 건물 (한옥 / 일본 마치야 / 중국 누각 / 유럽 비스트로)
+  for (const id of Object.keys(SHOPZ)) shopFront(id, SHOPZ[id].side, FRONT[SHOPZ[id].side], DOOR3[id].z, lit);
   // 옆 건물들 (불 켜진 창만 있는 어두운 집)
   for (const [sd, z, len, h] of [[-1, 2.8, 6.6, 3.6], [1, 3.1, 6.4, 5.4], [-1, 18.2, 7.4, 5.0], [1, 18.2, 7.4, 3.8], [-1, -11.5, 5.2, 5.2], [1, -11, 5.4, 4.2]]) {
     const fx = FRONT[sd] + (z < -9 ? sd * 1.6 : 0), cx = fx + sd * 3.4; add(box(6.8, h, len), M.dark, cx, h / 2, z); add(box(7.4, 0.3, len + 0.6), M.brown, cx, h + 0.15, z);
@@ -514,7 +576,7 @@ if (STREET) { const d = DOOR3[QS.get('from')]; if (d) me.g.position.set(d.x * 0.
 else me.g.position.set((Math.random() - 0.5) * 3, 0, HD - 1.2);
 let seatAt = 0;
 // 사장님 (가게 주인): 주방에서 가끔 한마디씩 함
-const owners = TH.owners.map((o, i) => { const p = makePerson('npc' + i, o, false); people.delete('npc' + i); p.g.position.set(o.x, 0.25, -6.9); p.sp.scale.set(1.75, 1.75, 1); p.nm.position.y = 1.8; p.lines = o.lines; p.home = o.x; return p; });
+const owners = TH.owners.map((o, i) => { const p = makePerson('npc' + i, o, false); people.delete('npc' + i); p.g.position.set(o.x, 0.75, -6.9); p.sh.visible = false; p.sp.scale.set(2.05, 2.05, 1); p.nm.position.y = 2.15; p.lines = o.lines; p.home = o.x; return p; });
 let ownerT = owners.length && setTimeout(function chat() { const o = owners[Math.floor(Math.random() * owners.length)]; bubble(o, o.lines[1 + Math.floor(Math.random() * (o.lines.length - 1))], '', 3600); ownerT = setTimeout(chat, 9000 + Math.random() * 9000); }, 7000);
 
 // ═══ 천막 밖 비 ═══
@@ -721,7 +783,7 @@ const seatedAt = (t) => [...people.values()].filter(p => p.t === t).length;
 function sit(t, s) {
   if (taken(t, s)) { s = freeSeat(t); if (s === null) { toast('그 자리는 꽉 찼어요'); return; } }
   if (me.t !== null) leaveTable();
-  putSeat(me, t, s); seatAt = Date.now(); joinTable(t); track();
+  goDoor = null; putSeat(me, t, s); seatAt = Date.now(); joinTable(t); track();
   log.push({ sys: true, text: tables[t].solo ? TH.solo + '에 앉았어요. 소리를 켜고 천천히 쉬어가세요.' : `${tables[t].name}에 앉았어요. 대화는 같은 테이블 사람에게만 보여요.` });
   ui();
 }
@@ -774,11 +836,11 @@ function ui(logOnly) {
   if (logOnly && mode === panelMode) { if ($('log')) { $('log').innerHTML = logHTML; $('log').scrollTop = 1e6; } if ($('where2')) $('where2').textContent = whereText(); return; }
   panelMode = mode; const P = $('panel');
   const emo = (xs, st = '') => `<div class="emo" ${st}>${xs.map(e => `<button data-e="${e}" aria-label="감정 표현 ${e}">${e}</button>`).join('')}</div>`;
-  if (mode === 'walk') P.innerHTML = `<div class="where">테이블을 누르면 바로 앉아요 <small>· 대화는 앉아야 할 수 있어요</small></div><div class="row"><button class="btn hot" id="q1">🪑 바로 앉기</button><button class="btn" id="q2">${RID === 'pocha' ? '🍶' : '🍚'} ${TH.solo} 가기</button></div>${emo(EMOTES)}`;
+  if (mode === 'walk') P.innerHTML = `<div class="where">테이블을 누르면 바로 앉아요 <small>· 대화는 앉아야 할 수 있어요</small></div><div class="row"><button class="btn hot" id="q1">🪑 바로 앉기</button><button class="btn" id="qo">🚪 나가기</button><button class="btn" id="q2">${RID === 'pocha' ? '🍶' : '🍚'} ${TH.solo} 가기</button></div>${emo(EMOTES)}`;
   else if (mode === 'solo') P.innerHTML = `<div class="log" id="log">${logHTML}</div><div class="where">${RID === 'pocha' ? '🍶' : '🍚'} ${TH.solo} <small>· 대화 없이 빗소리와 가게 소리만 들려요</small></div><div class="row"><button class="btn" id="up">🚪 일어나기</button></div>`;
   else P.innerHTML = `<div id="game"></div><div class="log" id="log">${logHTML}</div><div class="where"><span id="where2">${whereText()}</span></div><div class="row"><input class="in" id="msg" maxlength="60" placeholder="우리 테이블에만 보여요" autocomplete="off" enterkeyhint="send"><button class="btn hot" id="go">전송</button></div><div class="row" style="margin-top:8px"><button class="btn" id="gv">🗳️ 메뉴 투표</button><button class="btn" id="gw">🏆 음식 월드컵</button><button class="btn" id="up">🚪 일어나기</button></div>${emo(EMOTES.concat('🍻'))}`;
   const on = (id, f) => { const el = $(id); if (el) el.onclick = f; };
-  on('q1', () => quick(false)); on('q2', () => quick(true)); on('up', stand); on('go', say); on('gv', () => startGame('vote')); on('gw', () => startGame('wc')); renderGame();
+  on('qo', goOut); on('q1', () => quick(false)); on('q2', () => quick(true)); on('up', stand); on('go', say); on('gv', () => startGame('vote')); on('gw', () => startGame('wc')); renderGame();
   if ($('log')) $('log').onclick = (e) => { const sd = e.target && e.target.dataset && e.target.dataset.mute; if (!sd) return; if (muted.has(sd)) { muted.delete(sd); toast('다시 보이게 했어요'); } else { muted.add(sd); toast('이 손님의 말을 가렸어요 (이름을 다시 누르면 풀려요)'); } };
   if ($('msg')) $('msg').onkeydown = (e) => { if (e.key === 'Enter' && !e.isComposing) say(); };
   P.querySelectorAll('[data-e]').forEach(b => b.onclick = () => emote(b.dataset.e));
@@ -921,9 +983,10 @@ function tap(cx, cy) {
     for (const q of seats) { if (q.t !== t || taken(t, q.i)) continue; const d = Math.hypot(q.x - x, q.z - z); if (d < bd) { bd = d; best = q; } }
     if (!best) { toast('그 자리는 꽉 찼어요'); return; } sit(t, best.i); return;
   }
+  if (z > HD - 0.6 && Math.abs(x) < 2.2) { goOut(); return; }       // 입구 발판 → 걸어 나가서 골목으로
   if (Math.abs(x) > HW - 0.5 || z < -3.9 || z > HD + 4) return;
   if (me.t !== null) stand();
-  me.target = { x, z }; sendMove();
+  goDoor = null; me.target = { x, z }; sendMove();
 }
 let moveLater = null;
 function sendMove() {
@@ -933,7 +996,8 @@ function sendMove() {
   ch.send({ type: 'broadcast', event: 'move', payload });
 }
 function walkToShop(id) { const d = DOOR3[id]; goDoor = id; me.target = { x: d.x, z: d.z }; sendMove(); toast(`${THEMES[id].name}(으)로 가는 중…`); }
-function enterShop(id, sitNow) { location.href = `pocha3d.html?room=${id}${sitNow ? '&sit=1' : ''}`; }
+function goOut() { if (me.t !== null) stand(); goDoor = '__out'; me.target = { x: 0, z: HD + 1.1 }; sendMove(); toast('밖으로 나가는 중…'); }
+function enterShop(id, sitNow) { if (id === '__out') { location.href = `pocha3d.html?room=street&from=${RID}`; return; } location.href = `pocha3d.html?room=${id}${sitNow ? '&sit=1' : ''}`; }
 function avoid(p) { if (STREET) { p.x = Math.min(4.0, Math.max(-3.4, p.x)); p.z = Math.min(20.4, Math.max(-12.8, p.z)); return; } for (const tb of tables) { if (tb.bar || tb.solo) continue; const dx = p.x - tb.x, dz = p.z - tb.z, d = Math.hypot(dx, dz), min = 1.55; if (d < min && d > 0.001) { p.x = tb.x + dx / d * min; p.z = tb.z + dz / d * min; } } p.z = Math.max(-3.9, p.z); p.x = Math.min(HW - 2.3, Math.max(-HW + 0.6, p.x)); }
 
 // ═══ 매 프레임 ═══
@@ -948,7 +1012,7 @@ function frame(now) {
     p.sp.scale.y = 1.5 * (1 + (walking ? 0 : Math.sin(T * 2 + p.ph) * 0.025));
     for (let i = 0; i < p.fx.length; i++) { const k = (T * 0.42 + i / 3 + p.ph) % 1, f = p.fx[i]; f.position.set(Math.sin(i * 2.1 + p.ph) * 0.5 + Math.sin(k * 5) * 0.08, 1.05 + k * 0.95, 0.02); f.material.opacity = Math.sin(k * Math.PI) * 0.95; const sc = 0.3 + k * 0.2; f.scale.set(sc, sc, 1); }
   }
-  for (const o of owners) { const nx = o.home + Math.sin(T * 0.35 + o.ph) * 1.1; o.sp.scale.x = (nx < o.g.position.x ? -1.75 : 1.75); o.g.position.x = nx; o.sp.position.y = Math.abs(Math.sin(T * 3 + o.ph)) * 0.05; }
+  for (const o of owners) { const nx = o.home + Math.sin(T * 0.35 + o.ph) * 1.1; o.sp.scale.x = (nx < o.g.position.x ? -2.05 : 2.05); o.g.position.x = nx; o.sp.position.y = Math.abs(Math.sin(T * 3 + o.ph)) * 0.05; }
   cam.tx += (me.g.position.x * 0.8 - cam.tx) * Math.min(1, dt * 3); cam.tz += ((me.g.position.z * 0.75 + 0.3) - cam.tz) * Math.min(1, dt * 3);
   for (const l of lanterns) { const f = 0.88 + Math.sin(T * 5.3 + l.ph) * 0.06 + Math.sin(T * 13.1 + l.ph * 2) * 0.04; if (l.L) l.L.intensity = l.base * f; l.glow.material.opacity = 0.5 * f; if (!l.L && l.base === 1) l.glow.material.opacity = 0.35 + Math.abs(Math.sin(T * 9 + l.ph)) * 0.4; }
   for (const s of steams) { const k = (T * 0.35 + s.ph) % 1; s.s.position.set(s.x + Math.sin(k * 6 + s.ph * 9) * 0.15, s.y + k * 1.5, s.z); const sc = 0.5 + k * 1.1; s.s.scale.set(sc, sc, 1); s.s.material.opacity = Math.sin(k * Math.PI) * 0.22; }
