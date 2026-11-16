@@ -621,6 +621,21 @@
   .similar-wrap.open { display:flex; }
   .similar-chip { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:11px; color:var(--text); cursor:pointer; transition:all 0.15s; }
   .similar-chip:hover { border-color:var(--orange); color:var(--orange); }
+  .menu-more { position:fixed; inset:0; z-index:870; background:rgba(0,0,0,.55); display:none; align-items:flex-end; justify-content:center; }
+  .menu-more.open { display:flex; animation:fadeIn .15s ease; }
+  .menu-more-box { width:100%; max-width:480px; max-height:86vh; overflow-y:auto; background:var(--card); border-radius:22px 22px 0 0; padding:16px 16px calc(18px + env(safe-area-inset-bottom)); box-sizing:border-box; }
+  .more-top { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .more-top img, .more-top .more-em { width:58px; height:58px; border-radius:14px; object-fit:cover; flex:none; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:34px; }
+  .more-title { font-family:'Jua',sans-serif; font-size:20px; color:var(--text); } .more-q { font-size:12px; color:var(--muted); margin-top:2px; }
+  .more-x { margin-left:auto; background:var(--surface); border:1px solid var(--border); border-radius:50%; width:34px; height:34px; color:var(--muted); font-size:14px; cursor:pointer; flex:none; }
+  .more-sec { margin-top:12px; } .more-h { font-size:12px; font-weight:700; color:var(--muted); margin:0 2px 6px; }
+  .more-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border:1px solid var(--border); background:var(--surface); border-radius:14px; margin-bottom:6px; text-decoration:none; color:var(--text); cursor:pointer; }
+  .more-item:active { transform:scale(.99); }
+  .mi-ic { font-size:22px; width:28px; text-align:center; flex:none; } .mi-ic img { width:22px !important; height:22px !important; }
+  .mi-tx { flex:1; min-width:0; display:flex; flex-direction:column; } .mi-tx b { font-size:14px; } .mi-tx small { font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .mi-go { color:var(--muted); font-size:18px; }
+  .shop-mini { display:inline-flex; align-items:center; gap:3px; background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:8px 11px; min-height:36px; box-sizing:border-box; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+  .cp-notice { font-size:11px; color:var(--muted); background:var(--bg); border-radius:8px; padding:6px 8px; margin:0 0 6px; line-height:1.5; }
   .menu-peek { position:fixed; inset:0; z-index:880; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; padding:24px; }
   .menu-peek.open { display:flex; }
   .menu-peek-box { width:100%; max-width:340px; background:var(--card); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
@@ -4136,7 +4151,6 @@ const recipeDB = {
   '내장전골': {calories:348, carbs:17.3, protein:32.5, fat:17.3},
   '낙지삼겹살볶음': {calories:302, carbs:7.5, protein:18.2, fat:21.1},
   '닭발볶음': {calories:372, carbs:23, protein:28, fat:19},
-  '닭갈비': {calories:465, carbs:20, protein:35, fat:27},
   '고추잡채': {calories:151, carbs:9, protein:12, fat:7.6},
   '꽁치구이': {calories:327, carbs:3.9, protein:37.6, fat:16.5},
   '닭강정': {calories:365, carbs:33.4, protein:31.4, fat:10.5},
@@ -4146,66 +4160,16 @@ const recipeDB = {
   '참치죽': {calories:193, carbs:28.3, protein:7.8, fat:5.3},
   '잣죽': {calories:397, carbs:64.9, protein:8.2, fat:11.5},
 
-  '된장찌개': {calories:184, carbs:22.5, protein:14.4, fat:4.8},
-  '김치찌개': {calories:184, carbs:11.7, protein:16.8, fat:8},
-  '순두부찌개': {calories:140, carbs:8.7, protein:11.9, fat:6.4},
-  '제육볶음': {calories:296, carbs:27.4, protein:30.8, fat:7.4},
   '소불고기': {calories:288, carbs:12.2, protein:15.6, fat:19.2},
-  '계란볶음밥': {calories:410, carbs:65.5, protein:14.5, fat:8.7},
-  '김치볶음밥': {calories:418, carbs:58, protein:10.4, fat:16.1},
-  '비빔밥': {calories:448, carbs:70.8, protein:14.8, fat:11},
-  '갈비찜': {calories:594, carbs:15.8, protein:59.8, fat:32.3},
-  '닭볶음탕': {calories:388, carbs:29.8, protein:41.7, fat:11.3},
-  '잡채': {calories:292, carbs:48.5, protein:9.4, fat:6.6},
   '콩나물국밥': {calories:312, carbs:65.6, protein:8.7, fat:1.4},
-  '미역국': {calories:90, carbs:4, protein:7, fat:4},
-  '나물비빔밥': {calories:639, carbs:85, protein:31, fat:19},
-  '닭가슴살 샐러드': {calories:220, carbs:8, protein:32, fat:7},
-  '라면': {calories:379, carbs:47.8, protein:13.2, fat:14.5},
-  '토스트': {calories:320, carbs:42, protein:12, fat:11},
-  '오믈렛': {calories:230, carbs:1, protein:13, fat:18},
-  '까르보나라': {calories:630, carbs:68, protein:25, fat:28},
-  '알리오올리오': {calories:704, carbs:115, protein:21, fat:17},
-  '아라비아타': {calories:480, carbs:70, protein:14, fat:16},
-  '리조또': {calories:560, carbs:76, protein:16, fat:22},
-  '스테이크': {calories:388, carbs:0.3, protein:60.4, fat:16.1},
-  '시저샐러드': {calories:285, carbs:8, protein:14, fat:22},
-  '아보카도 토스트': {calories:380, carbs:38, protein:12, fat:22},
   '닭고기덮밥(오야코동)': {calories:500, carbs:59.3, protein:45.6, fat:8.7},
   '연어덮밥(사케동)': {calories:515, carbs:70, protein:25, fat:15},
-  '마파두부': {calories:278, carbs:19.1, protein:16.4, fat:14.8},
-  '후라이드 치킨': {calories:830, carbs:46, protein:56, fat:46},
-  '양념치킨': {calories:900, carbs:72, protein:52, fat:40},
-  '간장치킨': {calories:820, carbs:52, protein:56, fat:42},
-  '파닭': {calories:850, carbs:60, protein:54, fat:44},
-  '페퍼로니 피자': {calories:750, carbs:80, protein:32, fat:34},
-  '불고기 피자': {calories:720, carbs:82, protein:30, fat:30},
-  '짜장면': {calories:612, carbs:117, protein:21, fat:10},
-  '짬뽕': {calories:444, carbs:68, protein:26, fat:7},
-  '탕수육': {calories:348, carbs:39, protein:20, fat:13},
-  '떡볶이': {calories:360, carbs:65, protein:9, fat:7},
-  '순대': {calories:280, carbs:54, protein:4, fat:5},
-  '라볶이': {calories:335, carbs:50, protein:7, fat:12},
-  '김밥': {calories:350, carbs:50, protein:12, fat:11},
   '족발': {calories:466, carbs:2, protein:52, fat:28},
-  '보쌈': {calories:340, carbs:12, protein:28, fat:20},
-  '불고기버거': {calories:500, carbs:45, protein:28, fat:23},
-  '치킨버거': {calories:480, carbs:44, protein:26, fat:22},
-  '치즈버거': {calories:530, carbs:46, protein:28, fat:26},
-  '마라탕': {calories:363, carbs:28, protein:22, fat:18},
-  '쌀국수': {calories:292, carbs:50, protein:14, fat:4},
-  '삼겹살': {calories:841, carbs:1, protein:41, fat:75},
   '목살': {calories:480, carbs:4, protein:30, fat:36},
   '소고기등심': {calories:420, carbs:2, protein:40, fat:28},
   '소갈비': {calories:434, carbs:3, protein:47, fat:26},
   '초밥 세트': {calories:480, carbs:68, protein:24, fat:12},
-  '회덮밥': {calories:580, carbs:71, protein:36, fat:17},
-  '오마카세': {calories:600, carbs:40, protein:36, fat:32},
-  '돈코츠라멘': {calories:441, carbs:26, protein:19, fat:29},
   '일식돈까스': {calories:520, carbs:42, protein:28, fat:26},
-  '순대국밥': {calories:375, carbs:52, protein:16, fat:11},
-  '에그베네딕트': {calories:480, carbs:22, protein:22, fat:30},
-  '고기뷔페': {calories:1200, carbs:20, protein:80, fat:90},
   '수육': {calories:320, carbs:2, protein:28, fat:22},
   '소불고기덮밥(규동)': {calories:728, carbs:107.8, protein:26.4, fat:21.2},
   '잡곡밥': {calories:416, carbs:72, protein:14, fat:8},
@@ -4379,6 +4343,61 @@ const recipeDB = {
   '만두': {calories:420, carbs:48, protein:18, fat:16},
   '간짜장': {calories:680, carbs:110, protein:22, fat:16},
 };
+// 위 레시피(재료·순서)가 있는 메뉴의 영양 정보: 같은 이름을 객체에 두 번 쓰면 레시피가 지워져서 따로 두고 합침
+const RECIPE_NUTRI = {
+  '닭갈비': {calories:465, carbs:20, protein:35, fat:27},
+  '된장찌개': {calories:184, carbs:22.5, protein:14.4, fat:4.8},
+  '김치찌개': {calories:184, carbs:11.7, protein:16.8, fat:8},
+  '순두부찌개': {calories:140, carbs:8.7, protein:11.9, fat:6.4},
+  '제육볶음': {calories:296, carbs:27.4, protein:30.8, fat:7.4},
+  '계란볶음밥': {calories:410, carbs:65.5, protein:14.5, fat:8.7},
+  '김치볶음밥': {calories:418, carbs:58, protein:10.4, fat:16.1},
+  '비빔밥': {calories:448, carbs:70.8, protein:14.8, fat:11},
+  '갈비찜': {calories:594, carbs:15.8, protein:59.8, fat:32.3},
+  '닭볶음탕': {calories:388, carbs:29.8, protein:41.7, fat:11.3},
+  '잡채': {calories:292, carbs:48.5, protein:9.4, fat:6.6},
+  '미역국': {calories:90, carbs:4, protein:7, fat:4},
+  '나물비빔밥': {calories:639, carbs:85, protein:31, fat:19},
+  '닭가슴살 샐러드': {calories:220, carbs:8, protein:32, fat:7},
+  '라면': {calories:379, carbs:47.8, protein:13.2, fat:14.5},
+  '토스트': {calories:320, carbs:42, protein:12, fat:11},
+  '오믈렛': {calories:230, carbs:1, protein:13, fat:18},
+  '까르보나라': {calories:630, carbs:68, protein:25, fat:28},
+  '알리오올리오': {calories:704, carbs:115, protein:21, fat:17},
+  '아라비아타': {calories:480, carbs:70, protein:14, fat:16},
+  '리조또': {calories:560, carbs:76, protein:16, fat:22},
+  '스테이크': {calories:388, carbs:0.3, protein:60.4, fat:16.1},
+  '시저샐러드': {calories:285, carbs:8, protein:14, fat:22},
+  '아보카도 토스트': {calories:380, carbs:38, protein:12, fat:22},
+  '마파두부': {calories:278, carbs:19.1, protein:16.4, fat:14.8},
+  '후라이드 치킨': {calories:830, carbs:46, protein:56, fat:46},
+  '양념치킨': {calories:900, carbs:72, protein:52, fat:40},
+  '간장치킨': {calories:820, carbs:52, protein:56, fat:42},
+  '파닭': {calories:850, carbs:60, protein:54, fat:44},
+  '페퍼로니 피자': {calories:750, carbs:80, protein:32, fat:34},
+  '불고기 피자': {calories:720, carbs:82, protein:30, fat:30},
+  '짜장면': {calories:612, carbs:117, protein:21, fat:10},
+  '짬뽕': {calories:444, carbs:68, protein:26, fat:7},
+  '탕수육': {calories:348, carbs:39, protein:20, fat:13},
+  '떡볶이': {calories:360, carbs:65, protein:9, fat:7},
+  '순대': {calories:280, carbs:54, protein:4, fat:5},
+  '라볶이': {calories:335, carbs:50, protein:7, fat:12},
+  '김밥': {calories:350, carbs:50, protein:12, fat:11},
+  '보쌈': {calories:340, carbs:12, protein:28, fat:20},
+  '불고기버거': {calories:500, carbs:45, protein:28, fat:23},
+  '치킨버거': {calories:480, carbs:44, protein:26, fat:22},
+  '치즈버거': {calories:530, carbs:46, protein:28, fat:26},
+  '마라탕': {calories:363, carbs:28, protein:22, fat:18},
+  '쌀국수': {calories:292, carbs:50, protein:14, fat:4},
+  '삼겹살': {calories:841, carbs:1, protein:41, fat:75},
+  '회덮밥': {calories:580, carbs:71, protein:36, fat:17},
+  '오마카세': {calories:600, carbs:40, protein:36, fat:32},
+  '돈코츠라멘': {calories:441, carbs:26, protein:19, fat:29},
+  '순대국밥': {calories:375, carbs:52, protein:16, fat:11},
+  '에그베네딕트': {calories:480, carbs:22, protein:22, fat:30},
+  '고기뷔페': {calories:1200, carbs:20, protein:80, fat:90},
+};
+for (const [k, v] of Object.entries(RECIPE_NUTRI)) recipeDB[k] = Object.assign(recipeDB[k] || {}, v);
 
 
 
@@ -4557,6 +4576,68 @@ const SHOP_AFFILIATE = {
   },
 };
 
+// 외부 연결 링크 (레시피·먹방은 검색 결과로 보냄. 다른 사이트 내용을 앱에 복사하지 않음)
+const MENU_LINKS = {
+  ytRecipe: (n) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent((recipeDB[n] && recipeDB[n].youtube) || (n + ' 레시피')),
+  mukbang: (n) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(n + ' 먹방'),
+  man10k: (n) => 'https://www.10000recipe.com/recipe/list.html?q=' + encodeURIComponent(n),
+};
+// 대가성 문구: 수수료 링크를 켰을 때(tracked)만, 쇼핑 묶음 맨 위에 표시
+const cpNotice = () => SHOP_AFFILIATE.coupang.tracked ? '<div class="cp-notice">이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : '';
+// 재료 목록은 [재료, 양?, 쿠팡 검색어?, 재료, ...] 처럼 양·검색어가 빠진 칸이 섞여 있어서 모양을 보고 나눔
+function recipeIngredients(name) {
+  const raw = (recipeDB[name] && recipeDB[name].ingredients) || [], out = [];
+  const isAmt = (t) => /^(약간|적당량|적당히|조금|한\s?줌|톡톡|취향껏)$/.test(t) || /^[\d½¼⅓][\d\/.~\s]*[^\d\s]{0,3}$/.test(t);   // 1/2포기, 150g, 2큰술, 약간
+  const isQuery = (t, n) => t.includes(n) || n.includes(t) || [...Array(Math.max(0, n.length - 1)).keys()].some(k => t.includes(n.slice(k, k + 2)));                       // 포기김치 1kg, 돼지 앞다리살 찌개용
+  for (let i = 0; i < raw.length; ) {
+    const n = String(raw[i++] || ''); if (!n) continue;
+    let amount = '', query = n;
+    if (i < raw.length && isAmt(raw[i])) amount = raw[i++];
+    if (i < raw.length && !isAmt(raw[i]) && isQuery(raw[i], n)) query = raw[i++];
+    out.push({ name: n, amount, query });
+  }
+  return out;
+}
+// 재료를 장보기 목록에 한 번에 담기 (이미 담긴 건 건너뜀). 레시피 재료가 없는 메뉴는 쿠팡 검색으로
+function addAllIngredients(name) {
+  const ings = recipeIngredients(name);
+  if (!ings.length) { window.open(SHOP_AFFILIATE.coupang.url(name + ' 재료'), '_blank', 'noopener'); return; }
+  let n = 0;
+  for (const g of ings) if (!cartItems.some(c => c.name === g.name && c.from === name)) { cartItems.push({ name: g.name, amount: g.amount, from: name }); n++; }
+  saveCart();
+  showToast(n ? `🧺 ${name} 재료 ${n}개를 장보기에 담았어요` : '이미 다 담겨 있어요');
+  const b = document.getElementById('more-ing-btn'); if (b) { b.innerHTML = `<b>✓ 장보기에 담았어요</b><small>장보기에서 재료별로 하나씩 살 수 있어요</small>`; b.onclick = () => { closeMenuMore(); showPage('cart'); }; }
+}
+function openMenuMore(name, emoji) {
+  const m = menuDB.find(x => x.name === name) || { name, emoji: emoji || '🍽️' };
+  const js = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'"), img = getMenuImg(name), hasRecipe = !!(recipeDB[name] && (recipeDB[name].steps || []).length);
+  const ingN = recipeIngredients(name).length, cookFirst = typeof selectedCat === 'undefined' || selectedCat === 'cook';
+  const item = (icon, title, sub, attrs) => `<a class="more-item" ${attrs}><span class="mi-ic">${icon}</span><span class="mi-tx"><b>${title}</b><small>${sub}</small></span><span class="mi-go">›</span></a>`;
+  const ext = (u) => `href="${u}" target="_blank" rel="noopener"`;
+  const cook = `<div class="more-sec"><div class="more-h">🍳 만들어 먹기</div>
+      ${hasRecipe ? item('📋', '오메추 레시피', '재료·순서를 한 장에', `href="#" onclick="closeMenuMore();openRecipe('${js}','${m.emoji}');return false"`) : ''}
+      ${item('▶️', '유튜브 레시피 영상', `"${escHtml(name)} 레시피" 검색`, ext(MENU_LINKS.ytRecipe(name)))}
+      ${item('📗', '만개의 레시피', '다른 사람들 레시피 모아 보기', ext(MENU_LINKS.man10k(name)))}
+    </div>
+    <div class="more-sec"><div class="more-h">🛒 장보기</div>${cpNotice()}
+      <a class="more-item" id="more-ing-btn" href="#" onclick="addAllIngredients('${js}');return false"><span class="mi-ic">🧺</span><span class="mi-tx"><b>${ingN ? `재료 ${ingN}가지 장보기에 담기` : '재료 찾아보기'}</b><small>${ingN ? '담은 뒤 재료별로 하나씩 사요' : `쿠팡에서 "${escHtml(name)} 재료" 검색`}</small></span><span class="mi-go">›</span></a>
+      ${item('🎁', `${escHtml(name)} 밀키트`, '손질된 재료로 간편하게', ext(SHOP_AFFILIATE.mealkit.url(name)))}
+    </div>`;
+  const eat = `<div class="more-sec"><div class="more-h">🛵 사 먹기</div>
+      ${item('📍', '근처 맛집 찾기', '지금 위치 주변 가게', `href="#" onclick="closeMenuMore();openNearbyMap('${js}');return false"`)}
+    </div>`;
+  const watch = `<div class="more-sec"><div class="more-h">👀 구경하기</div>${item('📺', `${escHtml(name)} 먹방`, '먹는 거 보면서 결정하기', ext(MENU_LINKS.mukbang(name)))}</div>`;
+  let el = document.getElementById('menu-more');
+  if (!el) { el = document.createElement('div'); el.id = 'menu-more'; el.className = 'menu-more'; el.onclick = (e) => { if (e.target === el) closeMenuMore(); }; document.body.appendChild(el); }
+  el.innerHTML = `<div class="menu-more-box" role="dialog" aria-label="${escHtml(name)}로 할 수 있는 것">
+    <div class="more-top">${img ? `<img src="${img}" alt="">` : `<span class="more-em">${m.emoji}</span>`}<div><div class="more-title">${escHtml(name)}</div><div class="more-q">이 메뉴로 뭐 할까요?</div></div><button class="more-x" onclick="closeMenuMore()" aria-label="닫기">✕</button></div>
+    ${cookFirst ? cook + eat : eat + cook}${watch}
+  </div>`;
+  if (typeof twemoji !== 'undefined' && twemoji.parse) try { twemoji.parse(el); } catch (e) {}
+  el.classList.add('open');
+}
+function closeMenuMore() { const el = document.getElementById('menu-more'); if (el) el.classList.remove('open'); }
+
 function shopButtons(menuName) {
   return Object.values(SHOP_AFFILIATE).filter(s => s.enabled).map(s => `
     <a href="${s.url(menuName)}" target="_blank" rel="noopener"
@@ -4658,6 +4739,8 @@ function renderResults(rejectPattern, flipIndex) {
               ? `<button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">📋 레시피</button>`
               : `<button class="result-btn" onclick="openNearbyMap('${item.name.replace(/'/g,"\\'")}')" style="color:var(--orange)">📍 근처 찾기</button>`}
             <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? `💬 후기 ${rc}개` : '✍️ 첫 후기 남기기'; })()}</button>
+          
+            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="grid-column:1 / -1;color:var(--orange);font-weight:700">🍽️ 더 보기 · 먹방·밀키트</button>
           </div>
           <div id="similar-btn-wrap-${i}">
             <button class="similar-toggle-btn" onclick="toggleSimilar('${item.name.replace(/'/g,"\\'")}',${i})">🔍 비슷한 메뉴</button>
@@ -4689,13 +4772,15 @@ function renderResults(rejectPattern, flipIndex) {
 
   const shopSection = !isHate ? `
   <div style="margin-top:10px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px">
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px">🛒 재료·밀키트 사러가기</div>
-    ${currentPicked.map(m => `
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px">🛒 재료·밀키트</div>${cpNotice()}
+    ${currentPicked.map(m => { const js = m.name.replace(/'/g, "\\'"); return `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
         <span style="flex:1 0 70px;font-size:13px;min-width:70px">${m.emoji} ${m.name}</span>
-        <span style="display:flex;gap:6px;flex-wrap:wrap">${shopButtons(m.name)}</span>
-      </div>`).join('')}
-    ${SHOP_AFFILIATE.coupang.tracked ? '<div style="font-size:11px;color:var(--muted);text-align:right;margin-top:2px">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : ''}
+        <span style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="shop-mini" onclick="addAllIngredients('${js}')">🧺 ${recipeIngredients(m.name).length ? '재료 담기' : '재료 찾기'}</button>
+          <a class="shop-mini" href="${SHOP_AFFILIATE.mealkit.url(m.name)}" target="_blank" rel="noopener">🎁 밀키트</a>
+        </span>
+      </div>`; }).join('')}
   </div>` : '';
 
   document.getElementById('result-area').innerHTML = `<div class="result-grid">${cards}</div>${feedbackHtml}${rerollBtn}
@@ -4757,27 +4842,19 @@ function openRecipe(menuName, emoji) {
       </div>
       <div class="recipe-section" style="margin-top:8px">
         <a href="${ytUrl}" target="_blank" rel="noopener"><button class="youtube-btn">▶ 유튜브에서 ${menuName} 레시피 보기</button></a>
+        <a href="${MENU_LINKS.man10k(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:#2f7a3a">📗 만개의 레시피에서 보기</button></a>
       </div>
-      <div class="recipe-section" style="margin-top:8px;padding-bottom:20px">
-        <a href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener"><button class="buy-all-btn">🛒 ${menuName} 재료·밀키트 보기</button></a>
-        ${SHOP_AFFILIATE.coupang.tracked ? '<div class="cp-disclaimer">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : ''}
+      <div class="recipe-section" style="margin-top:8px;padding-bottom:20px">${cpNotice()}
+        <a href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener"><button class="buy-all-btn">🧺 ${menuName} 재료 찾아보기</button></a>
+        <a href="${SHOP_AFFILIATE.mealkit.url(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:#2e8b57">🎁 ${menuName} 밀키트 보기</button></a>
+        <a href="${MENU_LINKS.mukbang(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:var(--surface);color:var(--text);border:1px solid var(--border)">📺 ${menuName} 먹방 보기</button></a>
       </div>`;
     modal.classList.add('show');
     return;
   }
 
   // ingredients가 flat 배열 ['재료명','양','쿠팡검색어', ...] 형태이므로 객체 배열로 변환
-  const rawIng = r.ingredients || [];
-  const ingredients = [];
-  for (let i = 0; i < rawIng.length; i += 3) {
-    if (rawIng[i]) {
-      ingredients.push({
-        name: rawIng[i],
-        amount: rawIng[i + 1] || '',
-        query: rawIng[i + 2] || rawIng[i],
-      });
-    }
-  }
+  const ingredients = recipeIngredients(menuName);
 
   // 재료 목록 HTML
   const ingList = ingredients.map(ing => `
@@ -4838,10 +4915,9 @@ function openRecipe(menuName, emoji) {
 
     <div class="recipe-section">
       <div class="recipe-section-title">재료 (1인분 기준)</div>
-      <div class="ingredient-list">${ingList}</div>
-      <a href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener">
-        <button class="buy-all-btn">🛒 전체 재료 쿠팡에서 보기</button>
-      </a>
+      ${cpNotice()}<div class="ingredient-list">${ingList}</div>
+      <button class="buy-all-btn" onclick="addAllIngredients('${menuName.replace(/'/g, "\\'")}')">🧺 재료 ${ingredients.length}가지 장보기에 한 번에 담기</button>
+      <a href="${SHOP_AFFILIATE.mealkit.url(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:#2e8b57">🎁 ${menuName} 밀키트 보기</button></a>
     </div>
 
     <div class="recipe-section" style="margin-top:20px">
@@ -4853,9 +4929,11 @@ function openRecipe(menuName, emoji) {
       <a href="${ytUrl}" target="_blank" rel="noopener">
         <button class="youtube-btn">▶ 유튜브 레시피 영상 보기</button>
       </a>
+      <a href="${MENU_LINKS.man10k(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:#2f7a3a">📗 만개의 레시피에서 다른 레시피 보기</button></a>
+      <a href="${MENU_LINKS.mukbang(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:var(--surface);color:var(--text);border:1px solid var(--border)">📺 ${menuName} 먹방 보기</button></a>
     </div>
 
-    <div class="recipe-section" style="margin-top:4px;padding-bottom:20px">
+    <div class="recipe-section" style="margin-top:4px;padding-bottom:20px">${cpNotice()}
       <a class="coupang-partners-banner" href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener">
         <span class="cp-rocket">🚀</span>
         <div class="cp-text">
@@ -4865,7 +4943,6 @@ function openRecipe(menuName, emoji) {
         <span class="cp-logo">coupang</span>
         <span class="cp-arrow">›</span>
       </a>
-      ${SHOP_AFFILIATE.coupang.tracked ? '<div class="cp-disclaimer">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>' : ''}
     </div>`;
 
   modal.classList.add('show');
