@@ -628,13 +628,16 @@
   .more-top img, .more-top .more-em { width:58px; height:58px; border-radius:14px; object-fit:cover; flex:none; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:34px; }
   .more-title { font-family:'Jua',sans-serif; font-size:20px; color:var(--text); } .more-q { font-size:12px; color:var(--muted); margin-top:2px; }
   .more-x { margin-left:auto; background:var(--surface); border:1px solid var(--border); border-radius:50%; width:34px; height:34px; color:var(--muted); font-size:14px; cursor:pointer; flex:none; }
-  .more-sec { margin-top:12px; } .more-h { font-size:12px; font-weight:700; color:var(--muted); margin:0 2px 6px; }
-  .more-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border:1px solid var(--border); background:var(--surface); border-radius:14px; margin-bottom:6px; text-decoration:none; color:var(--text); cursor:pointer; }
-  .more-item:active { transform:scale(.99); }
-  .mi-ic { font-size:22px; width:28px; text-align:center; flex:none; } .mi-ic img { width:22px !important; height:22px !important; }
-  .mi-tx { flex:1; min-width:0; display:flex; flex-direction:column; } .mi-tx b { font-size:14px; } .mi-tx small { font-size:11.5px; color:var(--muted); margin-top:2px; }
-  .mi-go { color:var(--muted); font-size:18px; }
-  .shop-mini { display:inline-flex; align-items:center; gap:3px; background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:8px 11px; min-height:36px; box-sizing:border-box; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+  .more-sec { margin-top:14px; } .more-h { font-size:12px; font-weight:700; color:var(--muted); margin:0 2px 7px; }
+  .more-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  .more-tile { display:flex; align-items:center; gap:9px; padding:10px; border:1px solid var(--border); background:var(--surface); border-radius:14px; text-decoration:none; color:var(--text); cursor:pointer; min-width:0; }
+  .more-tile:active { transform:scale(.98); }
+  .mt-ic { width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .mt-ic svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+  .t-or { background:rgba(255,122,26,.14); color:#ff8a3a; } .t-red { background:rgba(255,64,64,.14); color:#ff5a5a; } .t-grn { background:rgba(46,160,90,.16); color:#3cc07a; }
+  .t-yel { background:rgba(255,200,60,.16); color:#f2b630; } .t-mint { background:rgba(42,193,188,.16); color:#2ac1bc; } .t-pur { background:rgba(150,110,255,.16); color:#a98bff; }
+  .mt-tx { display:flex; flex-direction:column; min-width:0; } .mt-tx b { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mt-tx small { font-size:11px; color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .cp-notice { font-size:11px; color:var(--muted); background:var(--bg); border-radius:8px; padding:6px 8px; margin:0 0 6px; line-height:1.5; }
   .menu-peek { position:fixed; inset:0; z-index:880; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; padding:24px; }
   .menu-peek.open { display:flex; }
@@ -4557,17 +4560,33 @@ function likeMenu(name, emoji) {
 // ─────────────────────────────────────────────
 // [추적 버전 예시] 형이 파트너스에서 만든 고정 딥링크 — 검색은 안 되고 추적만 됨:
 //   const COUPANG_DEEPLINK = 'https://link.coupang.com/a/eu5btk';
+// 쿠팡 검색: 휴대폰에서 PC 검색 주소를 열면 '연결할 수 없는 페이지'가 떠서 모바일 주소를 따로 씀
+const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+function coupangSearch(q) {
+  return IS_MOBILE ? `https://m.coupang.com/nm/search?q=${encodeURIComponent(q)}` : `https://www.coupang.com/np/search?q=${encodeURIComponent(q)}&channel=user`;
+}
+// 배민: 메뉴 검색으로 바로 가는 공식 주소가 없어서, 메뉴 이름을 복사해 두고 배민 앱을 엶 (없으면 스토어)
+function openBaemin(name) {
+  try { navigator.clipboard && navigator.clipboard.writeText(name); } catch (e) {}
+  showToast(`'${name}' 복사했어요 · 배민 검색창에 붙여넣어 주세요`);
+  const ua = navigator.userAgent;
+  setTimeout(() => {
+    if (/Android/i.test(ua)) location.href = 'intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.sampleapp;S.browser_fallback_url=' + encodeURIComponent('https://play.google.com/store/apps/details?id=com.sampleapp') + ';end';
+    else if (/iPhone|iPad|iPod/i.test(ua)) location.href = 'https://apps.apple.com/kr/app/id378084485';
+    else window.open('https://www.baemin.com/', '_blank', 'noopener');
+  }, 650);
+}
 const SHOP_AFFILIATE = {
   coupang: {
     name: '쿠팡', emoji: '🛒', color: '#e62e14', enabled: true,
     // tracked: 수수료 추적 링크(파트너스 API)로 바꾸면 true → 대가성 문구 자동 표시
     tracked: false,
-    url: (q) => `https://www.coupang.com/np/search?q=${encodeURIComponent(q)}&channel=user`
+    url: (q) => coupangSearch(q)
   },
   mealkit: {
     name: '밀키트', emoji: '🍱', color: '#2e8b57', enabled: true,
     // 밀키트 = 쿠팡에서 "○○ 밀키트" 검색
-    url: (q) => `https://www.coupang.com/np/search?q=${encodeURIComponent(q + ' 밀키트')}&channel=user`
+    url: (q) => coupangSearch(q + ' 밀키트')
   },
   kurly: {
     name: '마켓컬리', emoji: '🥬', color: '#5f0080', enabled: false,
@@ -4606,34 +4625,47 @@ function addAllIngredients(name) {
   for (const g of ings) if (!cartItems.some(c => c.name === g.name && c.from === name)) { cartItems.push({ name: g.name, amount: g.amount, from: name }); n++; }
   saveCart();
   showToast(n ? `🧺 ${name} 재료 ${n}개를 장보기에 담았어요` : '이미 다 담겨 있어요');
-  const b = document.getElementById('more-ing-btn'); if (b) { b.innerHTML = `<b>✓ 장보기에 담았어요</b><small>장보기에서 재료별로 하나씩 살 수 있어요</small>`; b.onclick = () => { closeMenuMore(); showPage('cart'); }; }
+  const b = document.getElementById('more-ing-btn'); if (b) { const t = b.querySelector('.mt-tx'); if (t) t.innerHTML = '<b>✓ 담았어요</b><small>눌러서 장보기로</small>'; b.onclick = (e) => { e.preventDefault(); closeMenuMore(); showPage('cart'); }; }
 }
+// 더 보기 창 아이콘 (선 그림)
+const MORE_ICO = {
+  recipe: '<path d="M6 4h9l3 3v13H6z"/><path d="M9 10h6M9 13.5h6M9 17h4"/>',
+  play: '<rect x="3" y="5.5" width="18" height="13" rx="3.5"/><path d="M10.5 9.5v5l4-2.5z"/>',
+  book: '<path d="M4 5.5c2.5-1 5.5-1 8 .8 2.5-1.8 5.5-1.8 8-.8V19c-2.5-1-5.5-1-8 .8-2.5-1.8-5.5-1.8-8-.8z"/><path d="M12 6.3v13.5"/>',
+  basket: '<path d="M4 10h16l-1.6 9H5.6z"/><path d="M8.5 10 11 4.5M15.5 10 13 4.5M9.5 14v2.5M14.5 14v2.5"/>',
+  gift: '<rect x="4" y="9" width="16" height="11" rx="2"/><path d="M4 13h16M12 9v11"/><path d="M12 9c-1.6-3.6-5.4-3.2-4.6-.9.4 1 2.5.9 4.6.9zm0 0c1.6-3.6 5.4-3.2 4.6-.9-.4 1-2.5.9-4.6.9z"/>',
+  pin: '<path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0c0 4.9-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
+  scooter: '<circle cx="6.5" cy="17" r="2.5"/><circle cx="17.5" cy="17" r="2.5"/><path d="M9 17h6l2-6h-4M14.5 6.5H17l2.2 8"/><path d="M4 12.5h6l1.5 2.5"/>',
+  tv: '<rect x="3" y="6.5" width="18" height="12" rx="2.5"/><path d="M8.5 3.5 12 6.5l3.5-3"/><path d="M9.5 21h5"/>',
+};
+const moreIco = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${MORE_ICO[k]}</svg>`;
 function openMenuMore(name, emoji) {
+  closeMenuPeek();
   const m = menuDB.find(x => x.name === name) || { name, emoji: emoji || '🍽️' };
   const js = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'"), img = getMenuImg(name), hasRecipe = !!(recipeDB[name] && (recipeDB[name].steps || []).length);
-  const ingN = recipeIngredients(name).length, cookFirst = typeof selectedCat === 'undefined' || selectedCat === 'cook';
-  const item = (icon, title, sub, attrs) => `<a class="more-item" ${attrs}><span class="mi-ic">${icon}</span><span class="mi-tx"><b>${title}</b><small>${sub}</small></span><span class="mi-go">›</span></a>`;
-  const ext = (u) => `href="${u}" target="_blank" rel="noopener"`;
-  const cook = `<div class="more-sec"><div class="more-h">🍳 만들어 먹기</div>
-      ${hasRecipe ? item('📋', '오메추 레시피', '재료·순서를 한 장에', `href="#" onclick="closeMenuMore();openRecipe('${js}','${m.emoji}');return false"`) : ''}
-      ${item('▶️', '유튜브 레시피 영상', `"${escHtml(name)} 레시피" 검색`, ext(MENU_LINKS.ytRecipe(name)))}
-      ${item('📗', '만개의 레시피', '다른 사람들 레시피 모아 보기', ext(MENU_LINKS.man10k(name)))}
-    </div>
-    <div class="more-sec"><div class="more-h">🛒 장보기</div>${cpNotice()}
-      <a class="more-item" id="more-ing-btn" href="#" onclick="addAllIngredients('${js}');return false"><span class="mi-ic">🧺</span><span class="mi-tx"><b>${ingN ? `재료 ${ingN}가지 장보기에 담기` : '재료 찾아보기'}</b><small>${ingN ? '담은 뒤 재료별로 하나씩 사요' : `쿠팡에서 "${escHtml(name)} 재료" 검색`}</small></span><span class="mi-go">›</span></a>
-      ${item('🎁', `${escHtml(name)} 밀키트`, '손질된 재료로 간편하게', ext(SHOP_AFFILIATE.mealkit.url(name)))}
-    </div>`;
-  const eat = `<div class="more-sec"><div class="more-h">🛵 사 먹기</div>
-      ${item('📍', '근처 맛집 찾기', '지금 위치 주변 가게', `href="#" onclick="closeMenuMore();openNearbyMap('${js}');return false"`)}
-    </div>`;
-  const watch = `<div class="more-sec"><div class="more-h">👀 구경하기</div>${item('📺', `${escHtml(name)} 먹방`, '먹는 거 보면서 결정하기', ext(MENU_LINKS.mukbang(name)))}</div>`;
+  const ingN = recipeIngredients(name).length, cat = typeof selectedCat === 'undefined' || !selectedCat ? 'cook' : selectedCat, safe = escHtml(name);
+  const tile = (ic, tone, title, sub, attrs, id) => `<a class="more-tile" ${id ? `id="${id}"` : ''} ${attrs}><span class="mt-ic ${tone}">${moreIco(ic)}</span><span class="mt-tx"><b>${title}</b><small>${sub}</small></span></a>`;
+  const ext = (u) => `href="${u}" target="_blank" rel="noopener"`, act = (f) => `href="#" onclick="${f};return false"`;
+  const T = {
+    recipe: hasRecipe ? tile('recipe', 't-or', '오메추 레시피', '재료·순서 한 장에', act(`closeMenuMore();openRecipe('${js}','${m.emoji}')`)) : '',
+    yt: tile('play', 't-red', '유튜브 레시피', '영상으로 따라 하기', ext(MENU_LINKS.ytRecipe(name))),
+    man: tile('book', 't-grn', '만개의 레시피', '다른 레시피 모아 보기', ext(MENU_LINKS.man10k(name))),
+    ing: tile('basket', 't-yel', ingN ? `재료 ${ingN}가지 담기` : '재료 찾아보기', ingN ? '장보기에서 하나씩 사요' : '쿠팡에서 검색', act(`addAllIngredients('${js}')`), 'more-ing-btn'),
+    kit: tile('gift', 't-grn', '밀키트', '손질된 재료로 간편하게', ext(SHOP_AFFILIATE.mealkit.url(name))),
+    bae: tile('scooter', 't-mint', '배민에서 주문', '메뉴 이름 복사해서 열기', act(`openBaemin('${js}')`)),
+    near: tile('pin', 't-or', '근처 맛집', '내 주변 가게 찾기', act(`closeMenuMore();openNearbyMap('${js}')`)),
+    muk: tile('tv', 't-pur', '먹방 보기', '보고 결정하기', ext(MENU_LINKS.mukbang(name))),
+  };
+  const sec = (title, list, extra = '') => `<div class="more-sec"><div class="more-h">${title}</div>${extra}<div class="more-grid">${list.join('')}</div></div>`;
+  const cook = sec('만들어 먹기', [T.recipe, T.yt, T.man, T.muk].filter(Boolean));
+  const buy = sec('장보기', [T.ing, T.kit], cpNotice());
+  const eat = sec('사 먹기', cat === 'dine' ? [T.near, T.bae] : [T.bae, T.near]);
   let el = document.getElementById('menu-more');
   if (!el) { el = document.createElement('div'); el.id = 'menu-more'; el.className = 'menu-more'; el.onclick = (e) => { if (e.target === el) closeMenuMore(); }; document.body.appendChild(el); }
-  el.innerHTML = `<div class="menu-more-box" role="dialog" aria-label="${escHtml(name)}로 할 수 있는 것">
-    <div class="more-top">${img ? `<img src="${img}" alt="">` : `<span class="more-em">${m.emoji}</span>`}<div><div class="more-title">${escHtml(name)}</div><div class="more-q">이 메뉴로 뭐 할까요?</div></div><button class="more-x" onclick="closeMenuMore()" aria-label="닫기">✕</button></div>
-    ${cookFirst ? cook + eat : eat + cook}${watch}
+  el.innerHTML = `<div class="menu-more-box" role="dialog" aria-label="${safe}로 할 수 있는 것">
+    <div class="more-top">${img ? `<img src="${img}" alt="">` : `<span class="more-em">${m.emoji}</span>`}<div><div class="more-title">${safe}</div><div class="more-q">이 메뉴로 뭐 할까요?</div></div><button class="more-x" onclick="closeMenuMore()" aria-label="닫기">✕</button></div>
+    ${cat === 'cook' ? cook + buy + eat : eat + cook + buy}
   </div>`;
-  if (typeof twemoji !== 'undefined' && twemoji.parse) try { twemoji.parse(el); } catch (e) {}
   el.classList.add('open');
 }
 function closeMenuMore() { const el = document.getElementById('menu-more'); if (el) el.classList.remove('open'); }
@@ -4737,10 +4769,12 @@ function renderResults(rejectPattern, flipIndex) {
             <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">😅 안 땡겨</button>
             ${selectedCat === 'cook'
               ? `<button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">📋 레시피</button>`
+              : selectedCat === 'delivery'
+              ? `<button class="result-btn" onclick="openBaemin('${item.name.replace(/'/g,"\\'")}')" style="color:#2ac1bc">🛵 배민에서 주문</button>`
               : `<button class="result-btn" onclick="openNearbyMap('${item.name.replace(/'/g,"\\'")}')" style="color:var(--orange)">📍 근처 찾기</button>`}
             <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? `💬 후기 ${rc}개` : '✍️ 첫 후기 남기기'; })()}</button>
           
-            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="grid-column:1 / -1;color:var(--orange);font-weight:700">🍽️ 더 보기 · 먹방·밀키트</button>
+            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="grid-column:1 / -1;color:var(--muted);font-weight:700">더 보기 · 먹방 · 밀키트 ›</button>
           </div>
           <div id="similar-btn-wrap-${i}">
             <button class="similar-toggle-btn" onclick="toggleSimilar('${item.name.replace(/'/g,"\\'")}',${i})">🔍 비슷한 메뉴</button>
@@ -5617,12 +5651,10 @@ function openMenuPeek(name) {
   let el = document.getElementById('menu-peek');
   if (!el) { el = document.createElement('div'); el.id = 'menu-peek'; el.className = 'menu-peek'; el.onclick = (e) => { if (e.target === el) closeMenuPeek(); }; document.body.appendChild(el); }
   const img = getMenuImg(m.name), safe = escHtml(m.name), js = m.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-  const tags = (m.tags || []).filter(t => /한식|중식|일식|양식|매운|국물|면|밥|고기|해산물|채소|튀김|담백|달달/.test(t)).slice(0, 4);
   el.innerHTML = `<div class="menu-peek-box">
     <div class="menu-peek-img">${img ? `<img src="${img}" alt="${safe}" onerror="this.outerHTML='<span>${m.emoji}</span>'">` : `<span>${m.emoji}</span>`}</div>
-    <div class="menu-peek-name">${m.emoji} ${safe}</div>
-    <div class="menu-peek-tags">${tags.map(t => `<span>${t}</span>`).join('')}</div>
-    <div class="menu-peek-btns"><button class="primary" onclick="closeMenuPeek();openNearbyMap('${js}')">📍 근처에서 찾기</button><button onclick="closeMenuPeek()">닫기</button></div>
+    <div class="menu-peek-name" style="text-align:center">${safe}</div>
+    <div class="menu-peek-btns"><button class="primary" onclick="openMenuMore('${js}','${m.emoji}')">더 보기</button><button onclick="closeMenuPeek()">닫기</button></div>
   </div>`;
   if (typeof twemoji !== 'undefined' && twemoji.parse) try { twemoji.parse(el); } catch (e) {}
   el.classList.add('open');
