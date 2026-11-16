@@ -638,17 +638,31 @@
   .t-yel { background:rgba(255,200,60,.16); color:#f2b630; } .t-mint { background:rgba(42,193,188,.16); color:#2ac1bc; } .t-pur { background:rgba(150,110,255,.16); color:#a98bff; }
   .mt-tx { display:flex; flex-direction:column; min-width:0; } .mt-tx b { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .mt-tx small { font-size:11px; color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rc-top { position:sticky; top:0; z-index:2; background:var(--card); padding:16px 0 10px; margin:0; border-bottom:1px solid var(--border); }
+  .rc-note { font-size:12.5px; color:var(--muted); background:var(--surface); border-radius:12px; padding:10px 12px; margin-top:12px; line-height:1.6; }
+  .rc-ings { display:flex; flex-direction:column; border:1px solid var(--border); border-radius:14px; overflow:hidden; background:var(--surface); }
+  .rc-ing { display:flex; align-items:center; gap:8px; padding:9px 10px 9px 12px; border-top:1px solid var(--border); }
+  .rc-ing:first-child { border-top:none; }
+  .rc-n { font-size:13.5px; font-weight:700; } .rc-a { font-size:12px; color:var(--muted); flex:1; min-width:0; }
+  .rc-buy, .rc-add { font-size:11.5px; font-weight:700; border-radius:999px; padding:5px 10px; text-decoration:none; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; line-height:1.2; }
+  .rc-buy { color:#ff8a3a; background:rgba(255,122,26,.12); border:1px solid transparent; }
+  .rc-add { color:var(--text); background:var(--card); border:1px solid var(--border); } .rc-add.added { color:#3cc07a; border-color:rgba(60,192,122,.5); }
+  .rc-steps { display:flex; flex-direction:column; gap:6px; }
+  .rc-step { display:flex; gap:10px; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:13.5px; line-height:1.55; color:var(--text); }
+  .rc-k { width:22px; height:22px; border-radius:7px; background:rgba(255,122,26,.16); color:#ff8a3a; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex:none; margin-top:1px; }
+  .shop-mini { display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:5px 11px 5px 6px; min-height:36px; box-sizing:border-box; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+  .shop-mini .mt-ic { width:24px; height:24px; border-radius:7px; } .shop-mini .mt-ic svg { width:14px; height:14px; }
   .cp-notice { font-size:11px; color:var(--muted); background:var(--bg); border-radius:8px; padding:6px 8px; margin:0 0 6px; line-height:1.5; }
   .menu-peek { position:fixed; inset:0; z-index:880; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; padding:24px; }
   .menu-peek.open { display:flex; }
-  .menu-peek-box { width:100%; max-width:340px; background:var(--card); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+  .menu-peek-box { width:100%; max-width:340px; background:var(--card); border:1px solid var(--border); border-radius:22px; overflow:hidden; }
   .menu-peek-img { width:100%; aspect-ratio:4/3; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:72px; }
   .menu-peek-img img { width:100%; height:100%; object-fit:cover; display:block; }
   .menu-peek-name { font-family:'Jua',sans-serif; font-size:20px; color:var(--text); padding:14px 16px 6px; }
   .menu-peek-tags { display:flex; flex-wrap:wrap; gap:6px; padding:0 16px; }
   .menu-peek-tags span { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:3px 9px; }
   .menu-peek-btns { display:flex; gap:8px; padding:14px 16px 16px; }
-  .menu-peek-btns button { flex:1; padding:11px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+  .menu-peek-btns button { flex:1; padding:11px; border-radius:14px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
   .menu-peek-btns button.primary { background:var(--orange); border-color:var(--orange); color:#fff; }
   .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:6px 4px; min-height:40px; font-size:11.5px; line-height:1.25; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:3px; text-align:center; font-weight:600; }
   .result-btn:hover { border-color:var(--orange-soft); color:var(--orange-soft); }
@@ -694,14 +708,14 @@
 
   /* 레시피 모달 */
   .recipe-modal-backdrop {
-    display:none; position:fixed; inset:0; z-index:400;
-    background:rgba(0,0,0,0.75); backdrop-filter:blur(4px);
+    display:none; position:fixed; inset:0; z-index:875;
+    background:rgba(0,0,0,0.6); backdrop-filter:blur(3px);
     align-items:flex-end; justify-content:center;
   }
   .recipe-modal-backdrop.show { display:flex; animation:fadeIn 0.2s ease; }
   .recipe-modal-box {
-    width:100%; max-width:480px; background:var(--card);
-    border-radius:28px 28px 0 0; padding:0 0 40px;
+    width:100%; max-width:480px; background:var(--card); box-sizing:border-box;
+    border-radius:22px 22px 0 0; padding:0 16px calc(20px + env(safe-area-inset-bottom));
     max-height:90vh; overflow-y:auto;
     animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1);
   }
@@ -4624,6 +4638,7 @@ function addAllIngredients(name) {
   let n = 0;
   for (const g of ings) if (!cartItems.some(c => c.name === g.name && c.from === name)) { cartItems.push({ name: g.name, amount: g.amount, from: name }); n++; }
   saveCart();
+  for (const g of ings) { const bb = document.getElementById(`cartbtn-${name}-${g.name}`); if (bb) { bb.textContent = '✓ 추가됨'; bb.classList.add('added'); } }
   showToast(n ? `🧺 ${name} 재료 ${n}개를 장보기에 담았어요` : '이미 다 담겨 있어요');
   const b = document.getElementById('more-ing-btn'); if (b) { const t = b.querySelector('.mt-tx'); if (t) t.innerHTML = '<b>✓ 담았어요</b><small>눌러서 장보기로</small>'; b.onclick = (e) => { e.preventDefault(); closeMenuMore(); showPage('cart'); }; }
 }
@@ -4639,11 +4654,11 @@ const MORE_ICO = {
   tv: '<rect x="3" y="6.5" width="18" height="12" rx="2.5"/><path d="M8.5 3.5 12 6.5l3.5-3"/><path d="M9.5 21h5"/>',
 };
 const moreIco = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${MORE_ICO[k]}</svg>`;
-function openMenuMore(name, emoji) {
-  closeMenuPeek();
+// 메뉴 하나로 할 수 있는 것들(타일) — 더 보기 창과 레시피 창이 같이 씀
+function menuTiles(name, emoji) {
   const m = menuDB.find(x => x.name === name) || { name, emoji: emoji || '🍽️' };
-  const js = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'"), img = getMenuImg(name), hasRecipe = !!(recipeDB[name] && (recipeDB[name].steps || []).length);
-  const ingN = recipeIngredients(name).length, cat = typeof selectedCat === 'undefined' || !selectedCat ? 'cook' : selectedCat, safe = escHtml(name);
+  const js = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'"), hasRecipe = !!(recipeDB[name] && (recipeDB[name].steps || []).length);
+  const ingN = recipeIngredients(name).length;
   const tile = (ic, tone, title, sub, attrs, id) => `<a class="more-tile" ${id ? `id="${id}"` : ''} ${attrs}><span class="mt-ic ${tone}">${moreIco(ic)}</span><span class="mt-tx"><b>${title}</b><small>${sub}</small></span></a>`;
   const ext = (u) => `href="${u}" target="_blank" rel="noopener"`, act = (f) => `href="#" onclick="${f};return false"`;
   const T = {
@@ -4656,6 +4671,13 @@ function openMenuMore(name, emoji) {
     near: tile('pin', 't-or', '근처 맛집', '내 주변 가게 찾기', act(`closeMenuMore();openNearbyMap('${js}')`)),
     muk: tile('tv', 't-pur', '먹방 보기', '보고 결정하기', ext(MENU_LINKS.mukbang(name))),
   };
+  return { T, m, js, hasRecipe };
+}
+const moreSec = (title, list, extra = '') => `<div class="more-sec"><div class="more-h">${title}</div>${extra}<div class="more-grid">${list.filter(Boolean).join('')}</div></div>`;
+function openMenuMore(name, emoji) {
+  closeMenuPeek();
+  const { T, m } = menuTiles(name, emoji), img = getMenuImg(name), safe = escHtml(name);
+  const cat = typeof selectedCat === 'undefined' || !selectedCat ? 'cook' : selectedCat;
   const sec = (title, list, extra = '') => `<div class="more-sec"><div class="more-h">${title}</div>${extra}<div class="more-grid">${list.join('')}</div></div>`;
   const cook = sec('만들어 먹기', [T.recipe, T.yt, T.man, T.muk].filter(Boolean));
   const buy = sec('장보기', [T.ing, T.kit], cpNotice());
@@ -4774,7 +4796,7 @@ function renderResults(rejectPattern, flipIndex) {
               : `<button class="result-btn" onclick="openNearbyMap('${item.name.replace(/'/g,"\\'")}')" style="color:var(--orange)">📍 근처 찾기</button>`}
             <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? `💬 후기 ${rc}개` : '✍️ 첫 후기 남기기'; })()}</button>
           
-            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="grid-column:1 / -1;color:var(--muted);font-weight:700">더 보기 · 먹방 · 밀키트 ›</button>
+            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="grid-column:1 / -1;color:var(--muted);font-weight:700">어떻게 먹을까? ›</button>
           </div>
           <div id="similar-btn-wrap-${i}">
             <button class="similar-toggle-btn" onclick="toggleSimilar('${item.name.replace(/'/g,"\\'")}',${i})">🔍 비슷한 메뉴</button>
@@ -4806,13 +4828,13 @@ function renderResults(rejectPattern, flipIndex) {
 
   const shopSection = !isHate ? `
   <div style="margin-top:10px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px">
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px">🛒 재료·밀키트</div>${cpNotice()}
+    <div class="more-h" style="margin-bottom:10px">재료·밀키트</div>${cpNotice()}
     ${currentPicked.map(m => { const js = m.name.replace(/'/g, "\\'"); return `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
         <span style="flex:1 0 70px;font-size:13px;min-width:70px">${m.emoji} ${m.name}</span>
         <span style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="shop-mini" onclick="addAllIngredients('${js}')">🧺 ${recipeIngredients(m.name).length ? '재료 담기' : '재료 찾기'}</button>
-          <a class="shop-mini" href="${SHOP_AFFILIATE.mealkit.url(m.name)}" target="_blank" rel="noopener">🎁 밀키트</a>
+          <button class="shop-mini" onclick="addAllIngredients('${js}')"><span class="mt-ic t-yel">${moreIco('basket')}</span>${recipeIngredients(m.name).length ? '재료 담기' : '재료 찾기'}</button>
+          <a class="shop-mini" href="${SHOP_AFFILIATE.mealkit.url(m.name)}" target="_blank" rel="noopener"><span class="mt-ic t-grn">${moreIco('gift')}</span>밀키트</a>
         </span>
       </div>`; }).join('')}
   </div>` : '';
@@ -4856,139 +4878,30 @@ function renderResults(rejectPattern, flipIndex) {
 }
 
 function openRecipe(menuName, emoji) {
-  const r = recipeDB[menuName];
-  const modal = document.getElementById('recipe-modal');
-  const box = document.getElementById('recipe-modal-box');
-
-  const ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent((r && r.youtube) || (menuName + ' 레시피'));
+  closeMenuMore();
+  const r = recipeDB[menuName], modal = document.getElementById('recipe-modal'), box = document.getElementById('recipe-modal-box');
+  const { T, m, js } = menuTiles(menuName, emoji), img = getMenuImg(menuName), safe = escHtml(menuName);
+  const cat = typeof selectedCat === 'undefined' || !selectedCat ? 'cook' : selectedCat;
+  const kcal = r && r.calories ? `1인분 약 ${r.calories}kcal · 탄 ${r.carbs}g · 단 ${r.protein}g · 지 ${r.fat}g` : '레시피';
+  const top = `<div class="more-top rc-top">${img ? `<img src="${img}" alt="">` : `<span class="more-em">${m.emoji}</span>`}<div style="min-width:0"><div class="more-title">${safe}</div><div class="more-q">${kcal}</div></div><button class="more-x" onclick="closeRecipe()" aria-label="닫기">✕</button></div>`;
+  const others = moreSec('더 해보기', [T.yt, T.man, T.muk, cat === 'dine' ? T.near : T.bae]);
   if (!r || !(r.steps && r.steps.length)) {
-    box.innerHTML = `
-      <div class="recipe-header">
-        <div class="recipe-title-row">
-          <span class="recipe-emoji-big">${emoji}</span>
-          <div class="recipe-name-big">${menuName}</div>
-        </div>
-        <button class="recipe-close" onclick="closeRecipe()">✕</button>
-      </div>
-      ${r && r.calories ? `<div style="font-size:12px;color:var(--muted);text-align:center;margin:4px 0 10px">1인분 약 ${r.calories}kcal · 탄${r.carbs}g · 단${r.protein}g · 지${r.fat}g</div>` : ''}
-      <div class="no-recipe" style="padding-bottom:8px">
-        아직 오메추 레시피는 준비 중이에요.<br>유튜브에서 인기 레시피 영상을 바로 볼 수 있어요!
-      </div>
-      <div class="recipe-section" style="margin-top:8px">
-        <a href="${ytUrl}" target="_blank" rel="noopener"><button class="youtube-btn">▶ 유튜브에서 ${menuName} 레시피 보기</button></a>
-        <a href="${MENU_LINKS.man10k(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:#2f7a3a">📗 만개의 레시피에서 보기</button></a>
-      </div>
-      <div class="recipe-section" style="margin-top:8px;padding-bottom:20px">${cpNotice()}
-        <a href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener"><button class="buy-all-btn">🧺 ${menuName} 재료 찾아보기</button></a>
-        <a href="${SHOP_AFFILIATE.mealkit.url(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:#2e8b57">🎁 ${menuName} 밀키트 보기</button></a>
-        <a href="${MENU_LINKS.mukbang(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:var(--surface);color:var(--text);border:1px solid var(--border)">📺 ${menuName} 먹방 보기</button></a>
-      </div>`;
-    modal.classList.add('show');
-    return;
+    box.innerHTML = `${top}<div class="rc-note">아직 오메추 레시피는 준비 중이에요. 영상이나 다른 레시피로 바로 볼 수 있어요.</div>
+      ${moreSec('레시피 보기', [T.yt, T.man])}${moreSec('장보기', [T.ing, T.kit], cpNotice())}${moreSec('더 해보기', [T.muk, cat === 'dine' ? T.near : T.bae])}`;
+    modal.classList.add('show'); return;
   }
-
-  // ingredients가 flat 배열 ['재료명','양','쿠팡검색어', ...] 형태이므로 객체 배열로 변환
-  const ingredients = recipeIngredients(menuName);
-
-  // 재료 목록 HTML
-  const ingList = ingredients.map(ing => `
-    <div class="ingredient-item">
-      <div class="ingredient-left">
-        <div>
-          <div class="ingredient-name">${ing.name}</div>
-          <div class="ingredient-amount">${ing.amount}</div>
-        </div>
-      </div>
-      <div class="buy-btn-wrap">
-        <a href="${SHOP_AFFILIATE.coupang.url(ing.query)}" target="_blank" rel="noopener">
-          <button class="buy-btn">🛒 구매</button>
-        </a>
-        <button class="cart-btn" id="cartbtn-${menuName}-${ing.name}" onclick="addToCart('${ing.name.replace(/'/g,"\\'")}','${ing.amount}','${menuName.replace(/'/g,"\\'")}')">+ 목록</button>
-      </div>
-    </div>`).join('');
-
-  // 조리순서 HTML
-  const stepsList = (r.steps || []).map((step, i) => `
-    <div class="step-item">
-      <div class="step-num">${i + 1}</div>
-      <div class="step-text">${step}</div>
-    </div>`).join('');
-
-  // 전체 재료 쿠팡 검색어
-  const allQuery = ingredients.map(i => i.name).join(' ');
-
-  box.innerHTML = `
-    <div class="recipe-header">
-      <div class="recipe-title-row">
-        <span class="recipe-emoji-big">${emoji}</span>
-        <div class="recipe-name-big">${menuName}</div>
-      </div>
-      <button class="recipe-close" onclick="closeRecipe()">✕</button>
-    </div>
-
-    <div class="nutrition-bar">
-      <div>
-        <div class="kcal-big">${r.calories}</div>
-        <div class="kcal-label">kcal / 1인분</div>
-      </div>
-      <div class="macro-grid">
-        <div class="macro-item carb">
-          <div class="macro-val">${r.carbs}g</div>
-          <div class="macro-name">탄수화물</div>
-        </div>
-        <div class="macro-item prot">
-          <div class="macro-val">${r.protein}g</div>
-          <div class="macro-name">단백질</div>
-        </div>
-        <div class="macro-item fat">
-          <div class="macro-val">${r.fat}g</div>
-          <div class="macro-name">지방</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="recipe-section">
-      <div class="recipe-section-title">재료 (1인분 기준)</div>
-      ${cpNotice()}<div class="ingredient-list">${ingList}</div>
-      <button class="buy-all-btn" onclick="addAllIngredients('${menuName.replace(/'/g, "\\'")}')">🧺 재료 ${ingredients.length}가지 장보기에 한 번에 담기</button>
-      <a href="${SHOP_AFFILIATE.mealkit.url(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:#2e8b57">🎁 ${menuName} 밀키트 보기</button></a>
-    </div>
-
-    <div class="recipe-section" style="margin-top:20px">
-      <div class="recipe-section-title">조리 순서</div>
-      <div class="steps-list">${stepsList}</div>
-    </div>
-
-    <div class="recipe-section" style="margin-top:16px; padding-bottom:10px">
-      <a href="${ytUrl}" target="_blank" rel="noopener">
-        <button class="youtube-btn">▶ 유튜브 레시피 영상 보기</button>
-      </a>
-      <a href="${MENU_LINKS.man10k(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:#2f7a3a">📗 만개의 레시피에서 다른 레시피 보기</button></a>
-      <a href="${MENU_LINKS.mukbang(menuName)}" target="_blank" rel="noopener"><button class="buy-all-btn" style="margin-top:8px;background:var(--surface);color:var(--text);border:1px solid var(--border)">📺 ${menuName} 먹방 보기</button></a>
-    </div>
-
-    <div class="recipe-section" style="margin-top:4px;padding-bottom:20px">${cpNotice()}
-      <a class="coupang-partners-banner" href="${SHOP_AFFILIATE.coupang.url(menuName + ' 재료')}" target="_blank" rel="noopener">
-        <span class="cp-rocket">🚀</span>
-        <div class="cp-text">
-          <div class="cp-title">신선 재료 로켓배송으로 받기</div>
-          <div class="cp-sub">${menuName} 재료 쿠팡에서 바로 주문</div>
-        </div>
-        <span class="cp-logo">coupang</span>
-        <span class="cp-arrow">›</span>
-      </a>
-    </div>`;
-
+  const ings = recipeIngredients(menuName);
+  const inCart = (n) => cartItems.some(c => c.name === n && c.from === menuName);
+  const ingList = ings.map(g => `<div class="rc-ing"><span class="rc-n">${escHtml(g.name)}</span><span class="rc-a">${escHtml(g.amount)}</span>
+      <a class="rc-buy" href="${SHOP_AFFILIATE.coupang.url(g.query)}" target="_blank" rel="noopener">구매</a>
+      <button class="rc-add cart-btn ${inCart(g.name) ? 'added' : ''}" id="cartbtn-${menuName}-${g.name}" onclick="addToCart('${g.name.replace(/'/g, "\\'")}','${g.amount}','${js}')">${inCart(g.name) ? '✓ 추가됨' : '+ 목록'}</button></div>`).join('');
+  const steps = r.steps.map((st, k) => `<div class="rc-step"><span class="rc-k">${k + 1}</span><span>${st}</span></div>`).join('');
+  box.innerHTML = `${top}
+    <div class="more-sec"><div class="more-h">재료 · 1인분</div>${cpNotice()}<div class="rc-ings">${ingList}</div>
+      <div class="more-grid" style="margin-top:7px">${T.ing}${T.kit}</div></div>
+    <div class="more-sec"><div class="more-h">만드는 순서</div><div class="rc-steps">${steps}</div></div>
+    ${others}`;
   modal.classList.add('show');
-
-  // 이미 담긴 재료 버튼 상태 복원
-  setTimeout(() => {
-    ingredients.forEach(ing => {
-      const inCart = cartItems.find(i => i.name === ing.name && i.from === menuName);
-      const btn = document.getElementById(`cartbtn-${menuName}-${ing.name}`);
-      if (btn && inCart) { btn.textContent = '✓ 추가됨'; btn.classList.add('added'); }
-    });
-  }, 50);
 }
 
 function closeRecipe() {
@@ -5654,7 +5567,7 @@ function openMenuPeek(name) {
   el.innerHTML = `<div class="menu-peek-box">
     <div class="menu-peek-img">${img ? `<img src="${img}" alt="${safe}" onerror="this.outerHTML='<span>${m.emoji}</span>'">` : `<span>${m.emoji}</span>`}</div>
     <div class="menu-peek-name" style="text-align:center">${safe}</div>
-    <div class="menu-peek-btns"><button class="primary" onclick="openMenuMore('${js}','${m.emoji}')">더 보기</button><button onclick="closeMenuPeek()">닫기</button></div>
+    <div class="menu-peek-btns"><button class="primary" onclick="openMenuMore('${js}','${m.emoji}')">어떻게 먹을까?</button><button onclick="closeMenuPeek()">닫기</button></div>
   </div>`;
   if (typeof twemoji !== 'undefined' && twemoji.parse) try { twemoji.parse(el); } catch (e) {}
   el.classList.add('open');
