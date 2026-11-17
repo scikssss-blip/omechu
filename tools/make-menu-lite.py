@@ -13,7 +13,7 @@ for m in re.finditer(r"\{id:\d+,\s*name:'([^']+)',\s*emoji:'([^']*)'.*?tags:\[([
 js = '// 자동 생성 파일 (tools/make-menu-lite.py). 직접 고치지 마세요.\n'
 js += 'window.MENU_TAGS = ' + json.dumps(KEEP, ensure_ascii=False) + ';\n'
 js += 'window.MENU_LITE = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')) + ';\n'
-js += "var menuDB = MENU_LITE.map(function (m) { return { name: m[0], emoji: m[1], tags: m[2].map(function (i) { return MENU_TAGS[i]; }), img: m[3] ? '/images/' + m[0] + '.jpg' : null }; });\n"
+js += "var menuDB = MENU_LITE.map(function (m) { return { name: m[0], emoji: m[1], tags: m[2].map(function (i) { return MENU_TAGS[i]; }), img: m[3] ? '/images/' + m[0] + '.webp' : null }; });\n"
 js += "function getLikedMenus() { try { return JSON.parse(localStorage.getItem('likedMenus') || '[]') || []; } catch (e) { return []; } }\n"
 open(os.path.join(root, 'menu-lite.js'), 'w', encoding='utf-8').write(js)
 print(len(out), 'menus', sum(m[3] for m in out), 'with image')
