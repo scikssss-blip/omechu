@@ -390,6 +390,11 @@
   .ob-mini { width:40px; height:40px; border-radius:12px; background:rgba(255,71,87,0.12); color:var(--orange); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .ob-mini .ic { width:22px; height:22px; margin:0; }
   .ob-t { width:22px; height:22px; margin:0 0 2px; color:var(--text); }
+  .donate-card { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--text); cursor:pointer; }
+  .donate-card b { display:block; font-size:15px; }
+  .donate-card small { display:block; font-size:12px; color:var(--muted); margin-top:3px; line-height:1.5; }
+  .donate-ic { width:42px; height:42px; border-radius:14px; background:rgba(255,193,7,0.14); color:#e0a100; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .donate-ic .ic { width:24px; height:24px; margin:0; }
   .my-setting-row { display:flex; align-items:center; justify-content:space-between; padding:15px 0; border-bottom:1px solid var(--border); font-size:14px; cursor:pointer; transition:color 0.15s; }
   .my-setting-row:last-child { border-bottom:none; padding-bottom:0; }
   .my-setting-row:hover { color:var(--orange); }
@@ -2617,6 +2622,13 @@
     </div>
   </div>
 
+  <!-- 개발자에게 커피 (웹에서만, 링크를 넣었을 때만 보임) -->
+  <a class="my-section donate-card" id="donate-card" href="#" target="_blank" rel="noopener" style="display:none" onclick="return openDonate(event)">
+    <span class="donate-ic"><i class="ic" data-ic="coffee"></i></span>
+    <span style="flex:1;min-width:0"><b>개발자에게 커피 한 잔</b><small>오메추가 쓸 만했다면 응원해 주세요. 카카오페이로 보내져요.</small></span>
+    <span class="my-setting-arrow">›</span>
+  </a>
+
   <!-- 앱 정보 -->
   <div style="text-align:center;padding:20px 0 10px;color:var(--muted);font-size:11px">
     오메추 v0.4<br>
@@ -2706,6 +2718,25 @@ function paintIcons(root) {
   (root || document).querySelectorAll('i.ic[data-ic]').forEach(el => { el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${IC[el.dataset.ic] || ''}</svg>`; el.removeAttribute('data-ic'); });
 }
 paintIcons();
+// 개발자 후원: 카카오페이 송금 링크를 url에 넣으면 '내정보' 아래에 나타나요.
+// 플레이스토어 앱(TWA) 안에서는 구글 결제 정책 때문에 숨겨요. 웹에서만 보여요.
+const DONATE = { url: '' };
+(function () {
+  try {
+    if (document.referrer.startsWith('android-app://') || new URLSearchParams(location.search).get('src') === 'twa') sessionStorage.setItem('wmjStoreApp', '1');
+  } catch (e) {}
+})();
+function isStoreApp() { try { return sessionStorage.getItem('wmjStoreApp') === '1'; } catch (e) { return false; } }
+function openDonate(e) {
+  if (!/^https:\/\//.test(DONATE.url)) { e && e.preventDefault(); return false; }
+  e && e.preventDefault(); window.open(DONATE.url, '_blank', 'noopener'); return false;
+}
+function paintDonate() {
+  const el = document.getElementById('donate-card'); if (!el) return;
+  const on = /^https:\/\//.test(DONATE.url) && !isStoreApp();
+  el.style.display = on ? 'flex' : 'none'; if (on) el.href = DONATE.url;
+}
+paintDonate();
 // 알림 문구: 앞뒤 이모지와 느낌표를 떼고 담백하게
 function plainToast(msg) {
   return String(msg)
