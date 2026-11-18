@@ -705,6 +705,37 @@
   .rc-water .rc-n { color:#4aa8ff; }
   .rc-water .rc-a { color:var(--text); font-weight:600; }
   .rc-unit { font-size:12px; color:var(--muted); margin:6px 2px 0; }
+  .rc-meta { display:flex; flex-wrap:wrap; gap:6px; margin:-4px 0 10px; }
+  .rc-meta span { display:inline-flex; align-items:center; gap:2px; font-size:12px; font-weight:700; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:5px 10px; }
+  .rc-meta .ic { width:14px; height:14px; margin-right:3px; }
+  .rc-cook { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:13px; margin-bottom:14px; border:none; border-radius:14px; background:var(--orange); color:#fff; font-size:15px; font-weight:800; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .rc-cook small { font-weight:500; opacity:0.85; font-size:12px; }
+  .rc-cook .ic { margin:0; }
+  .rc-h { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .rc-serv { display:flex; gap:4px; }
+  .rc-serv button { padding:5px 9px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--muted); font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .rc-serv button.on { background:var(--orange); border-color:var(--orange); color:#fff; }
+  .rc-sub { display:block; font-size:11.5px; font-weight:500; color:var(--muted); margin-top:1px; }
+  .cook-mode { position:fixed; inset:0; z-index:950; background:var(--bg); display:none; flex-direction:column; padding:16px 18px calc(18px + env(safe-area-inset-bottom)); }
+  .cook-mode.open { display:flex; }
+  .ck-top { display:flex; align-items:center; gap:10px; }
+  .ck-top b { flex:1; font-size:18px; }
+  .ck-top span { color:var(--muted); font-weight:700; }
+  .ck-bar { height:5px; border-radius:4px; background:var(--surface); margin:12px 0 18px; overflow:hidden; }
+  .ck-bar i { display:block; height:100%; background:var(--orange); transition:width 0.3s; }
+  .ck-step { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:18px; }
+  .ck-k { width:44px; height:44px; border-radius:14px; background:rgba(255,71,87,0.14); color:var(--orange); font-size:20px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .ck-step p { font-size:24px; line-height:1.55; font-weight:700; margin:0; word-break:keep-all; }
+  .ck-start { display:flex; align-items:center; gap:4px; padding:12px 16px; border-radius:14px; border:1px solid var(--orange); background:none; color:var(--orange); font-size:16px; font-weight:800; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .ck-timer { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:14px; background:var(--surface); border:1px solid var(--border); margin-bottom:12px; }
+  .ck-timer b { font-size:26px; font-variant-numeric:tabular-nums; }
+  .ck-timer small { flex:1; color:var(--muted); }
+  .ck-timer button { padding:8px 12px; border-radius:10px; border:none; background:var(--card); color:var(--text); font-weight:700; font-family:'Noto Sans KR',sans-serif; }
+  .ck-timer.done { border-color:var(--orange); background:rgba(255,71,87,0.12); }
+  .ck-nav { display:flex; gap:10px; }
+  .ck-nav button { flex:1; padding:16px; border-radius:16px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:17px; font-weight:800; font-family:'Noto Sans KR',sans-serif; }
+  .ck-nav button.next { flex:2; background:var(--orange); border-color:var(--orange); color:#fff; }
+  .ck-nav button:disabled { opacity:0.4; }
   .rc-ings { display:flex; flex-direction:column; border:1px solid var(--border); border-radius:14px; overflow:hidden; background:var(--surface); }
   .rc-ing { display:flex; align-items:center; gap:8px; padding:9px 10px 9px 12px; border-top:1px solid var(--border); }
   .rc-ing:first-child { border-top:none; }
@@ -729,6 +760,8 @@
   .menu-peek-btns { display:flex; gap:8px; padding:14px 16px 16px; }
   .menu-peek-btns button { flex:1; padding:11px; border-radius:14px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
   .menu-peek-btns button.primary { background:var(--orange); border-color:var(--orange); color:#fff; }
+  .result-btn.decide-btn { color:var(--green); font-weight:700; }
+  .result-btn.decide-btn.on { background:rgba(6,214,160,0.12); border-color:var(--green) !important; }
   .result-btn .ic { width:15px; height:15px; margin-right:2px; }
   .like-btn.active .ic svg { fill:currentColor; }
   .result-btn { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:6px 4px; min-height:40px; font-size:11.5px; line-height:1.25; color:var(--muted); cursor:pointer; transition:all 0.15s; font-family:'Noto Sans KR',sans-serif; display:flex; align-items:center; justify-content:center; gap:3px; text-align:center; font-weight:600; }
@@ -3927,7 +3960,10 @@ function getRecommendation() {
 
   currentCandidates = candidates;
   pickReasons = {};
-  currentPicked = pickWeighted(candidates, Math.min(3, candidates.length));
+  // 오늘 이미 본 메뉴는 다시 추천에서 뺀다 (남는 게 3개보다 적으면 그냥 다 씀)
+  const seen = seenToday(), fresh = candidates.filter(m => !seen.includes(m.name));
+  currentPicked = pickWeighted(fresh.length >= 3 ? fresh : candidates, Math.min(3, candidates.length));
+  markSeen(currentPicked.map(m => m.name));
   logRecEvents(currentPicked);
 
   renderResults();
@@ -5197,6 +5233,23 @@ function renderFridge() {
   const hint = { '아침': '가벼운 메뉴', '점심': '밥·면·국물', '저녁': '고기·술안주', '야식': '야식', '추운 날': '따뜻한 국물', '더운 날': '시원한 메뉴' };
   el.textContent = `지금은 ${label.join(' · ')} — ${label.map(l => hint[l]).filter(Boolean).join(', ')} 쪽을 조금 더 골라요`;
 })();
+// ── 오늘 본 메뉴 / 오늘 정한 메뉴 ──
+const todayKey = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
+function seenToday() { try { const o = JSON.parse(localStorage.getItem('wmjSeen') || '{}'); return o.d === todayKey() ? o.n || [] : []; } catch (e) { return []; } }
+function markSeen(names) { try { const n = [...new Set([...seenToday(), ...names])].slice(-120); localStorage.setItem('wmjSeen', JSON.stringify({ d: todayKey(), n })); } catch (e) {} }
+function ateLog() { try { return JSON.parse(localStorage.getItem('wmjAte') || '[]'); } catch (e) { return []; } }
+function ateToday(name) { const k = todayKey(); return ateLog().some(a => a.d === k && a.name === name); }
+function decideMenu(name, emoji, btn) {
+  const k = todayKey(), log = ateLog();
+  if (!log.some(a => a.d === k && a.name === name)) {
+    const m = menuDB.find(x => x.name === name) || {};
+    log.push({ name, emoji, d: k, ts: Date.now(), how: (typeof selectedCat !== 'undefined' && selectedCat) || '', tags: (m.tags || []).slice(0, 12) });
+    try { localStorage.setItem('wmjAte', JSON.stringify(log.slice(-400))); } catch (e) {}
+  }
+  if (btn) { btn.classList.add('on'); btn.innerHTML = ic('check') + '오늘 메뉴'; }
+  showToast(`오늘은 ${name}로 정했어요 · 내정보에 기록돼요`);
+  setTimeout(() => openMenuMore(name, emoji), 350);
+}
 // 우승 메뉴 → '어떻게 먹을까?' 창 (사 먹기 먼저)
 function goEatBtn(name, emoji, tone) {
   const js = String(name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
@@ -5324,7 +5377,8 @@ function renderResults(rejectPattern, flipIndex) {
               : `<button class="result-btn" onclick="openNearbyMap('${item.name.replace(/'/g,"\\'")}')" style="color:var(--orange)">${ic('pin')}근처 찾기</button>`}
             <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? ic('chat') + `후기 ${rc}개` : ic('pencil') + '첫 후기 남기기'; })()}</button>
           
-            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="grid-column:1 / -1;color:var(--muted);font-weight:700">어떻게 먹을까? ›</button>
+            <button class="result-btn decide-btn${ateToday(item.name) ? ' on' : ''}" onclick="decideMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}',this)">${ic('check')}${ateToday(item.name) ? '오늘 메뉴' : '이걸로 정했어'}</button>
+            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--muted);font-weight:700">어떻게 먹을까? ›</button>
           </div>
           <div id="similar-btn-wrap-${i}">
             <button class="similar-toggle-btn" onclick="toggleSimilar('${item.name.replace(/'/g,"\\'")}',${i})">비슷한 메뉴 보기</button>
@@ -5405,7 +5459,45 @@ function renderResults(rejectPattern, flipIndex) {
   });
 }
 
-function openRecipe(menuName, emoji) {
+// ── 레시피: 인분 조절 · 조리 시간 · 대체 재료 · 요리 모드 ──
+let recipeServ = 2;
+try { recipeServ = +localStorage.getItem('wmjServ') || 2; } catch (e) {}
+const FRAC = { '½': 0.5, '¼': 0.25, '⅓': 1 / 3, '¾': 0.75 };
+function fmtNum(v, unit) {
+  if (/^(g|ml|kg|L)$/i.test(unit)) { const r = v >= 100 ? Math.round(v / 10) * 10 : Math.round(v); return String(r); }
+  const q = Math.round(v * 4) / 4, w = Math.floor(q), f = q - w;
+  const fs = f === 0.25 ? '1/4' : f === 0.5 ? '1/2' : f === 0.75 ? '3/4' : '';
+  if (!w) return fs || '1/4';
+  if (f === 0.5) return `${w}.5`;
+  return fs ? `${w}과 ${fs}` : String(w);
+}
+// "1/2포기", "150g", "1.5큰술", "2장(400g)", "6컵 (1.2L)" → 인분에 맞춰 숫자만 바꿈 ("약간"은 그대로)
+function scaleAmt(str, factor) {
+  if (!str || factor === 1) return str || '';
+  return String(str).replace(/(\d+(?:\.\d+)?)\s*\/\s*(\d+)|(\d+(?:\.\d+)?)|([½¼⅓¾])/g, (all, a, b, n, u, off, whole) => {
+    const v = a ? (+a / +b) : n ? +n : FRAC[u];
+    const unit = (whole.slice(off + all.length).match(/^\s*([a-zA-Z가-힣]+)/) || [])[1] || '';
+    if (/^L$/.test(unit)) return String(Math.round(v * factor * 10) / 10);
+    return fmtNum(v * factor, unit);
+  });
+}
+// 순서 문장 속 '물 5컵', '2큰술' 같은 양만 바꿈 (분·시간은 그대로)
+const scaleStep = (t, f) => f === 1 ? t : String(t).replace(/(\d+(?:\.\d+)?\s*\/\s*\d+|\d+(?:\.\d+)?)\s*(컵|큰술|작은술|ml|L)/g, (a) => scaleAmt(a, f));
+const SUBST = { '생크림':'우유 + 버터 조금','맛술':'소주 + 설탕 조금','미림':'소주 + 설탕 조금','굴소스':'간장 + 설탕 조금','쯔유':'간장 + 설탕 + 물','부침가루':'밀가루 + 소금 조금','피쉬소스':'멸치액젓',
+  '케찹마니스':'간장 + 설탕','페페론치노':'청양고추','파르메산치즈':'빼도 괜찮아요','코코넛밀크':'우유 + 생크림','버터':'식용유','다진마늘':'마늘가루 1/3 양','멸치육수팩':'멸치·다시마 10분 우린 물',
+  '베이크드빈스':'빼도 괜찮아요','치킨스톡':'소금 + 다진 양파','화이트와인':'맛술','쪽파':'대파','깻잎':'빼도 괜찮아요','고수':'빼도 괜찮아요','바질':'빼도 괜찮아요','레몬':'식초 조금','라임':'레몬',
+  '사워크림':'플레인 요거트','우스터소스':'돈가스소스','스리라차':'고추장 + 식초 조금','들깻가루':'참깨가루','날치알':'빼도 괜찮아요','가쓰오부시':'빼도 괜찮아요','청양고추':'고춧가루 조금' };
+const stepMinutes = (t) => { let m = 0; String(t).replace(/(\d+)\s*시간\s*(\d+)?\s*분?/g, (a, h, mm) => { m += +h * 60 + (+mm || 0); return ''; }).replace(/(\d+)\s*(?:~\s*\d+\s*)?분/g, (a, mm) => { m += +mm; return ''; }); return m; };
+const isPrepStep = (t) => /불린|불려|재운|재워|담가|핏물|해감|휴지|식힌|냉장/.test(t);
+function recipeTime(r) {
+  let cook = 0, prep = 0;
+  for (const st of r.steps || []) { const m = stepMinutes(st); if (isPrepStep(st)) prep += m; else cook += m; }
+  return { cook, prep };
+}
+const fmtMin = (m) => m >= 60 ? `${Math.floor(m / 60)}시간${m % 60 ? ' ' + (m % 60) + '분' : ''}` : `${m}분`;
+function setServ(n) { recipeServ = n; try { localStorage.setItem('wmjServ', String(n)); } catch (e) {} const m = document.getElementById('recipe-modal-box'); if (m && m.dataset.menu) openRecipe(m.dataset.menu, m.dataset.emoji, true); }
+
+function openRecipe(menuName, emoji, keepScroll) {
   closeMenuMore();
   const r = recipeDB[menuName], modal = document.getElementById('recipe-modal'), box = document.getElementById('recipe-modal-box');
   const { T, m, js } = menuTiles(menuName, emoji), img = getMenuImg(menuName), safe = escHtml(menuName);
@@ -5413,23 +5505,74 @@ function openRecipe(menuName, emoji) {
   const kcal = r && r.calories ? `1인분 약 ${r.calories}kcal · 탄 ${r.carbs}g · 단 ${r.protein}g · 지 ${r.fat}g` : '레시피';
   const top = `<div class="more-top rc-top">${img ? `<img src="${img}" alt="">` : `<span class="more-em">${m.emoji}</span>`}<div style="min-width:0"><div class="more-title">${safe}</div><div class="more-q">${kcal}</div></div><button class="more-x" onclick="closeRecipe()" aria-label="닫기">✕</button></div>`;
   const others = moreSec('더 해보기', [T.yt, T.man, T.muk, cat === 'dine' ? T.near : T.bae]);
+  box.dataset.menu = menuName; box.dataset.emoji = emoji || m.emoji;
   if (!r || !(r.steps && r.steps.length)) {
     box.innerHTML = `${top}<div class="rc-note">아직 오메추 레시피는 준비 중이에요. 영상이나 다른 레시피로 바로 볼 수 있어요.</div>
       ${moreSec('레시피 보기', [T.yt, T.man])}${moreSec('장보기', [T.ing, T.kit], cpNotice())}${moreSec('더 해보기', [T.muk, cat === 'dine' ? T.near : T.bae])}`;
     modal.classList.add('show'); return;
   }
+  const f = recipeServ / 2;
   const ings = recipeIngredients(menuName);
   const inCart = (n) => cartItems.some(c => c.name === n && c.from === menuName);
-  const ingList = ings.map(g => `<div class="rc-ing"><span class="rc-n">${escHtml(g.name)}</span><span class="rc-a">${escHtml(g.amount)}</span>
+  const ingList = ings.map(g => { const amt = scaleAmt(g.amount, f), sub = SUBST[g.name];
+    return `<div class="rc-ing"><span class="rc-n">${escHtml(g.name)}${sub ? `<small class="rc-sub">없으면 ${escHtml(sub)}</small>` : ''}</span><span class="rc-a">${escHtml(amt)}</span>
       <a class="rc-buy" href="${SHOP_AFFILIATE.coupang.url(g.query)}" target="_blank" rel="noopener">구매</a>
-      <button class="rc-add cart-btn ${inCart(g.name) ? 'added' : ''}" id="cartbtn-${menuName}-${g.name}" onclick="addToCart('${g.name.replace(/'/g, "\\'")}','${g.amount}','${js}')">${inCart(g.name) ? '✓ 추가됨' : '+ 목록'}</button></div>`).join('');
-  const steps = r.steps.map((st, k) => `<div class="rc-step"><span class="rc-k">${k + 1}</span><span>${st}</span></div>`).join('');
+      <button class="rc-add cart-btn ${inCart(g.name) ? 'added' : ''}" id="cartbtn-${menuName}-${g.name}" onclick="addToCart('${g.name.replace(/'/g, "\\'")}','${amt.replace(/'/g, "\\'")}','${js}')">${inCart(g.name) ? '✓ 추가됨' : '+ 목록'}</button></div>`; }).join('');
+  const steps = r.steps.map((st, k) => `<div class="rc-step"><span class="rc-k">${k + 1}</span><span>${scaleStep(st, f)}</span></div>`).join('');
+  const t = recipeTime(r), easy = (m.tags || []).includes('👶 초보도 가능');
+  const meta = [t.cook ? `${ic('timer')}조리 약 ${fmtMin(t.cook)}` : '', t.prep ? `준비 ${fmtMin(t.prep)} 따로` : '', easy ? '초보도 가능' : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('');
+  const serv = `<div class="rc-serv" role="group" aria-label="인분">${[1, 2, 3, 4].map(n => `<button class="${n === recipeServ ? 'on' : ''}" onclick="setServ(${n})">${n}인분</button>`).join('')}</div>`;
   box.innerHTML = `${top}
-    <div class="more-sec"><div class="more-h">재료 · 2인분 기준</div>${cpNotice()}<div class="rc-ings">${r.water ? `<div class="rc-ing rc-water"><span class="rc-n">물</span><span class="rc-a">${escHtml(r.water)}</span></div>` : ''}${ingList}</div><div class="rc-unit">1컵 = 200ml · 종이컵 가득 약 180ml</div>
+    ${meta ? `<div class="rc-meta">${meta}</div>` : ''}
+    <button class="rc-cook" onclick="openCookMode()">${ic('pot')}요리 모드로 보기 <small>화면 꺼짐 방지 · 타이머</small></button>
+    <div class="more-sec"><div class="more-h rc-h">재료${serv}</div>${cpNotice()}<div class="rc-ings">${r.water ? `<div class="rc-ing rc-water"><span class="rc-n">물</span><span class="rc-a">${escHtml(scaleAmt(r.water, f))}</span></div>` : ''}${ingList}</div><div class="rc-unit">1컵 = 200ml · 종이컵 가득 약 180ml${f !== 1 ? ' · 양은 2인분 기준을 계산한 값이라 간은 보면서 맞춰 주세요' : ''}</div>
       <div class="more-grid" style="margin-top:7px">${T.ing}${T.kit}</div></div>
     <div class="more-sec"><div class="more-h">만드는 순서</div><div class="rc-steps">${steps}</div></div>
     ${others}`;
   modal.classList.add('show');
+}
+
+// 요리 모드: 한 단계씩 크게, 화면 꺼짐 방지, 단계 속 시간으로 타이머
+let cookIdx = 0, cookLock = null, cookTimer = null, cookEnd = 0, cookLabel = '';
+async function keepAwake(on) {
+  try { if (on && 'wakeLock' in navigator) { cookLock = await navigator.wakeLock.request('screen'); } else if (!on && cookLock) { await cookLock.release(); cookLock = null; } } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && document.getElementById('cook-mode')?.classList.contains('open')) keepAwake(true); });
+function openCookMode() {
+  const box = document.getElementById('recipe-modal-box'), name = box && box.dataset.menu; if (!name || !recipeDB[name]) return;
+  let el = document.getElementById('cook-mode');
+  if (!el) { el = document.createElement('div'); el.id = 'cook-mode'; el.className = 'cook-mode'; document.body.appendChild(el); }
+  el.dataset.menu = name; cookIdx = 0; el.classList.add('open'); keepAwake(true); renderCook();
+}
+function closeCookMode() { const el = document.getElementById('cook-mode'); if (el) el.classList.remove('open'); keepAwake(false); }
+function cookGo(d) { const r = recipeDB[document.getElementById('cook-mode').dataset.menu]; cookIdx = Math.max(0, Math.min(r.steps.length - 1, cookIdx + d)); renderCook(); }
+function startCookTimer(min, label) {
+  clearInterval(cookTimer); cookEnd = Date.now() + min * 60000; cookLabel = label;
+  cookTimer = setInterval(tickCook, 500); tickCook();
+  try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {}
+}
+function stopCookTimer() { clearInterval(cookTimer); cookTimer = null; cookEnd = 0; const t = document.getElementById('cook-timer'); if (t) t.innerHTML = ''; }
+function tickCook() {
+  const t = document.getElementById('cook-timer'); const left = Math.max(0, cookEnd - Date.now());
+  const mm = Math.floor(left / 60000), ss = Math.floor(left / 1000) % 60;
+  if (t) t.innerHTML = `<div class="ck-timer ${left ? '' : 'done'}">${ic('timer')}<b>${left ? `${mm}:${String(ss).padStart(2, '0')}` : '시간 됐어요'}</b><small>${escHtml(cookLabel)}</small><button onclick="stopCookTimer()">${left ? '끄기' : '확인'}</button></div>`;
+  if (!left) {
+    clearInterval(cookTimer); cookTimer = null;
+    try { navigator.vibrate && navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) {}
+    try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, 0.35, 0.7].forEach(d => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(0.25, a.currentTime + d); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + d + 0.3); o.start(a.currentTime + d); o.stop(a.currentTime + d + 0.32); }); } catch (e) {}
+    try { if (document.hidden && 'Notification' in window && Notification.permission === 'granted') new Notification('오메추 타이머', { body: cookLabel + ' 시간이 됐어요' }); } catch (e) {}
+  }
+}
+function renderCook() {
+  const el = document.getElementById('cook-mode'), name = el.dataset.menu, r = recipeDB[name], n = r.steps.length, st = scaleStep(r.steps[cookIdx], recipeServ / 2);
+  const mins = stepMinutes(st);
+  el.innerHTML = `<div class="ck-top"><b>${escHtml(name)}</b><span>${cookIdx + 1} / ${n}</span><button class="more-x" onclick="closeCookMode()" aria-label="닫기">✕</button></div>
+    <div class="ck-bar"><i style="width:${((cookIdx + 1) / n) * 100}%"></i></div>
+    <div class="ck-step"><span class="ck-k">${cookIdx + 1}</span><p>${escHtml(st)}</p>
+      ${mins ? `<button class="ck-start" onclick="startCookTimer(${mins}, '${cookIdx + 1}단계')">${ic('timer')}${fmtMin(mins)} 타이머 시작</button>` : ''}</div>
+    <div id="cook-timer"></div>
+    <div class="ck-nav"><button onclick="cookGo(-1)" ${cookIdx ? '' : 'disabled'}>이전</button><button class="next" onclick="${cookIdx < n - 1 ? 'cookGo(1)' : 'closeCookMode()'}">${cookIdx < n - 1 ? '다음 단계' : '다 만들었어요'}</button></div>`;
+  if (cookTimer || cookEnd) tickCook();
 }
 
 function closeRecipe() {
