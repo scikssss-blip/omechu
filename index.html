@@ -2720,7 +2720,7 @@ function paintIcons(root) {
 paintIcons();
 // 개발자 후원: 카카오페이 송금 링크를 url에 넣으면 '내정보' 아래에 나타나요.
 // 플레이스토어 앱(TWA) 안에서는 구글 결제 정책 때문에 숨겨요. 웹에서만 보여요.
-const DONATE = { url: '' };
+const DONATE = { url: 'https://qr.kakaopay.com/Ej8GCXoWw' };
 (function () {
   try {
     if (document.referrer.startsWith('android-app://') || new URLSearchParams(location.search).get('src') === 'twa') sessionStorage.setItem('wmjStoreApp', '1');
