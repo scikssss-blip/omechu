@@ -395,6 +395,10 @@
   .donate-card small { display:block; font-size:12px; color:var(--muted); margin-top:3px; line-height:1.5; }
   .donate-ic { width:42px; height:42px; border-radius:14px; background:rgba(255,193,7,0.14); color:#e0a100; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .donate-ic .ic { width:24px; height:24px; margin:0; }
+  .go-eat { display:flex; align-items:center; justify-content:center; gap:4px; width:100%; max-width:280px; margin:0 auto; padding:13px 16px; border:none; border-radius:14px; font-size:15px; font-weight:800; font-family:'Noto Sans KR',sans-serif; color:#fff; background:var(--orange); cursor:pointer; }
+  .go-eat .ic { width:18px; height:18px; margin-right:4px; }
+  .go-eat.green { background:var(--green); }
+  .go-eat.yellow { background:var(--yellow); color:#2a2100; }
   .my-setting-row { display:flex; align-items:center; justify-content:space-between; padding:15px 0; border-bottom:1px solid var(--border); font-size:14px; cursor:pointer; transition:color 0.15s; }
   .my-setting-row:last-child { border-bottom:none; padding-bottom:0; }
   .my-setting-row:hover { color:var(--orange); }
@@ -5010,15 +5014,33 @@ function coupangSearch(q) {
   return IS_MOBILE ? `https://m.coupang.com/nm/search?q=${encodeURIComponent(q)}` : `https://www.coupang.com/np/search?q=${encodeURIComponent(q)}&channel=user`;
 }
 // 배민: 메뉴 검색으로 바로 가는 공식 주소가 없어서, 메뉴 이름을 복사해 두고 배민 앱을 엶 (없으면 스토어)
+// 앱이 깔려 있으면 앱으로, 없으면 스토어나 웹으로
+// 안드로이드 크롬은 '실행 아이콘(LAUNCHER)' 방식 intent를 막아서 늘 스토어로 갔어요 → 앱이 받는 주소(scheme) 방식으로 바꿈
+const onAndroid = () => /Android/i.test(navigator.userAgent);
+const onIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
+function tryAppThen(appUrl, fallbackUrl, wait = 1400) {
+  let left = false;
+  const onHide = () => { left = true; };
+  document.addEventListener('visibilitychange', onHide, { once: true });
+  window.addEventListener('pagehide', onHide, { once: true });
+  location.href = appUrl;
+  setTimeout(() => { if (!left && !document.hidden) location.href = fallbackUrl; }, wait);
+}
 function openBaemin(name) {
   try { navigator.clipboard && navigator.clipboard.writeText(name); } catch (e) {}
   showToast(`'${name}' 복사했어요 · 배민 검색창에 붙여넣어 주세요`);
-  const ua = navigator.userAgent;
+  const store = onIOS() ? 'https://apps.apple.com/kr/app/id378084485' : 'https://play.google.com/store/apps/details?id=com.sampleapp';
   setTimeout(() => {
-    if (/Android/i.test(ua)) location.href = 'intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.sampleapp;S.browser_fallback_url=' + encodeURIComponent('https://play.google.com/store/apps/details?id=com.sampleapp') + ';end';
-    else if (/iPhone|iPad|iPod/i.test(ua)) location.href = 'https://apps.apple.com/kr/app/id378084485';
+    if (onAndroid()) location.href = 'intent://#Intent;scheme=baemin;package=com.sampleapp;S.browser_fallback_url=' + encodeURIComponent(store) + ';end';
+    else if (onIOS()) tryAppThen('baemin://', store);
     else window.open('https://www.baemin.com/', '_blank', 'noopener');
   }, 650);
+}
+// 만개의 레시피: 앱이 있으면 앱에서 검색 결과, 없으면 웹 검색 결과
+function openMan10k(name) {
+  const web = MENU_LINKS.man10k(name);
+  if (onAndroid()) { location.href = 'intent://' + web.replace(/^https:\/\//, '') + '#Intent;scheme=https;package=com.ezhld.recipe;S.browser_fallback_url=' + encodeURIComponent(web) + ';end'; return; }
+  window.open(web, '_blank', 'noopener');
 }
 const SHOP_AFFILIATE = {
   coupang: {
@@ -5097,7 +5119,7 @@ function menuTiles(name, emoji) {
   const T = {
     recipe: hasRecipe ? tile('recipe', 't-or', '오메추 레시피', '재료·순서 한 장에', act(`closeMenuMore();openRecipe('${js}','${m.emoji}')`)) : '',
     yt: tile('play', 't-red', '유튜브 레시피', '영상으로 따라 하기', ext(MENU_LINKS.ytRecipe(name))),
-    man: tile('book', 't-grn', '만개의 레시피', '다른 레시피 모아 보기', ext(MENU_LINKS.man10k(name))),
+    man: tile('book', 't-grn', '만개의 레시피', '다른 레시피 모아 보기', act(`openMan10k('${js}')`)),
     ing: tile('basket', 't-yel', ingN ? `재료 ${ingN}가지 담기` : '재료 찾아보기', ingN ? '장보기에서 하나씩 사요' : '쿠팡에서 검색', act(`addAllIngredients('${js}')`), 'more-ing-btn'),
     kit: tile('gift', 't-grn', '밀키트', '손질된 재료로 간편하게', ext(SHOP_AFFILIATE.mealkit.url(name))),
     bae: tile('scooter', 't-mint', '배민에서 주문', '메뉴 이름 복사해서 열기', act(`openBaemin('${js}')`)),
@@ -5107,7 +5129,12 @@ function menuTiles(name, emoji) {
   return { T, m, js, hasRecipe };
 }
 const moreSec = (title, list, extra = '') => `<div class="more-sec"><div class="more-h">${title}</div>${extra}<div class="more-grid">${list.filter(Boolean).join('')}</div></div>`;
-function openMenuMore(name, emoji) {
+// 우승 메뉴 → '어떻게 먹을까?' 창 (사 먹기 먼저)
+function goEatBtn(name, emoji, tone) {
+  const js = String(name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  return `<button class="go-eat ${tone || ''}" onclick="openMenuMore('${js}','${emoji || ''}','eat')">${ic('utensils')}먹으러 가기 <span aria-hidden="true">›</span></button>`;
+}
+function openMenuMore(name, emoji, prefer) {
   closeMenuPeek();
   const { T, m } = menuTiles(name, emoji), img = getMenuImg(name), safe = escHtml(name);
   const cat = typeof selectedCat === 'undefined' || !selectedCat ? 'cook' : selectedCat;
@@ -5118,8 +5145,8 @@ function openMenuMore(name, emoji) {
   let el = document.getElementById('menu-more');
   if (!el) { el = document.createElement('div'); el.id = 'menu-more'; el.className = 'menu-more'; el.onclick = (e) => { if (e.target === el) closeMenuMore(); }; document.body.appendChild(el); }
   el.innerHTML = `<div class="menu-more-box" role="dialog" aria-label="${safe}로 할 수 있는 것">
-    <div class="more-top">${img ? `<img src="${img}" alt="">` : `<span class="more-em">${m.emoji}</span>`}<div><div class="more-title">${safe}</div><div class="more-q">이 메뉴로 뭐 할까요?</div></div><button class="more-x" onclick="closeMenuMore()" aria-label="닫기">✕</button></div>
-    ${cat === 'cook' ? cook + buy + eat : eat + cook + buy}
+    <div class="more-top">${img ? `<img src="${img}" alt="">` : `<span class="more-em">${m.emoji}</span>`}<div><div class="more-title">${safe}</div><div class="more-q">${prefer === 'eat' ? '우승 메뉴, 어떻게 먹을까요?' : '이 메뉴로 뭐 할까요?'}</div></div><button class="more-x" onclick="closeMenuMore()" aria-label="닫기">✕</button></div>
+    ${prefer === 'eat' ? eat + cook + buy : cat === 'cook' ? cook + buy + eat : eat + cook + buy}
   </div>`;
   el.classList.add('open');
 }
@@ -5516,6 +5543,13 @@ document.addEventListener('DOMContentLoaded', paintFoodFriends);
 // 3D 가게에서 돌아오면 먹자골목 화면으로 바로 엶
 window.addEventListener('load', () => {
   const h = location.hash, v2d = new URLSearchParams(location.search).get('v2d');
+  if (h.startsWith('#eat=')) {                               // 3D 가게 월드컵 우승 메뉴 → 어떻게 먹을까? 창
+    let name = ''; try { name = decodeURIComponent(h.slice(5)).slice(0, 30); } catch (e) {}
+    history.replaceState(null, '', location.pathname);
+    const m = typeof menuDB !== 'undefined' && menuDB.find(x => x.name === name);
+    if (m) setTimeout(() => { if (typeof closeOnboarding === 'function' && document.getElementById('onboarding-backdrop')?.style.display !== 'none') closeOnboarding(); openMenuMore(m.name, m.emoji, 'eat'); }, 300);
+    return;
+  }
   if (h.startsWith('#find=')) {                              // 3D 가게에서 고른 메뉴를 근처에서 찾기
     let name = ''; try { name = decodeURIComponent(h.slice(6)).slice(0, 30); } catch (e) {}
     history.replaceState(null, '', location.pathname);
@@ -8272,7 +8306,7 @@ function renderTournamentMatches() {
       winnerEl.innerHTML = '<div style="background:linear-gradient(135deg,rgba(255,209,102,0.15),rgba(255,71,87,0.1));border:2px solid var(--yellow);border-radius:20px;padding:24px;text-align:center;margin-top:12px">'
         + '<div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:8px">🏆 이번 주 최강 메뉴 (현재 기준)</div>'
         + wcFoodVisual(winner, 96, 180)
-        + '<div style="font-size:20px;font-weight:700;color:var(--text)">' + winner.name + '</div></div>';
+        + '<div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:14px">' + winner.name + '</div>' + goEatBtn(winner.name, winner.emoji, 'yellow') + '</div>';
     } else { winnerEl.style.display = 'none'; }
   } else if (winnerEl) { winnerEl.style.display = 'none'; }
 
@@ -8481,8 +8515,9 @@ function renderWorldcup() {
       <div style="background:linear-gradient(135deg,rgba(6,214,160,0.1),rgba(255,71,87,0.08));border:2px solid var(--green);border-radius:20px;padding:24px;text-align:center">
         <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">🏆 나의 최애 메뉴!</div>
         ${wcFoodVisual(winner, 110, 200)}
-        <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:16px">${winner.name}</div>
-        <button onclick="resetWorldcup()" style="background:var(--green);border:none;border-radius:12px;padding:10px 24px;font-size:13px;font-weight:700;color:white;cursor:pointer;font-family:'Noto Sans KR',sans-serif">다시 하기</button>
+        <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:14px">${winner.name}</div>
+        ${goEatBtn(winner.name, winner.emoji, 'green')}
+        <button onclick="resetWorldcup()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px 24px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:8px">다시 하기</button>
       </div>`;
     return;
   }

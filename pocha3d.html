@@ -779,7 +779,7 @@ function pickGame(c) {
 function renderGame() {
   const el = $('game'); if (!el) return; if (!game) { el.innerHTML = ''; return; }
   const pic = (name) => { const m = MENU_NAMES.get(name); return m && m.img ? `<img src="${m.img}" alt="">` : `<span class="em">${m ? m.emoji : '🍽️'}</span>`; };
-  if (game.done) { el.innerHTML = `<div class="game"><div class="win">${pic(game.winner)}🎉 ${esc(game.winner)}</div><div class="row" style="margin-top:10px;justify-content:center"><a class="btn hot" href="./#find=${encodeURIComponent(game.winner)}">📍 근처에서 찾기</a><button class="btn" id="gx">닫기</button></div></div>`; $('gx').onclick = endGame; return; }
+  if (game.done) { el.innerHTML = `<div class="game"><div class="win">${pic(game.winner)}🎉 ${esc(game.winner)}</div><div class="row" style="margin-top:10px;justify-content:center"><a class="btn hot" href="./#eat=${encodeURIComponent(game.winner)}">🍽️ 먹으러 가기</a><button class="btn" id="gx">닫기</button></div></div>`; $('gx').onclick = endGame; return; }
   const ch2 = gameChoices(), mine = game.picks[SID], total = tableSids().length, done = Object.keys(game.picks).length;
   const title = game.kind === 'vote' ? '🗳️ 메뉴 투표' : `🏆 음식 월드컵 · ${game.alive.length === 2 ? '결승' : game.alive.length + '강'} ${game.k + 1}/${game.alive.length / 2}`;
   const okBtn = mine !== undefined ? `<div style="text-align:center;font-size:12px;color:#cfc6e6;margin-top:8px">확정했어요 · 다른 분을 기다리는 중</div>`
