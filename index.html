@@ -399,6 +399,37 @@
   .go-eat .ic { width:18px; height:18px; margin-right:4px; }
   .go-eat.green { background:var(--green); }
   .go-eat.yellow { background:var(--yellow); color:#2a2100; }
+  .find-row { display:flex; gap:8px; margin:4px 0 8px; }
+  .find-box { flex:1; min-width:0; display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:0 12px; height:46px; color:var(--muted); }
+  .find-box .ic { margin:0; }
+  .find-box input { flex:1; min-width:0; border:none; outline:none; background:none; color:var(--text); font-size:15px; font-family:'Noto Sans KR',sans-serif; }
+  .fridge-btn { flex-shrink:0; display:flex; align-items:center; gap:4px; height:46px; padding:0 12px; border-radius:14px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .fridge-btn .ic { margin:0; color:#4aa8ff; }
+  .find-list { display:none; background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:10px; }
+  .find-list.show { display:block; }
+  .find-item { display:flex; align-items:center; gap:10px; width:100%; padding:9px 12px; border:none; border-top:1px solid var(--border); background:none; color:var(--text); text-align:left; font-size:15px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .find-item:first-child { border-top:none; }
+  .find-item img, .find-item .em { width:40px; height:40px; border-radius:10px; object-fit:cover; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; background:var(--surface); }
+  .find-item small { display:block; font-size:12px; color:var(--muted); }
+  .find-empty { padding:14px; font-size:13px; color:var(--muted); text-align:center; }
+  .fr-modal { position:fixed; inset:0; z-index:880; background:rgba(0,0,0,0.6); display:none; align-items:flex-end; justify-content:center; }
+  .fr-modal.open { display:flex; }
+  .fr-box { width:100%; max-width:480px; max-height:88vh; overflow:auto; background:var(--card); border-radius:22px 22px 0 0; padding:18px 16px 28px; }
+  .fr-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .fr-top b { font-size:18px; }
+  .fr-chips { display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 14px; }
+  .fr-chip { padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .fr-chip.on { background:rgba(74,168,255,0.16); border-color:#4aa8ff; color:#4aa8ff; font-weight:700; }
+  .fr-add { display:flex; gap:6px; margin-top:4px; }
+  .fr-add input { flex:1; min-width:0; height:42px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); padding:0 12px; font-size:15px; font-family:'Noto Sans KR',sans-serif; }
+  .fr-add button { height:42px; padding:0 14px; border-radius:12px; border:none; background:var(--surface); color:var(--text); font-weight:700; font-family:'Noto Sans KR',sans-serif; }
+  .fr-res-h { font-size:13px; color:var(--muted); font-weight:700; margin:16px 2px 8px; }
+  .fr-res { display:flex; flex-direction:column; gap:8px; }
+  .fr-item { display:flex; gap:10px; align-items:center; padding:10px; border-radius:14px; border:1px solid var(--border); background:var(--surface); cursor:pointer; text-align:left; color:var(--text); font-family:'Noto Sans KR',sans-serif; }
+  .fr-item img, .fr-item .em { width:54px; height:54px; border-radius:12px; object-fit:cover; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:26px; background:var(--card); }
+  .fr-item b { font-size:15px; }
+  .fr-item .fr-have { font-size:12px; color:#4aa8ff; margin-top:2px; }
+  .fr-item .fr-need { font-size:12px; color:var(--muted); margin-top:2px; }
   .my-setting-row { display:flex; align-items:center; justify-content:space-between; padding:15px 0; border-bottom:1px solid var(--border); font-size:14px; cursor:pointer; transition:color 0.15s; }
   .my-setting-row:last-child { border-bottom:none; padding-bottom:0; }
   .my-setting-row:hover { color:var(--orange); }
@@ -1015,8 +1046,13 @@
   <div class="hero">
     <span class="hero-emoji" id="hero-chars">🍽️</span>
     <h1>오늘 메뉴<br><em>추천해드려요</em></h1>
-    <p>원하는 느낌을 고르거나, 싫은 것만 빼도 돼요</p>
+    <p id="hero-sub">원하는 느낌을 고르거나, 싫은 것만 빼도 돼요</p>
   </div>
+  <div class="find-row">
+    <label class="find-box"><i class="ic" data-ic="search"></i><input id="menu-find" type="search" placeholder="메뉴 이름으로 찾기 (예: 김치찌개)" autocomplete="off" maxlength="20" oninput="menuFindInput(this.value)" onfocus="menuFindInput(this.value)"></label>
+    <button class="fridge-btn" onclick="openFridge()"><i class="ic" data-ic="fridge"></i>냉장고 재료로</button>
+  </div>
+  <div id="menu-find-list" class="find-list"></div>
   <div class="pc-entry" onclick="showPage('pocha')">
     <span style="font-size:28px">🏮</span>
     <div><div class="t">오메추 먹자골목</div><div class="s" id="pc-entry-home">포차·한식·일식·중식·양식, 들어가서 같이 골라요</div></div>
@@ -2145,63 +2181,13 @@
 
 <div id="onboarding-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center">
   <div style="width:100%;max-width:380px;margin:0 20px;position:relative;background:var(--card);border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
-
-    <!-- 슬라이드 래퍼 -->
-    <div style="overflow:hidden">
-      <div id="onboarding-track" style="display:flex;transition:transform 0.35s ease">
-
-        <!-- 슬라이드 1 -->
-        <div style="min-width:100%;padding:40px 28px 20px;text-align:center">
-          <div class="ob-chars" id="ob-chars"></div>
-          <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">오늘 <em style="color:var(--orange);font-style:normal">뭐 먹지?</em></div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.8">직접 요리, 배달, 외식 중 하나를 고르고<br>원하는 조건을 누르면<br><strong style="color:var(--text)">메뉴 3개</strong>를 골라 드려요</div>
-          <div style="margin-top:24px;background:var(--surface);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;text-align:left">
-            <span class="ob-mini"><i class="ic" data-ic="help"></i></span>
-            <div style="font-size:13px;color:var(--muted);line-height:1.6">질문으로 추천받을 수도 있어요.<br>몇 가지에 답하면 알아서 추려 줘요.</div>
-          </div>
-        </div>
-
-        <!-- 슬라이드 2 -->
-        <div style="min-width:100%;padding:40px 28px 20px;text-align:center">
-          <div class="ob-big"><i class="ic" data-ic="chat"></i></div>
-          <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">같이 <em style="color:var(--orange);font-style:normal">고민해요</em></div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.8">오메추 투표로 뭐 먹을지 물어보고<br>오늘 먹은 것도 인증해봐요<br><strong style="color:var(--text)">커뮤니티</strong>에서 같이 고민해요</div>
-          <div style="margin-top:24px;display:flex;gap:8px">
-            <div style="flex:1;background:var(--surface);border-radius:12px;padding:12px 8px;font-size:12px;color:var(--muted);line-height:1.6;text-align:center"><i class="ic ob-t" data-ic="ballot"></i><br>오메추 투표</div>
-            <div style="flex:1;background:var(--surface);border-radius:12px;padding:12px 8px;font-size:12px;color:var(--muted);line-height:1.6;text-align:center"><i class="ic ob-t" data-ic="tray"></i><br>오늘의 급식</div>
-            <div style="flex:1;background:var(--surface);border-radius:12px;padding:12px 8px;font-size:12px;color:var(--muted);line-height:1.6;text-align:center"><i class="ic ob-t" data-ic="swords"></i><br>메뉴 배틀</div>
-          </div>
-        </div>
-
-        <!-- 슬라이드 3 -->
-        <div style="min-width:100%;padding:40px 28px 20px;text-align:center">
-          <div class="ob-big"><i class="ic" data-ic="calendar"></i></div>
-          <div style="font-family:'Jua',sans-serif;font-size:22px;color:var(--text);margin-bottom:10px;line-height:1.3">먹은 거 <em style="color:var(--orange);font-style:normal">기록해요</em></div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.8">오늘 식단을 올리면<br><strong style="color:var(--text)">먹방 달력</strong>에 자동으로 쌓여요<br>며칠 연속으로 올렸는지도 세어 줘요</div>
-          <button onclick="closeOnboarding()"
-            style="width:100%;margin-top:28px;padding:16px;background:var(--orange);border:none;border-radius:12px;color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:'Jua',sans-serif;letter-spacing:0">
-            시작하기
-          </button>
-        </div>
-
-      </div>
+    <div id="onboarding-track" style="padding:36px 28px 26px;text-align:center">
+      <div class="ob-chars" id="ob-chars"></div>
+      <div style="font-family:'Jua',sans-serif;font-size:24px;color:var(--text);margin-bottom:10px;line-height:1.3">오늘 <em style="color:var(--orange);font-style:normal">뭐 먹지?</em></div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.8">직접 요리·배달·외식 중 하나를 고르면<br><strong style="color:var(--text)">메뉴 3개</strong>를 골라 드려요</div>
+      <button onclick="closeOnboarding()" style="width:100%;margin-top:26px;padding:16px;background:var(--orange);border:none;border-radius:14px;color:white;font-size:17px;font-weight:700;cursor:pointer;font-family:'Jua',sans-serif">지금 추천받기</button>
+      <div style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6">커뮤니티·놀거리·먹자골목은 아래 탭에서 둘러볼 수 있어요</div>
     </div>
-
-    <!-- 하단 컨트롤 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 24px 24px">
-      <!-- 닷 인디케이터 -->
-      <div style="display:flex;gap:6px">
-        <div class="ob-dot active" id="ob-dot-0"></div>
-        <div class="ob-dot" id="ob-dot-1"></div>
-        <div class="ob-dot" id="ob-dot-2"></div>
-      </div>
-      <!-- 다음/스킵 -->
-      <div style="display:flex;gap:10px;align-items:center">
-        <button id="ob-skip-btn" onclick="closeOnboarding()" style="background:none;border:none;font-size:14px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;padding:12px 14px;min-height:44px">건너뛰기</button>
-        <button id="ob-next-btn" onclick="onboardingNext()" style="background:var(--orange);border:none;border-radius:20px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;padding:8px 20px">다음 →</button>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -2718,6 +2704,10 @@ const IC = {
   wind:'<path d="M3 9h11a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 17h7"/>',
   alert:'<path d="M12 4 2.5 20h19z"/><path d="M12 10v4.5M12 17.3v.2"/>',
   flame:'<path d="M12 21c-4 0-6.5-2.7-6.5-6.3 0-3.5 2.5-5.2 3.5-8.2 1.5 1.5 2 3 2 4.5 1-1 1.5-2.5 1.5-4.5 3.5 2.5 6 5.5 6 8.6 0 3.4-2.5 5.9-6.5 5.9z"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+  fridge:'<rect x="5.5" y="3" width="13" height="18" rx="2.5"/><path d="M5.5 10h13M9 6v2M9 13v3"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+  timer:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M10 2.5h4"/>',
   coffee:'<path d="M4.5 9h12v5.5a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z"/><path d="M16.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.8M8 3.5c0 1-1 1.5-1 2.5M12 3.5c0 1-1 1.5-1 2.5"/>',
 };
 const ic = (k, c) => `<i class="ic${c ? ' ' + c : ''}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[k] || ''}</svg></i>`;
@@ -5129,6 +5119,84 @@ function menuTiles(name, emoji) {
   return { T, m, js, hasRecipe };
 }
 const moreSec = (title, list, extra = '') => `<div class="more-sec"><div class="more-h">${title}</div>${extra}<div class="more-grid">${list.filter(Boolean).join('')}</div></div>`;
+
+// ── 메뉴 이름으로 찾기 ──
+function menuFindInput(q) {
+  const box = document.getElementById('menu-find-list'); if (!box) return;
+  q = String(q || '').trim().replace(/\s+/g, '');
+  if (!q) { box.classList.remove('show'); box.innerHTML = ''; return; }
+  const norm = (t) => t.replace(/\s+/g, '').replace(/\(.*?\)/g, '');
+  const hits = menuDB.filter(m => norm(m.name).includes(q) || (m.name.replace(/\s+/g, '')).includes(q))
+    .sort((a, b) => (norm(a.name).startsWith(q) ? 0 : 1) - (norm(b.name).startsWith(q) ? 0 : 1) || a.name.length - b.name.length).slice(0, 8);
+  const cats = { cook: '직접 요리', delivery: '배달', dine: '외식' };
+  box.innerHTML = hits.length ? hits.map(m => { const img = getMenuImg(m.name), js = m.name.replace(/'/g, "\\'");
+    return `<button class="find-item" onclick="menuFindPick('${js}')">${img ? `<img src="${img}" alt="" loading="lazy">` : `<span class="em">${m.emoji}</span>`}<span><b>${escHtml(m.name)}</b><small>${(m.cat || []).map(c => cats[c]).filter(Boolean).join(' · ')}</small></span></button>`; }).join('')
+    : `<div class="find-empty">'${escHtml(q)}' 메뉴가 아직 없어요. 내정보 › 메뉴 건의하기로 알려 주세요.</div>`;
+  box.classList.add('show');
+}
+function menuFindPick(name) {
+  const m = menuDB.find(x => x.name === name); if (!m) return;
+  const inp = document.getElementById('menu-find'); if (inp) { inp.value = ''; inp.blur(); }
+  menuFindInput('');
+  openMenuMore(m.name, m.emoji);
+}
+document.addEventListener('click', (e) => { if (!e.target.closest('.find-row') && !e.target.closest('#menu-find-list')) { const b = document.getElementById('menu-find-list'); if (b) b.classList.remove('show'); } });
+
+// ── 냉장고 재료로 찾기 ──
+// 집에 늘 있는 양념은 '있다'고 보고 계산에서 뺀다
+const PANTRY = ['간장','진간장','국간장','소금','설탕','참기름','다진마늘','마늘','식용유','고춧가루','후추','통후추','깨','통깨','물엿','맛술','식초','올리브유','굵은소금','꽃소금','밀가루','물','깐마늘','통마늘'];
+let fridgeHave = new Set();
+try { fridgeHave = new Set(JSON.parse(localStorage.getItem('wmjFridge') || '[]')); } catch (e) {}
+const ingKey = (n) => String(n).replace(/\s+/g, '').replace(/^(다진|삶은|건)(?=.)/, '');
+function cookMenusWithIngs() {
+  return menuDB.filter(m => (m.cat || []).includes('cook') && recipeDB[m.name] && (recipeDB[m.name].steps || []).length)
+    .map(m => ({ m, ings: recipeIngredients(m.name).map(g => g.name).filter(n => !PANTRY.includes(n)) }));
+}
+function fridgeCommon() {
+  const cnt = {};
+  for (const { ings } of cookMenusWithIngs()) for (const n of new Set(ings.map(ingKey))) cnt[n] = (cnt[n] || 0) + 1;
+  return Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 36).map(([n]) => n);
+}
+function openFridge() {
+  let el = document.getElementById('fr-modal');
+  if (!el) { el = document.createElement('div'); el.id = 'fr-modal'; el.className = 'fr-modal'; el.onclick = (e) => { if (e.target === el) closeFridge(); }; document.body.appendChild(el); }
+  el.classList.add('open'); renderFridge();
+}
+function closeFridge() { const el = document.getElementById('fr-modal'); if (el) el.classList.remove('open'); }
+function toggleFridge(n) { fridgeHave.has(n) ? fridgeHave.delete(n) : fridgeHave.add(n); try { localStorage.setItem('wmjFridge', JSON.stringify([...fridgeHave])); } catch (e) {} renderFridge(); }
+function addFridgeTyped() {
+  const i = document.getElementById('fr-in'); const v = ingKey((i && i.value) || ''); if (!v) return;
+  fridgeHave.add(v); try { localStorage.setItem('wmjFridge', JSON.stringify([...fridgeHave])); } catch (e) {} renderFridge();
+}
+function renderFridge() {
+  const el = document.getElementById('fr-modal'); if (!el) return;
+  const common = fridgeCommon(), extra = [...fridgeHave].filter(n => !common.includes(n));
+  const chip = (n) => `<button class="fr-chip ${fridgeHave.has(n) ? 'on' : ''}" onclick="toggleFridge('${n.replace(/'/g, "\\'")}')">${escHtml(n)}</button>`;
+  const has = (n) => fridgeHave.has(ingKey(n)) || [...fridgeHave].some(h => h.length >= 2 && (ingKey(n).includes(h) || h.includes(ingKey(n))));
+  let res = '';
+  if (fridgeHave.size) {
+    const rows = cookMenusWithIngs().map(({ m, ings }) => { const got = ings.filter(has), need = ings.filter(n => !has(n)); return { m, got, need, score: got.length / Math.max(1, ings.length) }; })
+      .filter(r => r.got.length).sort((a, b) => a.need.length - b.need.length || b.score - a.score).slice(0, 20);
+    res = `<div class="fr-res-h">${rows.length ? '만들 수 있는 순서예요 · 기본 양념은 있다고 봤어요' : '고른 재료로 만들 메뉴를 못 찾았어요'}</div><div class="fr-res">${rows.map(r => { const img = getMenuImg(r.m.name), js = r.m.name.replace(/'/g, "\\'");
+      return `<button class="fr-item" onclick="closeFridge();openRecipe('${js}','${r.m.emoji}')">${img ? `<img src="${img}" alt="" loading="lazy">` : `<span class="em">${r.m.emoji}</span>`}<span style="min-width:0"><b>${escHtml(r.m.name)}</b>
+        <div class="fr-have">있는 재료 ${r.got.length}/${r.got.length + r.need.length}</div><div class="fr-need">${r.need.length ? '더 필요: ' + escHtml(r.need.slice(0, 4).join(', ')) + (r.need.length > 4 ? ' 외' : '') : '지금 바로 만들 수 있어요'}</div></span></button>`; }).join('')}</div>`;
+  }
+  el.innerHTML = `<div class="fr-box" role="dialog" aria-label="냉장고 재료로 찾기">
+    <div class="fr-top"><b>냉장고에 뭐 있어요?</b><button class="more-x" onclick="closeFridge()" aria-label="닫기">✕</button></div>
+    <div style="font-size:13px;color:var(--muted)">있는 재료를 누르면 만들 수 있는 메뉴를 보여 드려요</div>
+    <div class="fr-chips">${common.map(chip).join('')}${extra.map(chip).join('')}</div>
+    <div class="fr-add"><input id="fr-in" placeholder="목록에 없는 재료 직접 쓰기" maxlength="12" onkeydown="if(event.key==='Enter')addFridgeTyped()"><button onclick="addFridgeTyped()">추가</button>${fridgeHave.size ? `<button onclick="fridgeHave.clear();try{localStorage.removeItem('wmjFridge')}catch(e){};renderFridge()">비우기</button>` : ''}</div>
+    ${res}
+  </div>`;
+}
+
+// 홈 문구: 지금 시간·계절에 맞춰 무엇을 조금 더 골라 주는지 알려 줌
+(function paintHeroSub() {
+  const el = document.getElementById('hero-sub'); if (!el || typeof getContextBoosts !== 'function') return;
+  const { label } = getContextBoosts(); if (!label.length) return;
+  const hint = { '아침': '가벼운 메뉴', '점심': '밥·면·국물', '저녁': '고기·술안주', '야식': '야식', '추운 날': '따뜻한 국물', '더운 날': '시원한 메뉴' };
+  el.textContent = `지금은 ${label.join(' · ')} — ${label.map(l => hint[l]).filter(Boolean).join(', ')} 쪽을 조금 더 골라요`;
+})();
 // 우승 메뉴 → '어떻게 먹을까?' 창 (사 먹기 먼저)
 function goEatBtn(name, emoji, tone) {
   const js = String(name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
@@ -5562,7 +5630,9 @@ window.addEventListener('load', () => {
   if (h === '#dress') window.__pocha2dOnce = true;          // 3D 골목에서 꾸미기만 하러 온 경우: 닫으면 3D로 돌아감
   setTimeout(() => { showPage('pocha'); if (h === '#dress' && window.Pocha) Pocha.openDress(); }, 80);
 });
+const TAB_TIPS = { community: '투표로 뭐 먹을지 물어보고, 먹은 걸 인증해 보세요', fun: '월드컵·메뉴 배틀로 오늘 메뉴를 정해 보세요', cart: '레시피에서 담은 재료가 여기 모여요' };
 function showPage(page) {
+  try { if (TAB_TIPS[page] && !localStorage.getItem('wmjTip_' + page)) { localStorage.setItem('wmjTip_' + page, '1'); setTimeout(() => showToast(TAB_TIPS[page]), 400); } } catch (e) {}
   if (page === 'settings') setTimeout(() => { const l = document.getElementById('tap-sound-label'); if (l && window.TapSound) l.textContent = TapSound.isOn() ? '켜짐' : '꺼짐'; }, 0);
   if (page === 'mypage' || page === 'home') setTimeout(paintFoodFriends, 0);
   window.scrollTo(0, 0);
@@ -10497,7 +10567,7 @@ function toggleTheme() {
 
 initTheme();
 let obCurrentSlide = 0;
-const OB_TOTAL = 3;
+const OB_TOTAL = 1;
 
 function showOnboarding() {
   obCurrentSlide = 0;
