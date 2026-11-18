@@ -310,6 +310,17 @@
   .coupang-logo { display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
   .coupang-rocket { font-size:11px; font-weight:700; color:#e62e14; background:rgba(230,46,20,0.1); padding:3px 8px; border-radius:20px; white-space:nowrap; border:1px solid rgba(230,46,20,0.2); }
   .coupang-desc { flex:1; }
+  .cart-pantry { display:flex; align-items:center; gap:4px; width:100%; padding:10px 12px; margin-bottom:12px; border-radius:12px; border:1px dashed var(--border); background:none; color:var(--muted); font-size:13px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .cart-pantry .ic { margin-right:4px; }
+  .cart-g { margin-bottom:14px; }
+  .cart-gh { font-size:13px; font-weight:800; color:var(--muted); margin:0 2px 6px; }
+  .cart-check { width:26px; height:26px; flex-shrink:0; border-radius:8px; border:2px solid var(--border); background:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+  .cart-check .ic { margin:0; width:16px; height:16px; }
+  .page-cart-item.done .cart-check { background:var(--green); border-color:var(--green); }
+  .page-cart-item.done .page-cart-item-name { text-decoration:line-through; color:var(--muted); }
+  .page-cart-item.done { opacity:0.65; }
+  .cart-amt { color:var(--muted); font-size:13px; font-weight:500; }
+  a.page-cart-buy { text-decoration:none; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; }
   .page-cart-item {
     display:flex; align-items:center; gap:14px;
     background:var(--card); border:1.5px solid var(--border); border-radius:20px;
@@ -5117,7 +5128,8 @@ function addAllIngredients(name) {
   const ings = recipeIngredients(name);
   if (!ings.length) { window.open(SHOP_AFFILIATE.coupang.url(name + ' 재료'), '_blank', 'noopener'); return; }
   let n = 0;
-  for (const g of ings) if (!cartItems.some(c => c.name === g.name && c.from === name)) { cartItems.push({ name: g.name, amount: g.amount, from: name }); n++; }
+  const f = (typeof recipeServ !== 'undefined' ? recipeServ : 2) / 2;
+  for (const g of ings) if (!(cartHidePantry && PANTRY.includes(g.name)) && !cartItems.some(c => c.name === g.name && c.from === name)) { cartItems.push({ name: g.name, amount: scaleAmt(g.amount, f), from: name }); n++; }
   saveCart();
   for (const g of ings) { const bb = document.getElementById(`cartbtn-${name}-${g.name}`); if (bb) { bb.textContent = '✓ 추가됨'; bb.classList.add('added'); } }
   showToast(n ? `🧺 ${name} 재료 ${n}개를 장보기에 담았어요` : '이미 다 담겨 있어요');
@@ -5875,37 +5887,62 @@ function showPage(page) {
 }
 
 // ── 장보기 페이지 렌더 ──
+// 장보기: 같은 재료 합치기 · 종류별로 묶기 · 산 것 체크 · 기본 양념 숨기기
+const CART_GROUPS = [
+  ['채소·과일', /파|양파|마늘|배추|양배추|감자|고구마|당근|애호박|호박|무$|무청|시래기|우거지|버섯|양송이|표고|팽이|콩나물|숙주|시금치|부추|깻잎|오이|고추|피망|파프리카|토마토|상추|양상추|쑥갓|미나리|고사리|가지|브로콜리|아보카도|레몬|라임|바나나|블루베리|배$|고수|바질|생강|대추|수삼|채소|샐러드|로즈마리|달래|쪽파|열무/],
+  ['고기·해산물', /고기|돼지|소고기|닭|오리|갈비|등뼈|삼겹|목살|양지|베이컨|햄|소시지|스팸|새우|오징어|쭈꾸미|낙지|조개|바지락|홍합|꼬막|가리비|전복|굴$|게|꽃게|대구|동태|우럭|갈치|고등어|가자미|연어|명란|날치알|참치|어묵|북어|황태|멸치|게맛살|해물|영계/],
+  ['달걀·유제품·두부', /달걀|계란|우유|치즈|버터|생크림|요거트|두부|순두부|비지/],
+  ['밥·면·가루', /밥|쌀|찹쌀|면|소면|국수|스파게티|파스타|펜네|마카로니|우동|라면|떡|당면|만두피|또띠아|식빵|바게트|빵|가루|부침|전분|그래놀라|만두|사리/],
+];
+const SAUCE_RE = /장$|소스|케첩|마요|식초|설탕|소금|기름|올리브유|후추|깨$|물엿|맛술|미림|액젓|젓$|스톡|페이스트|시럽|꿀|머스터드|머스타드|와인|가루|파우더|육수팩|다진마늘|쯔유|폰즈|카레|하이라이스|스리라차|케찹/;
+const cartGroupOf = (n) => SAUCE_RE.test(n) ? '양념·소스·기타' : (CART_GROUPS.find(([, re]) => re.test(n)) || ['양념·소스·기타'])[0];
+let cartHidePantry = false;
+try { cartHidePantry = localStorage.getItem('wmjCartPantry') === '1'; } catch (e) {}
+function sumAmts(list) {
+  const parsed = list.map(a => { const m = String(a || '').trim().match(/^(\d+(?:\.\d+)?(?:\s*\/\s*\d+)?|[½¼⅓¾])\s*([가-힣a-zA-Z]+)$/); if (!m) return null; const n = m[1].includes('/') ? m[1].split('/').reduce((x, y) => +x / +y) : (FRAC[m[1]] ?? +m[1]); return { n, u: m[2] }; });
+  if (parsed.every(Boolean) && parsed.every(p => p.u === parsed[0].u)) return fmtNum(parsed.reduce((t, p) => t + p.n, 0), parsed[0].u) + parsed[0].u;
+  return [...new Set(list.filter(Boolean))].join(' + ');
+}
+function cartToggleDone(name) { const on = !cartItems.filter(c => c.name === name).every(c => c.done); cartItems.forEach(c => { if (c.name === name) c.done = on; }); saveCart(); renderPageCartList(); }
+function cartRemoveName(name) { cartItems = cartItems.filter(c => c.name !== name); saveCart(); renderPageCartList(); }
+function cartTogglePantry() { cartHidePantry = !cartHidePantry; try { localStorage.setItem('wmjCartPantry', cartHidePantry ? '1' : '0'); } catch (e) {} renderPageCartList(); }
 function renderPageCartList() {
   const listEl = document.getElementById('page-cart-list');
   const countEl = document.getElementById('page-cart-count');
   const clearBtn = document.getElementById('page-cart-clear');
   const buyAllBtn = document.getElementById('page-cart-buy-all');
-
-  countEl.textContent = cartItems.length > 0 ? `(${cartItems.length}개)` : '';
+  // 같은 이름 합치기
+  const byName = new Map();
+  for (const c of cartItems) { if (!byName.has(c.name)) byName.set(c.name, []); byName.get(c.name).push(c); }
+  let rows = [...byName.entries()].map(([name, list]) => ({ name, amount: sumAmts(list.map(x => x.amount)), from: [...new Set(list.map(x => x.from).filter(Boolean))], done: list.every(x => x.done), pantry: PANTRY.includes(name) }));
+  const hidden = cartHidePantry ? rows.filter(r => r.pantry).length : 0;
+  if (cartHidePantry) rows = rows.filter(r => !r.pantry);
+  const left = rows.filter(r => !r.done).length;
+  countEl.textContent = rows.length ? `(${left}/${rows.length})` : '';
   clearBtn.style.display = cartItems.length > 0 ? 'block' : 'none';
   buyAllBtn.style.display = cartItems.length > 0 ? 'block' : 'none';
-
   if (cartItems.length === 0) {
-    listEl.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;color:var(--muted)">
-        <div style="font-size:40px;margin-bottom:12px">🛒</div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">장보기 목록이 비어있어요</div>
-        <div style="font-size:12px">레시피에서 재료를 추가해 보세요!</div>
-      </div>`;
+    listEl.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted)">
+        <div class="ob-big" style="width:60px;height:60px;border-radius:18px;margin-bottom:12px">${ic('cart')}</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">장보기 목록이 비어 있어요</div>
+        <div style="font-size:13px">레시피에서 '재료 담기'를 누르면 여기 모여요</div></div>`;
     return;
   }
-  listEl.innerHTML = cartItems.map((item, i) => `
-    <div class="page-cart-item">
-      <div class="page-cart-item-icon">🥬</div>
-      <div class="page-cart-item-info">
-        <div class="page-cart-item-name">${item.name} <span style="color:var(--muted);font-size:11px">${item.amount}</span></div>
-        <div class="page-cart-item-meta">📋 ${item.from} 레시피</div>
-      </div>
-      <div class="page-cart-item-btns">
-        <button class="page-cart-buy" onclick="window.open('${SHOP_AFFILIATE.coupang.url(item.name)}','_blank')">🛒</button>
-        <button class="page-cart-del" onclick="removeFromCart(${i});renderPageCartList()">✕</button>
-      </div>
-    </div>`).join('');
+  const groups = {};
+  for (const r of rows) (groups[cartGroupOf(r.name)] = groups[cartGroupOf(r.name)] || []).push(r);
+  const order = [...CART_GROUPS.map(g => g[0]), '양념·소스·기타'];
+  listEl.innerHTML = `<button class="cart-pantry" onclick="cartTogglePantry()">${ic(cartHidePantry ? 'check' : 'ban')}${cartHidePantry ? `집에 있는 기본 양념 숨김 중${hidden ? ` (${hidden}개)` : ''} · 다시 보기` : '집에 있는 기본 양념(간장·소금·설탕 등) 숨기기'}</button>`
+    + order.filter(g => groups[g]).map(g => `<div class="cart-g"><div class="cart-gh">${g}</div>${groups[g].sort((a, b) => a.done - b.done).map(r => { const js = r.name.replace(/'/g, "\\'");
+      return `<div class="page-cart-item ${r.done ? 'done' : ''}">
+        <button class="cart-check" onclick="cartToggleDone('${js}')" aria-label="${escHtml(r.name)} 샀어요">${r.done ? ic('check') : ''}</button>
+        <div class="page-cart-item-info" onclick="cartToggleDone('${js}')">
+          <div class="page-cart-item-name">${escHtml(r.name)} <span class="cart-amt">${escHtml(r.amount)}</span></div>
+          <div class="page-cart-item-meta">${escHtml(r.from.join(', '))}</div>
+        </div>
+        <div class="page-cart-item-btns">
+          <a class="page-cart-buy" href="${SHOP_AFFILIATE.coupang.url(r.name)}" target="_blank" rel="noopener">구매</a>
+          <button class="page-cart-del" onclick="cartRemoveName('${js}')" aria-label="빼기">✕</button>
+        </div></div>`; }).join('')}</div>`).join('');
 }
 
 // ── 마이페이지 렌더 ──
