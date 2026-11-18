@@ -692,6 +692,13 @@ function connect() {
   const lobbyTrack = () => lobby.track({ nick: myNick, kind: myLook.kind, color: '#ffd36b', acc: myLook.acc, face: myLook.face, room: RID, x: TH.door[0], y: TH.door[1] });
   lobbyTrackFn = lobbyTrack; lobby.subscribe((st) => { if (st === 'SUBSCRIBED') lobbyTrack(); });
 }
+// 손님이 나 혼자면 사장님이 오늘 메뉴를 하나 권함 (가게 안에서만, 한 번)
+setTimeout(() => {
+  if (RID === 'street' || !owners || !owners[0] || !TH.menu) return;
+  const others = [...people.values()].filter(p => !p.mine).length; if (others) return;
+  const pick = TH.menu[Math.floor(Math.random() * TH.menu.length)].replace(/\s+[\d,]+$/, '').trim();
+  bubble(owners[0], `한산하네요~ 오늘은 ${pick} 어때요?`, '', 5200);
+}, 9000);
 // 30초마다 위치 다시 알리기 (한 번만 시작)
 setInterval(() => { track(); if (lobbyTrackFn) lobbyTrackFn(); }, 30000);
 // 끊긴 연결 되살리기: 3초 안에 저절로 안 붙으면 채널을 새로 만들어 다시 들어감 (앉은 자리·테이블 대화방도 다시 연결)

@@ -441,6 +441,26 @@
   .fr-item b { font-size:15px; }
   .fr-item .fr-have { font-size:12px; color:#4aa8ff; margin-top:2px; }
   .fr-item .fr-need { font-size:12px; color:var(--muted); margin-top:2px; }
+  .comm-starter { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0 14px; }
+  .comm-starter button { display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:14px 12px; border-radius:16px; border:1px solid var(--border); background:var(--surface); color:var(--text); text-align:left; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .comm-starter .ic { width:24px; height:24px; color:var(--orange); margin:0 0 6px; }
+  .comm-starter b { font-size:14px; }
+  .comm-starter small { font-size:12px; color:var(--muted); }
+  .wc-theme { display:flex; align-items:center; gap:10px; width:100%; padding:12px 14px; margin-bottom:12px; border-radius:14px; border:1px solid var(--orange); background:rgba(255,71,87,0.08); color:var(--text); text-align:left; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .wc-theme .ic { color:var(--orange); margin:0; }
+  .wc-theme span:nth-child(2) { flex:1; }
+  .wc-theme b { display:block; font-size:14px; }
+  .wc-theme small { font-size:12px; color:var(--muted); }
+  .wc-share { display:flex; align-items:center; justify-content:center; gap:4px; width:100%; max-width:280px; margin:8px auto 0; padding:11px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .fr-chip.on.avoid { background:rgba(255,71,87,0.14); border-color:var(--orange); color:var(--orange); }
+  .wk-sum { font-size:15px; margin:2px 2px 8px; }
+  .wk-sum b { color:var(--orange); font-size:18px; }
+  .wk-how { display:flex; gap:6px; margin-bottom:8px; }
+  .wk-how span { flex:1; text-align:center; padding:8px 4px; border-radius:12px; background:var(--surface); font-size:12px; color:var(--muted); }
+  .wk-how b { display:block; font-size:17px; color:var(--text); }
+  .wk-list { display:flex; flex-wrap:wrap; gap:6px; }
+  .wk-list span { font-size:12px; padding:5px 10px; border-radius:20px; border:1px solid var(--border); color:var(--text); }
+  .net-bar { position:fixed; top:0; left:0; right:0; z-index:2000; padding:8px 12px calc(8px); padding-top:calc(8px + env(safe-area-inset-top)); background:#3a3a3a; color:#fff; font-size:13px; font-weight:700; text-align:center; }
   .my-setting-row { display:flex; align-items:center; justify-content:space-between; padding:15px 0; border-bottom:1px solid var(--border); font-size:14px; cursor:pointer; transition:color 0.15s; }
   .my-setting-row:last-child { border-bottom:none; padding-bottom:0; }
   .my-setting-row:hover { color:var(--orange); }
@@ -2484,6 +2504,13 @@
     <div class="my-setting-row" onclick="toggleLocationSetting()">
       <span class="row-l"><i class="ic" data-ic="pin"></i>현재 위치 사용</span><span style="font-size:11px;color:var(--orange)" id="location-label">허용 전</span>
     </div>
+    <div class="my-setting-row" onclick="exportMyData()">
+      <span class="row-l"><i class="ic" data-ic="send"></i>내 기록 파일로 저장 (폰 바꿀 때)</span><span class="my-setting-arrow">›</span>
+    </div>
+    <label class="my-setting-row" style="cursor:pointer">
+      <span class="row-l"><i class="ic" data-ic="folder"></i>저장한 기록 파일 불러오기</span><span class="my-setting-arrow">›</span>
+      <input type="file" accept="application/json,.json" style="display:none" onchange="importMyData(this.files[0]);this.value=''">
+    </label>
     <div class="my-setting-row" onclick="clearBlockedUsers()">
       <span class="row-l"><i class="ic" data-ic="ban"></i>차단한 사용자 해제</span><span class="my-setting-arrow">›</span>
     </div>
@@ -2557,6 +2584,18 @@
       <button class="my-edit-btn" onclick="openNicknameModal()">편집</button>
     </div>
     <div class="my-profile-stats" id="my-profile-stats"></div>
+  </div>
+
+  <!-- 이번 주 먹은 것 -->
+  <div class="my-section" id="my-week-wrap">
+    <div class="my-section-header"><span class="my-section-title"><i class="ic" data-ic="calendar"></i>이번 주 먹은 것</span></div>
+    <div id="my-week"></div>
+  </div>
+
+  <!-- 못 먹는 것 -->
+  <div class="my-section">
+    <div class="my-section-header"><span class="my-section-title"><i class="ic" data-ic="ban"></i>못 먹는 것</span><span style="font-size:12px;color:var(--muted)">추천에서 늘 빼요</span></div>
+    <div id="my-avoid"></div>
   </div>
 
   <!-- 입맛 분석 -->
@@ -3270,7 +3309,7 @@ function getCandidates() {
       );
     }
   }
-  return candidates;
+  return avoidFilter(candidates);
 }
 
 let prevCount = -1;
@@ -5262,6 +5301,77 @@ function decideMenu(name, emoji, btn) {
   showToast(`오늘은 ${name}로 정했어요 · 내정보에 기록돼요`);
   setTimeout(() => openMenuMore(name, emoji), 350);
 }
+// ── 내 기록 옮기기 (로그인 없이 폰을 바꿀 때) ──
+const MYDATA_KEY = (k) => /^(wmj|wmm|liked|omechu)/i.test(k);
+function exportMyData() {
+  const data = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (MYDATA_KEY(k)) data[k] = localStorage.getItem(k); }
+  const blob = new Blob([JSON.stringify({ app: 'omechu', v: 1, at: new Date().toISOString(), data })], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `오메추-내기록-${todayKey()}.json`; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  showToast('기록 파일을 저장했어요. 새 폰에서 불러오기를 눌러 주세요');
+}
+function importMyData(file) {
+  if (!file) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const o = JSON.parse(rd.result); if (!o || o.app !== 'omechu' || !o.data) throw 0;
+      Object.entries(o.data).forEach(([k, v]) => { if (MYDATA_KEY(k) && typeof v === 'string') localStorage.setItem(k, v); });
+      showToast('기록을 불러왔어요. 다시 열게요'); setTimeout(() => location.reload(), 900);
+    } catch (e) { showToast('오메추 기록 파일이 아니에요'); }
+  };
+  rd.readAsText(file);
+}
+// ── 못 먹는 것 (알레르기·싫은 재료): 추천에서 늘 뺌, 이 기기에만 저장 ──
+const AVOID_OPTS = { '돼지고기': /돼지|삼겹|목살|등뼈|햄|베이컨|소시지|스팸|갈매기살|족발|수육|제육|돈까스|돈가스|두루치기/, '소고기': /소고기|소갈비|양지|불고기|갈비탕|곰탕|설렁탕|육개장|스테이크|규동|스키야키|떡갈비/,
+  '닭고기': /닭|치킨|영계/, '해산물': /새우|오징어|쭈꾸미|낙지|조개|바지락|홍합|꼬막|가리비|전복|굴|게|대구|동태|우럭|갈치|고등어|가자미|연어|명란|날치알|참치|어묵|북어|황태|해물|해산물|멸치|초밥|사시미|생선|물회|^회/,
+  '달걀': /달걀|계란|오믈렛|에그/, '우유·치즈': /우유|치즈|생크림|버터|요거트|크림|그라탕|리조또|까르보나라/, '밀가루': /밀가루|면|파스타|스파게티|빵|토스트|우동|라면|국수|만두|부침|튀김|피자|버거|또띠아|칼국수|수제비/,
+  '견과류': /땅콩|견과|잣|호두|아몬드/, '매운 것': /고춧가루|고추장|청양|매운|얼큰|불닭|짬뽕|떡볶이|마라/, '오이': /오이/, '버섯': /버섯|표고|양송이|팽이/, '고수': /고수/ };
+let avoidSet = new Set();
+try { avoidSet = new Set(JSON.parse(localStorage.getItem('wmjAvoid') || '[]')); } catch (e) {}
+function menuHits(m, re) {
+  if (re.test(m.name)) return true;
+  if ((m.tags || []).some(t => re.test(t))) return true;
+  return recipeIngredients(m.name).some(g => re.test(g.name));
+}
+function avoidFilter(list) {
+  if (!avoidSet.size) return list;
+  const res = [...avoidSet].map(k => AVOID_OPTS[k] || new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  return list.filter(m => !res.some(re => menuHits(m, re)));
+}
+function toggleAvoid(k) { avoidSet.has(k) ? avoidSet.delete(k) : avoidSet.add(k); try { localStorage.setItem('wmjAvoid', JSON.stringify([...avoidSet])); } catch (e) {} renderAvoid(); }
+function addAvoidTyped() { const i = document.getElementById('avoid-in'); const v = (i && i.value || '').trim().slice(0, 10); if (!v) return; avoidSet.add(v); try { localStorage.setItem('wmjAvoid', JSON.stringify([...avoidSet])); } catch (e) {} renderAvoid(); }
+function renderAvoid() {
+  const el = document.getElementById('my-avoid'); if (!el) return;
+  const keys = [...Object.keys(AVOID_OPTS), ...[...avoidSet].filter(k => !AVOID_OPTS[k])];
+  el.innerHTML = `<div class="fr-chips" style="margin:4px 0 8px">${keys.map(k => `<button class="fr-chip ${avoidSet.has(k) ? 'on avoid' : ''}" onclick="toggleAvoid('${k.replace(/'/g, "\\'")}')">${escHtml(k)}</button>`).join('')}</div>
+    <div class="fr-add"><input id="avoid-in" placeholder="다른 재료 직접 쓰기 (예: 가지)" maxlength="10" onkeydown="if(event.key==='Enter')addAvoidTyped()"><button onclick="addAvoidTyped()">추가</button></div>
+    ${avoidSet.size ? `<div style="font-size:12px;color:var(--muted);margin-top:8px">${[...avoidSet].map(escHtml).join(', ')}가 들어간 메뉴는 추천하지 않아요. 이 정보는 이 폰에만 저장돼요.</div>` : ''}`;
+}
+// ── 이번 주 먹은 것: '이걸로 정했어' 기록으로 요약 ──
+function renderMyWeek() {
+  const el = document.getElementById('my-week'); if (!el) return;
+  const now = new Date(), mon = new Date(now); mon.setHours(0, 0, 0, 0); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+  const week = ateLog().filter(a => a.ts >= mon.getTime());
+  if (!week.length) { el.innerHTML = `<div class="my-saved-empty">추천 카드에서 '이걸로 정했어'를 누르면 여기 쌓여요</div>`; return; }
+  const how = { cook: '직접 요리', delivery: '배달', dine: '외식' }, cnt = {}, kinds = {};
+  week.forEach(a => { cnt[a.how] = (cnt[a.how] || 0) + 1; (a.tags || []).filter(t => /한식|일식|중식|양식|분식|아시안|세계/.test(t)).forEach(t => { const k = t.replace(/^\S+\s/, ''); kinds[k] = (kinds[k] || 0) + 1; }); });
+  const top = Object.entries(kinds).sort((a, b) => b[1] - a[1])[0];
+  const days = ['월', '화', '수', '목', '금', '토', '일'];
+  el.innerHTML = `<div class="wk-sum"><b>${week.length}끼</b> 정했어요${top ? ` · ${escHtml(top[0])}을 제일 많이 먹었어요` : ''}</div>
+    <div class="wk-how">${Object.entries(how).map(([k, v]) => `<span>${v} <b>${cnt[k] || 0}</b></span>`).join('')}</div>
+    <div class="wk-list">${week.slice(-7).reverse().map(a => { const d = new Date(a.ts); return `<span>${days[(d.getDay() + 6) % 7]} · ${escHtml(a.name)}</span>`; }).join('')}</div>`;
+}
+// 인터넷이 끊기면 위에 알려 줌 (추천·레시피는 기기 안 데이터라 계속 쓸 수 있음)
+function paintNet() {
+  let b = document.getElementById('net-bar');
+  if (navigator.onLine) { if (b) b.remove(); return; }
+  if (!b) { b = document.createElement('div'); b.id = 'net-bar'; b.className = 'net-bar'; document.body.appendChild(b); }
+  b.textContent = '인터넷 연결이 끊겼어요 · 추천과 레시피는 그대로 쓸 수 있어요';
+}
+window.addEventListener('online', () => { paintNet(); showToast('다시 연결됐어요'); });
+window.addEventListener('offline', paintNet);
+paintNet();
 // 우승 메뉴 → '어떻게 먹을까?' 창 (사 먹기 먼저)
 function goEatBtn(name, emoji, tone) {
   const js = String(name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
@@ -5787,6 +5897,7 @@ window.addEventListener('load', () => {
 });
 const TAB_TIPS = { community: '투표로 뭐 먹을지 물어보고, 먹은 걸 인증해 보세요', fun: '월드컵·메뉴 배틀로 오늘 메뉴를 정해 보세요', cart: '레시피에서 담은 재료가 여기 모여요' };
 function showPage(page) {
+  try { watchStreetCount(page === 'home'); } catch (e) {}
   try { if (TAB_TIPS[page] && !localStorage.getItem('wmjTip_' + page)) { localStorage.setItem('wmjTip_' + page, '1'); setTimeout(() => showToast(TAB_TIPS[page]), 400); } } catch (e) {}
   if (page === 'settings') setTimeout(() => { const l = document.getElementById('tap-sound-label'); if (l && window.TapSound) l.textContent = TapSound.isOn() ? '켜짐' : '꺼짐'; }, 0);
   if (page === 'mypage' || page === 'home') setTimeout(paintFoodFriends, 0);
@@ -5977,6 +6088,7 @@ function calcDietStreak() {
 }
 
 function renderMyPage() {
+  try { renderMyWeek(); renderAvoid(); } catch (e) {}
   resetMyAccordions();
   // 내 활동 하위(달력/저장글/내글)에서 돌아온 경우 펼친 상태 복원
   if (keepActivityOpen) {
@@ -8667,10 +8779,23 @@ function toggleWorldcupAccordion() {
   if (arrow) arrow.style.transform = worldcupAccordionOpen ? '' : 'rotate(-90deg)';
 }
 
-function startWorldcup(size) {
-  wcSize = size;
-  // menuDB에서 랜덤 size개 선정
-  const pool = [...menuDB];
+// 매주 바뀌는 주제 월드컵
+const WC_THEMES = [
+  { name: '국물 월드컵', t: '🍲 국물/찌개' }, { name: '야식 월드컵', t: '🌙 야식' }, { name: '면 요리 월드컵', t: '🍜 면' }, { name: '고기 월드컵', t: '🥩 고기' },
+  { name: '매운맛 월드컵', t: '🌶️ 매운/얼큰한맛' }, { name: '해산물 월드컵', t: '🦐 해산물' }, { name: '한식 월드컵', t: '🍱 한식' }, { name: '밥 월드컵', t: '🍚 밥' },
+];
+let wcTheme = null;
+function weekTheme() { const d = new Date(), w = Math.floor((d - new Date(d.getFullYear(), 0, 1)) / 604800000); const th = WC_THEMES[w % WC_THEMES.length]; const n = menuDB.filter(m => (m.tags || []).includes(th.t)).length; return { ...th, size: n >= 16 ? 16 : 8 }; }
+function startThemeWorldcup() { const th = weekTheme(); startWorldcup(th.size, th); }
+function shareWorldcup(name) {
+  const text = `내 최애 음식은 '${name}'! 오메추 음식 월드컵 해 봐요`, url = location.origin + '/';
+  if (navigator.share) navigator.share({ title: '오메추 음식 월드컵', text, url }).catch(() => {});
+  else { try { navigator.clipboard.writeText(text + ' ' + url); showToast('공유 문구를 복사했어요'); } catch (e) {} }
+}
+function startWorldcup(size, theme) {
+  wcSize = size; wcTheme = theme || null;
+  // menuDB에서 랜덤 size개 선정 (주제가 있으면 그 태그 메뉴만)
+  const pool = theme ? menuDB.filter(m => (m.tags || []).includes(theme.t)) : [...menuDB];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -8751,6 +8876,7 @@ function renderWorldcup() {
         <div class="ob-big" style="width:60px;height:60px;border-radius:18px;margin-bottom:10px">${ic('trophy')}</div>
         <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">나만의 음식 월드컵</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">무작위로 뽑힌 메뉴 중에서<br>제일 좋은 하나를 골라요</div>
+        <button class="wc-theme" onclick="startThemeWorldcup()">${ic('star')}<span><b>이번 주 주제 · ${weekTheme().name}</b><small>${weekTheme().size}강 · 매주 월요일에 바뀌어요</small></span><span aria-hidden="true">›</span></button>
         <div style="display:flex;gap:8px;justify-content:center">
           <button onclick="startWorldcup(16)" style="flex:1;max-width:80px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 6px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">16강</button>
           <button onclick="startWorldcup(32)" style="flex:1;max-width:80px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 6px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">32강</button>
@@ -8763,10 +8889,11 @@ function renderWorldcup() {
     const winner = wcHistory[wcHistory.length-1].winners[0];
     el.innerHTML = `
       <div style="background:linear-gradient(135deg,rgba(6,214,160,0.1),rgba(255,71,87,0.08));border:2px solid var(--green);border-radius:20px;padding:24px;text-align:center">
-        <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">🏆 나의 최애 메뉴!</div>
+        <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">${wcTheme ? escHtml(wcTheme.name) + ' 우승' : '나의 최애 메뉴'}</div>
         ${wcFoodVisual(winner, 110, 200)}
         <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:14px">${winner.name}</div>
         ${goEatBtn(winner.name, winner.emoji, 'green')}
+        <button onclick="shareWorldcup('${winner.name.replace(/'/g, "\\'")}')" class="wc-share">${ic('send')}친구한테 결과 보내기</button>
         <button onclick="resetWorldcup()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px 24px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:8px">다시 하기</button>
       </div>`;
     return;
@@ -9500,6 +9627,22 @@ function saveCommLocal() {
 }
 const SUPABASE_KEY = 'sb_publishable_fHCAe5O2yY_EPtZhdGPyJg_cHPkjgiB';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// 홈 '먹자골목' 입구에 지금 골목에 있는 사람 수 (나는 세지 않고 보기만 함)
+let homeLobby = null;
+function watchStreetCount(on) {
+  try {
+    if (!on) { if (homeLobby) { sb.removeChannel(homeLobby); homeLobby = null; } return; }
+    if (homeLobby) return;
+    homeLobby = sb.channel('omechu-street-v1', { config: { presence: { key: 'watch_' + Math.random().toString(36).slice(2, 8) } } });
+    homeLobby.on('presence', { event: 'sync' }, () => {
+      const n = Object.keys(homeLobby.presenceState()).length, el = document.getElementById('pc-entry-home'); if (!el) return;
+      const h = new Date().getHours(), late = h >= 20 || h < 2;
+      el.textContent = n ? `지금 ${n}명이 골목에 있어요${late ? ' · 야식 투표 하기 좋은 시간' : ' · 들어가서 같이 골라요'}` : (late ? '야식 시간이에요 · 들어가서 같이 골라요' : '포차·한식·일식·중식·양식, 들어가서 같이 골라요');
+    });
+    homeLobby.subscribe(() => {});
+  } catch (e) {}
+}
+setTimeout(() => watchStreetCount(true), 1500);
 
 // 유저 식별키 (로그인 없이 기기 단위)
 function getUserKey() {
@@ -9884,11 +10027,12 @@ function renderCommFeed(tab) {
   if (displayed.length === 0) {
     feed.innerHTML = commFilterTag
       ? `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">${commFilterTag} 후기가 아직 없어요<br>처음으로 올려 보세요</div>`
-      : `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px">${emptyChar('mandu','wow')}아직 글이 없어요<br>처음으로 올려 보세요</div>`;
+      : `<div style="text-align:center;padding:36px 20px 10px;color:var(--muted);font-size:13px">${emptyChar('mandu','wow')}아직 글이 없어요<br>첫 글을 올려 보세요</div>${commStarter()}`;
     return;
   }
 
-  feed.innerHTML = displayed.map(p => {
+  const starterTop = !commFilterTag && displayed.length < 4 ? commStarter() : '';
+  feed.innerHTML = starterTop + displayed.map(p => {
     const type = TYPE_INFO[p.type] || TYPE_INFO.menu;
     const liked = likedPosts.has(p.id);
     const likeCount = (p.likes || 0) + (liked && !p._liked ? 1 : 0);
@@ -10126,6 +10270,12 @@ const MENUTAG_LABEL_BY_TYPE = {
   pick: '후보 메뉴 태그 (선택)',
 };
 
+// 글이 적을 때 맨 위에 보여 주는 '이렇게 시작해 보세요'
+function commStarter() {
+  return `<div class="comm-starter"><button onclick="openCommWriteAs('pick')">${ic('ballot')}<b>뭐 먹을지 투표 올리기</b><small>선택지 2~4개, 1시간 동안</small></button>
+    <button onclick="openCommWriteAs('menu')">${ic('tray')}<b>오늘 먹은 거 인증</b><small>사진 한 장이면 돼요</small></button></div>`;
+}
+function openCommWriteAs(type) { openCommWrite(); const b = document.querySelector(`.comm-type-btn[data-type="${type}"]`); if (b) selectCommType(b); }
 function openCommWrite() {
   document.getElementById('comm-write-modal').classList.add('open');
   document.getElementById('comm-write-text').value = '';
