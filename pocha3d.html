@@ -13,6 +13,10 @@
   .top > * { pointer-events:auto; }
   .back { color:#fff; text-decoration:none; font-size:26px; line-height:1; padding:4px 6px 6px 0; }
   .title { font-weight:800; font-size:16px; white-space:nowrap; }
+  .hot3 { position:fixed; left:10px; top:calc(104px + env(safe-area-inset-top)); z-index:5; max-width:220px; padding:8px 10px; border-radius:12px; background:rgba(20,16,12,0.72); color:#fff; font-size:12px; line-height:1.5; pointer-events:auto; cursor:pointer; backdrop-filter:blur(4px); }
+  .hot3 b { display:block; font-size:12px; color:#ffd36b; margin-bottom:2px; }
+  .hot3 span { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hot3.min span { display:none; }
   .count { font-size:12px; background:#00000070; border:1px solid #ffffff2e; border-radius:999px; padding:4px 9px; white-space:nowrap; }
   .btn { background:#241d36; color:#fff; border:1px solid #4a4063; border-radius:12px; padding:9px 11px; font-size:13px; font-weight:700; white-space:nowrap; }
   .btn.on { background:#2b3f73; border-color:#7f9be0; }
@@ -83,6 +87,7 @@
   <span class="title" id="title">오메추 포차</span><span class="count" id="count">연결 중…</span>
   <button class="btn sp ico" id="dressbtn" aria-label="캐릭터 꾸미기">👕</button><button class="btn ico" id="setbtn" aria-label="설정">⚙️</button><button class="btn" id="snd" aria-label="빗소리 켜기">🔈</button>
 </div>
+<div class="hot3" id="hot3" hidden></div>
 <div id="bubbles"></div>
 <div class="toast" id="toast"></div>
 <div class="panel" id="panel"></div>
@@ -699,6 +704,23 @@ setTimeout(() => {
   const pick = TH.menu[Math.floor(Math.random() * TH.menu.length)].replace(/\s+[\d,]+$/, '').trim();
   bubble(owners[0], `한산하네요~ 오늘은 ${pick} 어때요?`, '', 5200);
 }, 9000);
+// ── 이 가게 인기 메뉴 TOP 3 (최근 2주, 이용자들이 정한 메뉴·월드컵 우승 기준). 데이터가 없으면 안 보임 ──
+function myOwnerArgs() { try { const k = localStorage.getItem('wmjUserKey'), s = localStorage.getItem('wmjOwnerSecret'); return k && s ? { p_user_key: k, p_secret: s } : null; } catch (e) { return null; } }
+function logPick(menu, kind) { const o = myOwnerArgs(); if (!sb || !o || !menu) return; sb.rpc('log_pick', { p_menu: String(menu).slice(0, 40), p_kind: kind, p_room: RID, ...o }).then(() => {}, () => {}); }
+async function loadHot3() {
+  const el = document.getElementById('hot3'); if (!el || !sb || RID === 'street' || !window.MENU_LITE || !TH.tags) return;
+  const tagIdx = TH.tags.map(t => (window.MENU_TAGS || []).indexOf(t)).filter(i => i >= 0);
+  const names = window.MENU_LITE.filter(m => (m[2] || []).some(i => tagIdx.includes(i))).map(m => m[0]).slice(0, 200);
+  if (!names.length) return;
+  try {
+    const { data, error } = await sb.rpc('popular_menus', { p_menus: names, p_days: 14, p_limit: 3 });
+    if (error || !data || !data.length) return;
+    const medal = ['1', '2', '3'];
+    el.innerHTML = `<b>이 가게 인기 TOP ${data.length}</b>${data.map((r, i) => `<span>${medal[i]}. ${String(r.menu).replace(/[<>&]/g, '')}</span>`).join('')}`;
+    el.hidden = false; el.onclick = () => el.classList.toggle('min');
+  } catch (e) {}
+}
+setTimeout(loadHot3, 1200);
 // 30초마다 위치 다시 알리기 (한 번만 시작)
 setInterval(() => { track(); if (lobbyTrackFn) lobbyTrackFn(); }, 30000);
 // 끊긴 연결 되살리기: 3초 안에 저절로 안 붙으면 채널을 새로 만들어 다시 들어감 (앉은 자리·테이블 대화방도 다시 연결)
@@ -760,7 +782,7 @@ function onGame(ev, m) {
     const won = gameChoices()[m.win];
     if (game.kind === 'vote') { game.done = true; game.winner = won; game.votes = Object.values(game.picks).filter(c => c === m.win).length; }
     else { game.next.push(won); game.k++; game.picks = {}; gameSel = null; if (game.k * 2 >= game.alive.length) { game.alive = game.next; game.next = []; game.k = 0; } if (game.alive.length === 1) { game.done = true; game.winner = game.alive[0]; } }
-    if (game.done) { clearTimeout(gameTimer); clearTimeout(gameWatch); log.push({ sys: true, text: `🍽️ 우리 테이블의 선택은 '${game.winner}'!` }); ui(true); }
+    if (game.done) { if (game.host === SID) logPick(game.winner, 'pocha'); clearTimeout(gameTimer); clearTimeout(gameWatch); log.push({ sys: true, text: `🍽️ 우리 테이블의 선택은 '${game.winner}'!` }); ui(true); }
     else armGame();
     renderGame();
   }

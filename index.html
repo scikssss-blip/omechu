@@ -5296,6 +5296,7 @@ function decideMenu(name, emoji, btn) {
     const m = menuDB.find(x => x.name === name) || {};
     log.push({ name, emoji, d: k, ts: Date.now(), how: (typeof selectedCat !== 'undefined' && selectedCat) || '', tags: (m.tags || []).slice(0, 12) });
     try { localStorage.setItem('wmjAte', JSON.stringify(log.slice(-400))); } catch (e) {}
+    try { ownerRpc('log_pick', { p_menu: name, p_kind: 'decide', p_room: '' }).catch(() => {}); } catch (e) {}
   }
   if (btn) { btn.classList.add('on'); btn.innerHTML = ic('check') + '오늘 메뉴'; }
   showToast(`오늘은 ${name}로 정했어요 · 내정보에 기록돼요`);
@@ -8887,6 +8888,7 @@ function renderWorldcup() {
 
   if (wcState === 'result') {
     const winner = wcHistory[wcHistory.length-1].winners[0];
+    if (window.__wcLogged !== wcHistory) { window.__wcLogged = wcHistory; try { ownerRpc('log_pick', { p_menu: winner.name, p_kind: 'wc', p_room: '' }).catch(() => {}); } catch (e) {} }
     el.innerHTML = `
       <div style="background:linear-gradient(135deg,rgba(6,214,160,0.1),rgba(255,71,87,0.08));border:2px solid var(--green);border-radius:20px;padding:24px;text-align:center">
         <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">${wcTheme ? escHtml(wcTheme.name) + ' 우승' : '나의 최애 메뉴'}</div>
