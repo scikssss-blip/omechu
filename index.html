@@ -5381,12 +5381,13 @@ window.addEventListener('online', () => { paintNet(); showToast('다시 연결�
 window.addEventListener('offline', paintNet);
 paintNet();
 // ── 점심·저녁 '오늘 뭐 먹지' 알림 (서버 쪽 준비가 끝나야 실제로 옴: supabase/08_push.sql + daily-push) ──
+const PUSH_READY = false;   // 서버 준비(SQL 08 + daily-push + 예약)가 끝나면 true로 바꿈 → 설정에 알림 줄이 보임
 const PUSH_VAPID = 'BF2eFGY_wl0JH8nReY4VyvQ5cEcntkOO4oi9n1n8lxMGezYBHkhUjfWqf4mFbkSbvnUjAkc0Lo-wOk94tQlNex4';
 const b64u = (s) => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); };
 async function pushReg() { return 'serviceWorker' in navigator ? navigator.serviceWorker.ready : null; }
 async function paintPush() {
   const row = document.getElementById('push-row'), st = document.getElementById('push-state'); if (!row) return;
-  if (!PUSH_VAPID || !('PushManager' in window) || !('Notification' in window)) return;
+  if (!PUSH_READY || !PUSH_VAPID || !('PushManager' in window) || !('Notification' in window)) return;
   row.style.display = '';
   try { const reg = await pushReg(); const sub = reg && await reg.pushManager.getSubscription(); st.textContent = sub ? '켬' : '끔'; st.style.color = sub ? 'var(--green)' : ''; } catch (e) {}
 }
