@@ -2504,6 +2504,9 @@
     <div class="my-setting-row" onclick="toggleLocationSetting()">
       <span class="row-l"><i class="ic" data-ic="pin"></i>현재 위치 사용</span><span style="font-size:11px;color:var(--orange)" id="location-label">허용 전</span>
     </div>
+    <div class="my-setting-row" id="push-row" style="display:none" onclick="togglePush()">
+      <span class="row-l"><i class="ic" data-ic="bell"></i>점심·저녁 메뉴 알림 <small style="color:var(--muted);font-size:12px;margin-left:6px">11:30 · 17:30</small></span><span class="my-setting-arrow" id="push-state">끔</span>
+    </div>
     <div class="my-setting-row" id="pwa-setting-row" onclick="document.getElementById('pwa-install-btn').click()">
       <span class="row-l"><i class="ic" data-ic="send"></i>홈 화면에 앱 추가하기</span><span class="my-setting-arrow">›</span>
     </div>
@@ -5377,6 +5380,32 @@ function paintNet() {
 window.addEventListener('online', () => { paintNet(); showToast('다시 연결됐어요'); });
 window.addEventListener('offline', paintNet);
 paintNet();
+// ── 점심·저녁 '오늘 뭐 먹지' 알림 (서버 쪽 준비가 끝나야 실제로 옴: supabase/08_push.sql + daily-push) ──
+const PUSH_VAPID = 'BF2eFGY_wl0JH8nReY4VyvQ5cEcntkOO4oi9n1n8lxMGezYBHkhUjfWqf4mFbkSbvnUjAkc0Lo-wOk94tQlNex4';
+const b64u = (s) => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); };
+async function pushReg() { return 'serviceWorker' in navigator ? navigator.serviceWorker.ready : null; }
+async function paintPush() {
+  const row = document.getElementById('push-row'), st = document.getElementById('push-state'); if (!row) return;
+  if (!PUSH_VAPID || !('PushManager' in window) || !('Notification' in window)) return;
+  row.style.display = '';
+  try { const reg = await pushReg(); const sub = reg && await reg.pushManager.getSubscription(); st.textContent = sub ? '켬' : '끔'; st.style.color = sub ? 'var(--green)' : ''; } catch (e) {}
+}
+async function togglePush() {
+  try {
+    if (/iPhone|iPad|iPod/i.test(navigator.userAgent) && !(window.matchMedia('(display-mode: standalone)').matches || navigator.standalone)) { showToast('아이폰은 홈 화면에 추가한 앱에서 알림을 켤 수 있어요'); return; }
+    const reg = await pushReg(); if (!reg) return;
+    const cur = await reg.pushManager.getSubscription();
+    if (cur) { await ownerRpc('delete_push_sub', { p_endpoint: cur.endpoint }).catch(() => {}); await cur.unsubscribe(); showToast('메뉴 알림을 껐어요'); paintPush(); return; }
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') { showToast('알림이 허용되지 않았어요 · 휴대폰 설정에서 바꿀 수 있어요'); return; }
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(PUSH_VAPID) });
+    const j = sub.toJSON();
+    const ok = await ownerRpc('save_push_sub', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_slots: ['lunch', 'dinner'] }).catch(() => false);
+    if (!ok) { await sub.unsubscribe(); showToast('알림 기능은 아직 준비 중이에요'); paintPush(); return; }
+    showToast('점심 11시 반, 저녁 5시 반에 메뉴를 추천해 드릴게요'); paintPush();
+  } catch (e) { showToast('이 기기에서는 알림을 켤 수 없어요'); }
+}
+setTimeout(paintPush, 1200);
 // 우승 메뉴 → '어떻게 먹을까?' 창 (사 먹기 먼저)
 function goEatBtn(name, emoji, tone) {
   const js = String(name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
