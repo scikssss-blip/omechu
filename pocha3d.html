@@ -721,6 +721,9 @@ async function loadHot3() {
   } catch (e) {}
 }
 setTimeout(loadHot3, 1200);
+// 밤 8시~새벽 1시: '야식 시간' — 가게에 들어오면 한 번 알리고, 앉으면 투표 버튼이 '야식 투표'로 바뀜
+function lateNight() { const h = new Date().getHours(); return h >= 20 || h < 1; }
+setTimeout(() => { if (RID !== 'street' && lateNight()) toast('야식 시간이에요 · 자리에 앉아 같은 테이블 사람들과 야식 투표를 열어 보세요'); }, 2500);
 // 30초마다 위치 다시 알리기 (한 번만 시작)
 setInterval(() => { track(); if (lobbyTrackFn) lobbyTrackFn(); }, 30000);
 // 끊긴 연결 되살리기: 3초 안에 저절로 안 붙으면 채널을 새로 만들어 다시 들어감 (앉은 자리·테이블 대화방도 다시 연결)
@@ -758,7 +761,8 @@ function startGame(kind) {
   if (me.t === null || tables[me.t].solo) return;
   if (game && !game.done) { toast('지금 고르는 중이에요'); return; }
   if (Date.now() - lastGame < 4000) { toast('잠시 후에 다시 눌러 주세요'); return; } lastGame = Date.now();
-  const pool = menuDB.filter(m => TH.tags.some(t => m.tags.includes(t))).sort(() => Math.random() - 0.5), n = kind === 'wc' ? 8 : 3;
+  let pool = menuDB.filter(m => TH.tags.some(t => m.tags.includes(t))).sort(() => Math.random() - 0.5); const n = kind === 'wc' ? 8 : 3;
+  if (lateNight()) { const night = pool.filter(m => m.tags.includes('🌙 야식') || m.tags.includes('🍺 술안주')); if (night.length >= n) pool = night.concat(pool.filter(m => !night.includes(m))); }   // 야식 시간엔 야식 메뉴 먼저
   const opts = pool.filter(m => m.img).concat(pool.filter(m => !m.img)).slice(0, n).sort(() => Math.random() - 0.5).map(m => m.name);
   if (opts.length < n) { toast('이 가게는 메뉴가 부족해요'); return; }
   const payload = { id: SID + Date.now().toString(36), kind, opts, sid: SID };
@@ -880,7 +884,7 @@ function ui(logOnly) {
   const emo = (xs, st = '') => `<div class="emo" ${st}>${xs.map(e => `<button data-e="${e}" aria-label="감정 표현 ${e}">${e}</button>`).join('')}</div>`;
   if (mode === 'walk') P.innerHTML = `<div class="where">테이블을 누르면 바로 앉아요 <small>· 대화는 앉아야 할 수 있어요</small></div><div class="row"><button class="btn hot" id="q1">🪑 바로 앉기</button><button class="btn" id="qo">🚪 나가기</button><button class="btn" id="q2">${RID === 'pocha' ? '🍶' : '🍚'} ${TH.solo} 가기</button></div>${emo(EMOTES)}`;
   else if (mode === 'solo') P.innerHTML = `<div class="log" id="log">${logHTML}</div><div class="where">${RID === 'pocha' ? '🍶' : '🍚'} ${TH.solo} <small>· 대화 없이 빗소리와 가게 소리만 들려요</small></div><div class="row"><button class="btn" id="up">🚪 일어나기</button></div>`;
-  else P.innerHTML = `<div id="game"></div><div class="log" id="log">${logHTML}</div><div class="where"><span id="where2">${whereText()}</span></div><div class="row"><input class="in" id="msg" maxlength="60" placeholder="우리 테이블에만 보여요" autocomplete="off" enterkeyhint="send"><button class="btn hot" id="go">전송</button></div><div class="row" style="margin-top:8px"><button class="btn" id="gv">🗳️ 메뉴 투표</button><button class="btn" id="gw">🏆 음식 월드컵</button><button class="btn" id="up">🚪 일어나기</button></div>${emo(EMOTES.concat('🍻'))}`;
+  else P.innerHTML = `<div id="game"></div><div class="log" id="log">${logHTML}</div><div class="where"><span id="where2">${whereText()}</span></div><div class="row"><input class="in" id="msg" maxlength="60" placeholder="우리 테이블에만 보여요" autocomplete="off" enterkeyhint="send"><button class="btn hot" id="go">전송</button></div><div class="row" style="margin-top:8px"><button class="btn${lateNight() ? ' hot' : ''}" id="gv">${lateNight() ? '🌙 야식 투표' : '🗳️ 메뉴 투표'}</button><button class="btn" id="gw">🏆 음식 월드컵</button><button class="btn" id="up">🚪 일어나기</button></div>${emo(EMOTES.concat('🍻'))}`;
   const on = (id, f) => { const el = $(id); if (el) el.onclick = f; };
   on('qo', goOut); on('q1', () => quick(false)); on('q2', () => quick(true)); on('up', stand); on('go', say); on('gv', () => startGame('vote')); on('gw', () => startGame('wc')); renderGame();
   if ($('log')) $('log').onclick = (e) => { const sd = e.target && e.target.dataset && e.target.dataset.mute; if (!sd) return; if (muted.has(sd)) { muted.delete(sd); toast('다시 보이게 했어요'); } else { muted.add(sd); toast('이 손님의 말을 가렸어요 (이름을 다시 누르면 풀려요)'); } };

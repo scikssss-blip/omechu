@@ -2504,6 +2504,9 @@
     <div class="my-setting-row" onclick="toggleLocationSetting()">
       <span class="row-l"><i class="ic" data-ic="pin"></i>현재 위치 사용</span><span style="font-size:11px;color:var(--orange)" id="location-label">허용 전</span>
     </div>
+    <div class="my-setting-row" id="pwa-setting-row" onclick="document.getElementById('pwa-install-btn').click()">
+      <span class="row-l"><i class="ic" data-ic="send"></i>홈 화면에 앱 추가하기</span><span class="my-setting-arrow">›</span>
+    </div>
     <div class="my-setting-row" onclick="exportMyData()">
       <span class="row-l"><i class="ic" data-ic="send"></i>내 기록 파일로 저장 (폰 바꿀 때)</span><span class="my-setting-arrow">›</span>
     </div>
@@ -5301,6 +5304,7 @@ function decideMenu(name, emoji, btn) {
   if (btn) { btn.classList.add('on'); btn.innerHTML = ic('check') + '오늘 메뉴'; }
   showToast(`오늘은 ${name}로 정했어요 · 내정보에 기록돼요`);
   setTimeout(() => openMenuMore(name, emoji), 350);
+  if (typeof showPwaBanner === 'function' && ateLog().length >= 2) showPwaBanner(2500);
 }
 // ── 내 기록 옮기기 (로그인 없이 폰을 바꿀 때) ──
 const MYDATA_KEY = (k) => /^(wmj|wmm|liked|omechu)/i.test(k);
@@ -10610,21 +10614,27 @@ if ('serviceWorker' in navigator && (location.hostname === 'localhost' || locati
 // ── PWA: 홈화면 설치 배너 ──
 let deferredPrompt = null;
 
+// 설치 안내: 이미 앱으로 열었으면 안 보임 · 닫으면 14일 뒤 다시 · 두 번째 방문부터 · 아이폰도 안내
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function pwaCanAsk() {
+  if (isStandalone()) return false;
+  const d = +localStorage.getItem('pwaDismissed') || 0;
+  if (d === 1) { localStorage.setItem('pwaDismissed', String(Date.now())); return false; }   // 예전 '영구 닫기' 값은 오늘부터 14일로
+  return !d || Date.now() - d > 14 * 86400000;
+}
+function showPwaBanner(delay) { if (!pwaCanAsk()) return; setTimeout(() => { if (pwaCanAsk()) document.getElementById('pwa-banner').classList.add('show'); }, delay || 0); }
+try { if (isStandalone()) { const r = document.getElementById('pwa-setting-row'); if (r) r.style.display = 'none'; } } catch (e) {}
+(function countVisit() { try { const n = (+localStorage.getItem('wmjVisits') || 0) + 1; localStorage.setItem('wmjVisits', String(n)); if (n >= 2 && /iPhone|iPad|iPod/i.test(navigator.userAgent)) showPwaBanner(6000); } catch (e) {} })();
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  // 이미 설치했거나 dismiss 했으면 표시 안 함
-  if (!localStorage.getItem('pwaDismissed')) {
-    setTimeout(() => {
-      document.getElementById('pwa-banner').classList.add('show');
-    }, 3000);
-  }
+  if ((+localStorage.getItem('wmjVisits') || 0) >= 2) showPwaBanner(4000);
 });
 
 document.getElementById('pwa-install-btn').addEventListener('click', async () => {
   if (!deferredPrompt) {
     // iOS 안내
-    showToast('Safari → 공유 → "홈 화면에 추가"를 눌러 주세요 📱');
+    showToast('Safari 아래 공유 버튼 → "홈 화면에 추가"를 눌러 주세요');
     dismissPWA();
     return;
   }
@@ -10639,7 +10649,7 @@ document.getElementById('pwa-install-btn').addEventListener('click', async () =>
 
 function dismissPWA() {
   document.getElementById('pwa-banner').classList.remove('show');
-  localStorage.setItem('pwaDismissed', '1');
+  localStorage.setItem('pwaDismissed', String(Date.now()));
 }
 
 window.addEventListener('appinstalled', () => {
@@ -10863,12 +10873,6 @@ window.addEventListener('appinstalled', () => {
   else init();
 })();
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-if (isIOS && !isStandalone && !localStorage.getItem('pwaDismissed')) {
-  setTimeout(() => {
-    document.getElementById('pwa-banner').classList.add('show');
-  }, 3000);
-}
 
 // 저장된 프리셋 초기 렌더
 renderMyPresets();
