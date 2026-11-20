@@ -10675,7 +10675,7 @@ if ('serviceWorker' in navigator) {
 if ('serviceWorker' in navigator && (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:')) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW registered:', reg.scope))
+      .then(reg => { reg.update().catch(() => {}); })   // 열 때마다 새 버전이 있는지 바로 확인
       .catch(err => console.log('SW error:', err));
   });
 }
