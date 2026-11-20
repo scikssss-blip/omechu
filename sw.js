@@ -1,5 +1,5 @@
 // 오메추 서비스 워커 — 앱 화면만 캐시하고, Supabase 등 외부 요청은 건드리지 않음
-const CACHE = 'omechu-v25';
+const CACHE = 'omechu-v26';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png', '/pocha.js', '/pocha-chars.js', '/pocha.css', '/tap-sound.js', '/menu-lite.js'];
 
 self.addEventListener('install', e => {
@@ -39,7 +39,7 @@ self.addEventListener('push', e => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (err) { d = { title: '오메추', body: e.data && e.data.text() }; }
   e.waitUntil(self.registration.showNotification(d.title || '오늘 뭐 먹지?', {
-    body: d.body || '눌러서 메뉴 3개 골라 받기', icon: '/icon-192.png', badge: '/icon-192.png', tag: 'omechu-daily', data: { url: d.url || '/' },
+    body: d.body || '눌러서 메뉴 3개 골라 받기', icon: '/icon-192.png', badge: '/badge-96.png', tag: 'omechu-daily', data: { url: d.url || '/' },
   }));
 });
 self.addEventListener('notificationclick', e => {
