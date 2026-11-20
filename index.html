@@ -395,6 +395,11 @@
   .cat-card.active .cat-icon { color:var(--orange); }
   .ob-chars { display:flex; justify-content:center; align-items:flex-end; gap:4px; height:76px; margin-bottom:16px; }
   .ob-chars img { width:58px; height:58px; object-fit:contain; }
+  .ob-list { display:flex; flex-direction:column; gap:8px; text-align:left; }
+  .ob-row { display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; background:var(--surface); border:1px solid var(--border); border-radius:12px; color:var(--text); cursor:pointer; font-family:'Noto Sans KR',sans-serif; text-align:left; }
+  .ob-row .ic { width:22px; height:22px; color:var(--orange); flex:none; }
+  .ob-row b { display:block; font-size:14px; }
+  .ob-row small { display:block; font-size:12px; color:var(--muted); margin-top:2px; line-height:1.4; }
   .ob-chars img:nth-child(2) { width:74px; height:74px; }
   .ob-big { width:76px; height:76px; margin:0 auto 16px; border-radius:24px; background:rgba(255,71,87,0.12); color:var(--orange); display:flex; align-items:center; justify-content:center; }
   .ob-big .ic { width:38px; height:38px; margin:0; }
@@ -708,7 +713,14 @@
   .result-row { display:flex; align-items:center; gap:10px; }
   .result-emoji { font-size:32px; flex-shrink:0; }
   .result-name { font-family:'Jua',sans-serif; font-size:17px; line-height:1.15; text-align:center; word-break:keep-all; }
-  .result-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:10px; }
+  .result-actions { display:flex; flex-direction:column; gap:6px; margin-top:10px; }
+  .result-actions .decide-btn { min-height:44px; font-size:13px; }
+  .result-actions .more-btn { min-height:40px; font-size:12px; color:var(--text); font-weight:700; }
+  .result-mini { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+  .result-mini .result-btn { flex-direction:column; min-height:42px; padding:4px 2px; gap:1px; font-size:10.5px; background:transparent; }
+  .result-mini .result-btn .ic { margin-right:0; }
+  .result-mini .result-btn.like-btn { border-color:var(--border) !important; color:var(--muted); }
+  .result-mini .result-btn.like-btn.active { border-color:var(--red) !important; color:var(--red); background:rgba(255,71,87,0.1); }
   .similar-toggle-btn { width:100%; margin-top:10px; padding:8px; background:none; border:1px dashed var(--border); border-radius:12px; color:var(--muted); font-size:11px; cursor:pointer; transition:all 0.15s; }
   .similar-toggle-btn:hover { border-color:var(--orange); color:var(--orange); }
   .similar-wrap { display:none; flex-wrap:wrap; gap:6px; margin-top:8px; }
@@ -1029,6 +1041,7 @@
     padding:10px 0; gap:8px; align-items:center;
   }
   .fixed-cta-bar.show { display:flex; animation:slideUp 0.3s ease; }
+  .fixed-cta-bar.show.over-result { display:none; }
   .fixed-cta-bar .cta-btn { border-radius:var(--radius); box-shadow:0 4px 20px rgba(0,0,0,0.4); }
 
     .bottom-nav {
@@ -1067,7 +1080,7 @@
   }
   .nav-item.active .nav-dot { opacity:1; }
 
-  .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--green); color:#0a2e24; font-size:13px; font-weight:700; padding:10px 20px; border-radius:10px; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; z-index:200; }
+  .toast { position:fixed; bottom:calc(150px + env(safe-area-inset-bottom)); max-width:calc(100% - 48px); box-sizing:border-box; text-align:center; word-break:keep-all; line-height:1.45; left:50%; transform:translateX(-50%) translateY(20px); background:var(--green); color:#0a2e24; font-size:13px; font-weight:700; padding:10px 20px; border-radius:10px; opacity:0; transition:all 0.3s; pointer-events:none; white-space:normal; width:max-content; z-index:200; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   .divider { border:none; border-top:1px solid var(--border); margin:28px 0 0; }
 
@@ -2248,10 +2261,15 @@
   <div style="width:100%;max-width:380px;margin:0 20px;position:relative;background:var(--card);border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
     <div id="onboarding-track" style="padding:36px 28px 26px;text-align:center">
       <div class="ob-chars" id="ob-chars"></div>
-      <div style="font-family:'Jua',sans-serif;font-size:24px;color:var(--text);margin-bottom:10px;line-height:1.3">오늘 <em style="color:var(--orange);font-style:normal">뭐 먹지?</em></div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.8">직접 요리·배달·외식 중 하나를 고르면<br><strong style="color:var(--text)">메뉴 3개</strong>를 골라 드려요</div>
-      <button onclick="closeOnboarding()" style="width:100%;margin-top:26px;padding:16px;background:var(--orange);border:none;border-radius:14px;color:white;font-size:17px;font-weight:700;cursor:pointer;font-family:'Jua',sans-serif">지금 추천받기</button>
-      <div style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6">커뮤니티·놀거리·먹자골목은 아래 탭에서 둘러볼 수 있어요</div>
+      <div style="font-family:'Jua',sans-serif;font-size:24px;color:var(--text);margin-bottom:6px;line-height:1.3">오늘 <em style="color:var(--orange);font-style:normal">뭐 먹지?</em></div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px">오메추리 마을에서 같이 골라요</div>
+      <div class="ob-list">
+        <button class="ob-row" onclick="closeOnboarding()"><i class="ic" data-ic="utensils"></i><span><b>메뉴 3개 추천</b><small>요리·배달·외식 중 고르면 바로 골라 드려요</small></span></button>
+        <button class="ob-row" onclick="closeOnboarding();showPage('pocha')"><i class="ic" data-ic="map"></i><span><b>먹자골목</b><small>포차·한식집에 들어가 사람들과 같이 골라요</small></span></button>
+        <button class="ob-row" onclick="closeOnboarding();showTab('fun')"><i class="ic" data-ic="trophy"></i><span><b>음식 월드컵</b><small>둘 중 하나씩 고르다 보면 오늘 메뉴가 나와요</small></span></button>
+      </div>
+      <button onclick="closeOnboarding()" style="width:100%;margin-top:20px;padding:16px;background:var(--orange);border:none;border-radius:14px;color:white;font-size:17px;font-weight:700;cursor:pointer;font-family:'Jua',sans-serif">지금 추천받기</button>
+      <button onclick="closeOnboarding(true)" style="margin-top:12px;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;padding:6px 10px">다시 보지 않기</button>
     </div>
   </div>
 </div>
@@ -5549,17 +5567,13 @@ function renderResults(rejectPattern, flipIndex) {
         <div class="result-right">
           ${why}${kcalHtml}${review}
           <div class="result-actions">
-            <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${ic('heart')}좋아요</button>
-            <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">${ic('ban')}안 땡겨</button>
-            ${selectedCat === 'cook'
-              ? `<button class="result-btn" onclick="openRecipe('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--orange)">${ic('doc')}레시피</button>`
-              : selectedCat === 'delivery'
-              ? `<button class="result-btn" onclick="openBaemin('${item.name.replace(/'/g,"\\'")}')" style="color:#2ac1bc">${ic('scooter')}배민에서 주문</button>`
-              : `<button class="result-btn" onclick="openNearbyMap('${item.name.replace(/'/g,"\\'")}')" style="color:var(--orange)">${ic('pin')}근처 찾기</button>`}
-            <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--text)">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? ic('chat') + `후기 ${rc}개` : ic('pencil') + '첫 후기 남기기'; })()}</button>
-          
             <button class="result-btn decide-btn${ateToday(item.name) ? ' on' : ''}" onclick="decideMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}',this)">${ic('check')}${ateToday(item.name) ? '오늘 메뉴' : '이걸로 정했어'}</button>
-            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')" style="color:var(--muted);font-weight:700">어떻게 먹을까? ›</button>
+            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${selectedCat === 'cook' ? '레시피·재료 보기' : selectedCat === 'delivery' ? '배민·먹는 방법' : '근처 맛집·더보기'} ›</button>
+            <div class="result-mini">
+              <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${ic('heart')}좋아요</button>
+              <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">${ic('ban')}안 땡겨</button>
+              <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? ic('chat') + `후기 ${rc}` : ic('pencil') + '후기'; })()}</button>
+            </div>
           </div>
           <div id="similar-btn-wrap-${i}">
             <button class="similar-toggle-btn" onclick="toggleSimilar('${item.name.replace(/'/g,"\\'")}',${i})">비슷한 메뉴 보기</button>
@@ -10989,9 +11003,13 @@ function showOnboarding() {
   updateOnboardingSlide();
 }
 
-function closeOnboarding() {
+// 안내는 처음 3번까지 보여주고, '다시 보지 않기'를 누르면 그때부터 안 보임
+function closeOnboarding(never) {
   document.getElementById('onboarding-backdrop').style.display = 'none';
-  localStorage.setItem('wmjOnboarded', '1');
+  try {
+    if (never) localStorage.setItem('wmjOnboarded', '1');
+    else localStorage.setItem('wmjObSeen', String((+localStorage.getItem('wmjObSeen') || 0) + 1));
+  } catch (e) {}
 }
 
 function onboardingNext() {
@@ -11021,7 +11039,7 @@ function updateOnboardingSlide() {
 }
 
 // 첫 실행 시 온보딩 표시
-if (!localStorage.getItem('wmjOnboarded')) {
+if (!localStorage.getItem('wmjOnboarded') && (+localStorage.getItem('wmjObSeen') || 0) < 3 && !location.hash) {
   setTimeout(showOnboarding, 500);
 }
 </script>
@@ -11096,5 +11114,16 @@ img.twemoji {
 <script src="tap-sound.js"></script>
 <script src="pocha-chars.js"></script>
 <script src="pocha.js"></script>
+<script>
+// 추천 결과가 화면에 보이면 하단 고정 버튼을 숨김(결과 카드를 가리지 않게). 위로 올려 조건을 볼 땐 다시 보임
+(function () {
+  const ra = document.getElementById('result-area'), bar = document.getElementById('fixed-cta-bar');
+  if (!ra || !bar) return;
+  const sync = () => bar.classList.toggle('over-result', ra.children.length > 0 && ra.getBoundingClientRect().top < window.innerHeight - 150);
+  window.addEventListener('scroll', sync, { passive: true });
+  window.addEventListener('resize', sync);
+  new MutationObserver(() => setTimeout(sync, 60)).observe(ra, { childList: true });
+})();
+</script>
 </body>
 </html>
