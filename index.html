@@ -59,7 +59,7 @@
   }
   .logo { font-family:'Jua',sans-serif; font-size:26px; color:var(--orange); letter-spacing:0px; }
   .logo span { color:var(--text); }
-  .header-badge { background:var(--orange); color:white; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; }
+  .header-badge { background:var(--orange); color:white; font-size:11px; font-weight:700; padding:4px 10px; border-radius:8px; }
 
   main { max-width:480px; margin:0 auto; padding:0 16px 200px; }
 
@@ -103,7 +103,7 @@
     text-transform:uppercase; letter-spacing:0; margin:24px 0 12px;
     display:flex; align-items:center; gap:8px;
   }
-  .sec-badge { font-size:12px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2px 8px; text-transform:none; letter-spacing:0; color:var(--muted); }
+  .sec-badge { font-size:12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:2px 8px; text-transform:none; letter-spacing:0; color:var(--muted); }
 
   .cat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
   .cat-card {
@@ -147,7 +147,7 @@
   .accordion-add-btn { font-size:11px; color:var(--orange); font-weight:700; display:flex; align-items:center; gap:4px; }
   .accordion-arrow { transition:transform 0.2s; font-size:11px; color:var(--muted); }
   .accordion-header.open .accordion-arrow { transform:rotate(180deg); }
-  .accordion-selected-count { background:var(--orange); color:white; border-radius:20px; padding:1px 7px; font-size:11px; font-weight:700; display:none; }
+  .accordion-selected-count { background:var(--orange); color:white; border-radius:8px; padding:1px 7px; font-size:11px; font-weight:700; display:none; }
   .accordion-selected-count.show { display:inline-block; }
   .accordion-body { display:none; padding:14px 16px; background:rgba(255,71,87,0.04); border:1.5px solid var(--orange); border-top:none; border-radius:0 0 14px 14px; margin-bottom:12px; }
   .accordion-body.open { display:block; animation:fadeIn 0.2s ease; }
@@ -165,11 +165,11 @@
   .preset-btn:hover { border-color:var(--yellow); color:var(--yellow); }
   .preset-btn.active { background:var(--yellow); border-color:var(--yellow); color:#1a1400; }
 
-  .count-badge { display:inline-block; background:rgba(255,255,255,0.25); border-radius:20px; padding:1px 8px; font-size:13px; font-weight:700; margin-left:4px; }
+  .count-badge { display:inline-block; background:rgba(255,255,255,0.25); border-radius:8px; padding:1px 8px; font-size:13px; font-weight:700; margin-left:4px; }
   .tag-wrap { display:flex; flex-wrap:wrap; gap:8px; }
 
   .tag {
-    padding:8px 14px; border-radius:20px; font-size:12px; font-weight:600;
+    padding:8px 14px; border-radius:8px; font-size:12px; font-weight:600;
     cursor:pointer; transition:all 0.15s; user-select:none;
     border:1.5px solid var(--border); background:var(--surface); color:var(--muted);
   }
@@ -184,7 +184,7 @@
   .summary-bar.show { display:block; }
   .sum-title { font-size:11px; color:var(--muted); margin-bottom:6px; }
   .summary-chips { display:flex; flex-wrap:wrap; gap:6px; }
-  .sum-chip { font-size:11px; padding:4px 10px; border-radius:20px; background:rgba(255,71,87,0.15); color:var(--orange); border:1px solid rgba(255,71,87,0.3); transition:all 0.15s; }
+  .sum-chip { font-size:11px; padding:4px 10px; border-radius:8px; background:rgba(255,71,87,0.15); color:var(--orange); border:1px solid rgba(255,71,87,0.3); transition:all 0.15s; }
   .sum-chip:hover { background:rgba(255,71,87,0.3); }
   .sum-chip.hate-chip { background:rgba(255,71,87,0.15); color:var(--red); border-color:rgba(255,71,87,0.3); }
 
@@ -249,7 +249,7 @@
   /* 즐겨찾기 칩 = 태그와 동일 디자인 */
   .fav-chip {
     display:inline-flex; align-items:center;
-    padding:7px 13px; border-radius:20px; font-size:12px; font-weight:500;
+    padding:7px 13px; border-radius:8px; font-size:12px; font-weight:500;
     cursor:pointer; transition:all 0.15s; user-select:none;
     border:1.5px solid var(--border); background:var(--surface); color:var(--muted);
   }
@@ -308,7 +308,7 @@
   }
   .coupang-banner:hover { border-color:#e62e14; transform:translateY(-2px); box-shadow:0 6px 20px rgba(230,46,20,0.2); }
   .coupang-logo { display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
-  .coupang-rocket { font-size:11px; font-weight:700; color:#e62e14; background:rgba(230,46,20,0.1); padding:3px 8px; border-radius:20px; white-space:nowrap; border:1px solid rgba(230,46,20,0.2); }
+  .coupang-rocket { font-size:11px; font-weight:700; color:#e62e14; background:rgba(230,46,20,0.1); padding:3px 8px; border-radius:8px; white-space:nowrap; border:1px solid rgba(230,46,20,0.2); }
   .coupang-desc { flex:1; }
   .cart-pantry { display:flex; align-items:center; gap:4px; width:100%; padding:10px 12px; margin-bottom:12px; border-radius:12px; border:1px dashed var(--border); background:none; color:var(--muted); font-size:13px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
   .cart-pantry .ic { margin-right:4px; }
@@ -348,7 +348,7 @@
   }
   .my-profile-top { display:flex; align-items:center; gap:16px; }
   .my-profile-stats { display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,71,87,0.18); }
-  .my-pchip { display:inline-flex; align-items:center; gap:4px; background:var(--card); border:1px solid var(--border); border-radius:13px; padding:6px 10px; font-size:11px; color:var(--text); font-weight:600; }
+  .my-pchip { display:inline-flex; align-items:center; gap:4px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:11px; color:var(--text); font-weight:600; }
   .my-pchip b { color:var(--orange); font-family:'Jua',sans-serif; font-weight:400; font-size:14px; }
   .my-pchip.taste { justify-content:center; background:linear-gradient(135deg,rgba(255,209,102,0.15),rgba(255,71,87,0.08)); border-color:rgba(255,209,102,0.45); color:var(--yellow); font-weight:700; }
   .my-acc-header { cursor:pointer; user-select:none; }
@@ -360,7 +360,7 @@
   .my-profile-info { flex:1; }
   .my-nickname { font-family:'Jua',sans-serif; font-size:20px; }
   .my-join { font-size:11px; color:var(--muted); margin-top:3px; }
-  .my-edit-btn { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text); font-family:'Noto Sans KR',sans-serif; transition:all 0.2s; white-space:nowrap; }
+  .my-edit-btn { background:var(--card); border:1.5px solid var(--border); border-radius:8px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text); font-family:'Noto Sans KR',sans-serif; transition:all 0.2s; white-space:nowrap; }
   .my-edit-btn:hover { border-color:var(--orange); color:var(--orange); }
 
   .my-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
@@ -376,7 +376,7 @@
   .my-section-hint { font-size:11px; color:var(--muted); }
 
   .my-saved-empty { text-align:center; padding:24px; color:var(--muted); font-size:13px; line-height:1.8; }
-  .my-saved-chip { display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1.5px solid var(--border); border-radius:20px; padding:8px 14px; font-size:12px; margin:4px; cursor:pointer; transition:all 0.2s; font-weight:600; }
+  .my-saved-chip { display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:8px 14px; font-size:12px; margin:4px; cursor:pointer; transition:all 0.2s; font-weight:600; }
   .my-saved-chip:hover { border-color:var(--orange); color:var(--orange); background:rgba(255,71,87,0.05); transform:translateY(-1px); }
 
 
@@ -429,7 +429,7 @@
   .fr-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
   .fr-top b { font-size:18px; }
   .fr-chips { display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 14px; }
-  .fr-chip { padding:8px 12px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .fr-chip { padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
   .fr-chip.on { background:rgba(74,168,255,0.16); border-color:#4aa8ff; color:#4aa8ff; font-weight:700; }
   .fr-add { display:flex; gap:6px; margin-top:4px; }
   .fr-add input { flex:1; min-width:0; height:42px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); padding:0 12px; font-size:15px; font-family:'Noto Sans KR',sans-serif; }
@@ -459,11 +459,12 @@
   .wk-how span { flex:1; text-align:center; padding:8px 4px; border-radius:12px; background:var(--surface); font-size:12px; color:var(--muted); }
   .wk-how b { display:block; font-size:17px; color:var(--text); }
   .wk-list { display:flex; flex-wrap:wrap; gap:6px; }
-  .wk-list span { font-size:12px; padding:5px 10px; border-radius:20px; border:1px solid var(--border); color:var(--text); }
+  .wk-list span { font-size:12px; padding:5px 10px; border-radius:8px; border:1px solid var(--border); color:var(--text); }
   .net-bar { position:fixed; top:0; left:0; right:0; z-index:2000; padding:8px 12px calc(8px); padding-top:calc(8px + env(safe-area-inset-top)); background:#3a3a3a; color:#fff; font-size:13px; font-weight:700; text-align:center; }
   .my-setting-row { display:flex; align-items:center; justify-content:space-between; padding:15px 0; border-bottom:1px solid var(--border); font-size:14px; cursor:pointer; transition:color 0.15s; }
   .my-setting-row:last-child { border-bottom:none; padding-bottom:0; }
   .my-setting-row:hover { color:var(--orange); }
+  .row-val { font-size:12px; color:var(--muted); font-weight:600; }
   .my-setting-arrow { color:var(--muted); font-size:20px; transition:transform 0.15s; }
   .my-setting-row:hover .my-setting-arrow { transform:translateX(2px); color:var(--orange); }
   .comm-write-box {
@@ -475,7 +476,7 @@
   .comm-write-box:hover { border-color:var(--orange); transform:translateY(-1px); }
   .comm-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--orange),#cc1a2e); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
   .comm-write-placeholder { flex:1; font-size:13px; color:var(--muted); }
-  .comm-write-btn { background:var(--orange); color:white; border:none; border-radius:20px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.22); }
+  .comm-write-btn { background:var(--orange); color:white; border:none; border-radius:8px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.22); }
 
   .comm-tabs {
     display:flex; gap:6px; margin-bottom:16px;
@@ -483,7 +484,7 @@
   }
   .comm-tabs::-webkit-scrollbar { display:none; }
   .comm-tab {
-    flex-shrink:0; padding:8px 14px; border-radius:20px;
+    flex-shrink:0; padding:8px 14px; border-radius:8px;
     border:1.5px solid var(--border); background:var(--surface);
     color:var(--muted); font-size:12px; font-weight:700; cursor:pointer;
     font-family:'Noto Sans KR',sans-serif; transition:all 0.2s;
@@ -519,18 +520,18 @@
   .comm-user-info { flex:1; }
   .comm-username { font-size:14px; font-weight:700; color:var(--text); }
   .comm-time { font-size:11px; color:var(--muted); margin-top:2px; }
-  .comm-badge { font-size:11px; background:rgba(255,71,87,0.15); color:var(--orange); border:1px solid rgba(255,71,87,0.3); border-radius:20px; padding:3px 8px; font-weight:700; }
+  .comm-badge { font-size:11px; background:rgba(255,71,87,0.15); color:var(--orange); border:1px solid rgba(255,71,87,0.3); border-radius:8px; padding:3px 8px; font-weight:700; }
 
   .comm-text { font-size:14px; line-height:1.75; color:var(--text); margin-bottom:10px; }
   .comm-text.clamped { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
   .comm-more-btn { font-size:12px; color:var(--orange); background:none; border:none; cursor:pointer; padding:0; margin-bottom:10px; font-family:'Noto Sans KR',sans-serif; font-weight:700; }
-  .comm-menu-tag { display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:6px 14px; font-size:12px; color:var(--text); margin-bottom:12px; }
+  .comm-menu-tag { display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-size:12px; color:var(--text); margin-bottom:12px; }
 
   .comm-img { width:100%; border-radius:20px; background:var(--surface); aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; font-size:48px; margin-bottom:12px; overflow:hidden; }
   .comm-img img { width:100%; height:100%; object-fit:cover; border-radius:20px; }
 
   .comm-actions { display:flex; gap:6px; padding-top:12px; border-top:1px solid var(--border); }
-  .comm-action-btn { display:flex; align-items:center; gap:5px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:7px 12px; color:var(--muted); font-size:12px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all 0.15s; font-weight:600; }
+  .comm-action-btn { display:flex; align-items:center; gap:5px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:7px 12px; color:var(--muted); font-size:12px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all 0.15s; font-weight:600; }
   .comm-action-btn:hover { border-color:var(--orange); color:var(--orange); background:rgba(255,71,87,0.05); }
   .comm-action-btn.liked { color:#ff4d6d; border-color:#ff4d6d; background:rgba(255,71,87,0.08); }
   .comm-action-btn:last-child { margin-left:auto; }
@@ -692,7 +693,7 @@
   .result-card.hate-result { border-color:var(--red); }
   .result-card::before { content:''; position:absolute; top:-20px; right:-20px; width:100px; height:100px; background:radial-gradient(circle,rgba(255,71,87,0.08),transparent 70%); pointer-events:none; }
   .result-rank { position:absolute; top:10px; right:14px; font-family:'Jua',sans-serif; font-size:20px; color:rgba(255,71,87,0.1); }
-  .result-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(255,71,87,0.15); color:var(--orange); font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; margin-bottom:8px; border:1px solid rgba(255,71,87,0.3); }
+  .result-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(255,71,87,0.15); color:var(--orange); font-size:11px; font-weight:700; padding:3px 10px; border-radius:8px; margin-bottom:8px; border:1px solid rgba(255,71,87,0.3); }
   .result-badge.hate-badge { background:rgba(255,71,87,0.15); color:var(--red); border-color:rgba(255,71,87,0.3); }
   .result-main { display:flex; gap:12px; align-items:flex-start; }
   .result-left { width:150px; flex-shrink:0; display:flex; flex-direction:column; gap:8px; }
@@ -712,7 +713,7 @@
   .similar-toggle-btn:hover { border-color:var(--orange); color:var(--orange); }
   .similar-wrap { display:none; flex-wrap:wrap; gap:6px; margin-top:8px; }
   .similar-wrap.open { display:flex; }
-  .similar-chip { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:11px; color:var(--text); cursor:pointer; transition:all 0.15s; }
+  .similar-chip { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:5px 12px; font-size:11px; color:var(--text); cursor:pointer; transition:all 0.15s; }
   .similar-chip:hover { border-color:var(--orange); color:var(--orange); }
   .menu-more { position:fixed; inset:0; z-index:870; background:rgba(0,0,0,.55); display:none; align-items:flex-end; justify-content:center; }
   .menu-more.open { display:flex; animation:fadeIn .15s ease; }
@@ -737,14 +738,14 @@
   .rc-water .rc-a { color:var(--text); font-weight:600; }
   .rc-unit { font-size:12px; color:var(--muted); margin:6px 2px 0; }
   .rc-meta { display:flex; flex-wrap:wrap; gap:6px; margin:-4px 0 10px; }
-  .rc-meta span { display:inline-flex; align-items:center; gap:2px; font-size:12px; font-weight:700; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:5px 10px; }
+  .rc-meta span { display:inline-flex; align-items:center; gap:2px; font-size:12px; font-weight:700; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:5px 10px; }
   .rc-meta .ic { width:14px; height:14px; margin-right:3px; }
   .rc-cook { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:13px; margin-bottom:14px; border:none; border-radius:14px; background:var(--orange); color:#fff; font-size:15px; font-weight:800; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
   .rc-cook small { font-weight:500; opacity:0.85; font-size:12px; }
   .rc-cook .ic { margin:0; }
   .rc-h { display:flex; align-items:center; justify-content:space-between; gap:8px; }
   .rc-serv { display:flex; gap:4px; }
-  .rc-serv button { padding:5px 9px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--muted); font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .rc-serv button { padding:5px 9px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--muted); font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
   .rc-serv button.on { background:var(--orange); border-color:var(--orange); color:#fff; }
   .rc-sub { display:block; font-size:11.5px; font-weight:500; color:var(--muted); margin-top:1px; }
   .cook-mode { position:fixed; inset:0; z-index:950; background:var(--bg); display:none; flex-direction:column; padding:16px 18px calc(18px + env(safe-area-inset-bottom)); }
@@ -787,7 +788,7 @@
   .menu-peek-img img { width:100%; height:100%; object-fit:cover; display:block; }
   .menu-peek-name { font-family:'Jua',sans-serif; font-size:20px; color:var(--text); padding:14px 16px 6px; }
   .menu-peek-tags { display:flex; flex-wrap:wrap; gap:6px; padding:0 16px; }
-  .menu-peek-tags span { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:3px 9px; }
+  .menu-peek-tags span { font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:3px 9px; }
   .menu-peek-btns { display:flex; gap:8px; padding:14px 16px 16px; }
   .menu-peek-btns button { flex:1; padding:11px; border-radius:14px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
   .menu-peek-btns button.primary { background:var(--orange); border-color:var(--orange); color:#fff; }
@@ -1066,7 +1067,7 @@
   }
   .nav-item.active .nav-dot { opacity:1; }
 
-  .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--green); color:#0a2e24; font-size:13px; font-weight:700; padding:10px 20px; border-radius:30px; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; z-index:200; }
+  .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--green); color:#0a2e24; font-size:13px; font-weight:700; padding:10px 20px; border-radius:10px; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; z-index:200; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   .divider { border:none; border-top:1px solid var(--border); margin:28px 0 0; }
 
@@ -1959,7 +1960,7 @@
   <!-- 필터 활성 칩 -->
   <div id="comm-filter-chip" style="display:none;margin-bottom:8px;align-items:center;gap:8px">
     <span style="font-size:11px;color:var(--muted)">보는 중:</span>
-    <span id="comm-filter-chip-text" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,71,87,0.1);border:1.5px solid var(--orange);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--orange);font-weight:700">
+    <span id="comm-filter-chip-text" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,71,87,0.1);border:1.5px solid var(--orange);border-radius:8px;padding:3px 10px;font-size:11px;color:var(--orange);font-weight:700">
       <span id="comm-filter-menu-name"></span>
       <button onclick="clearCommFilter()" style="background:none;border:none;color:var(--orange);font-size:14px;cursor:pointer;padding:0;line-height:1">×</button>
     </span>
@@ -2086,7 +2087,7 @@
         style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:10px 14px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif"
         onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'"
         onkeydown="if(event.key==='Enter')submitComment()">
-      <button onclick="submitComment()" style="background:var(--orange);border:none;border-radius:20px;color:white;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;flex-shrink:0">등록</button>
+      <button onclick="submitComment()" style="background:var(--orange);border:none;border-radius:8px;color:white;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;flex-shrink:0">등록</button>
     </div>
   </div>
 </div>
@@ -2160,7 +2161,7 @@
     </div>
     <!-- 선택된 태그 칩 -->
     <div id="comm-tag-selected" style="display:none;margin-top:6px">
-      <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,71,87,0.1);border:1.5px solid var(--orange);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--orange)">
+      <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,71,87,0.1);border:1.5px solid var(--orange);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--orange)">
         <span id="comm-tag-selected-text"></span>
         <button onclick="clearMenuTag()" style="background:none;border:none;color:var(--orange);font-size:15px;cursor:pointer;padding:0;line-height:1">×</button>
       </span>
@@ -2263,23 +2264,23 @@
 </div></div>
 
 <nav class="nav-bar bottom-nav">
-  <button class="nav-item active" id="nav-home" onclick="showPage('home')">
+  <button class="nav-item active" id="nav-home" onclick="showTab('home')">
     <div class="nav-icon-wrap"><span class="nav-icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z"/><path d="M8 20h8"/><path d="M9 3.5c-.8 1 .8 2-.1 3.2M12.5 3.5c-.8 1 .8 2-.1 3.2M16 3.5c-.8 1 .8 2-.1 3.2"/></svg></span></div>
     <span>추천</span><div class="nav-dot"></div>
   </button>
-  <button class="nav-item" id="nav-community" onclick="showPage('community')">
+  <button class="nav-item" id="nav-community" onclick="showTab('community')">
     <div class="nav-icon-wrap"><span class="nav-icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4A1.5 1.5 0 0 1 4 14.5z"/><path d="M8.5 9.5h7M8.5 12.5h4"/></svg></span></div>
     <span>커뮤니티</span><div class="nav-dot"></div>
   </button>
-  <button class="nav-item" id="nav-cart" onclick="showPage('cart')">
+  <button class="nav-item" id="nav-cart" onclick="showTab('cart')">
     <div class="nav-icon-wrap"><span class="nav-icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.3 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg></span></div>
     <span>장보기</span><div class="nav-dot"></div>
   </button>
-  <button class="nav-item" id="nav-fun" onclick="showPage('fun')">
+  <button class="nav-item" id="nav-fun" onclick="showTab('fun')">
     <div class="nav-icon-wrap"><span class="nav-icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".6"/><circle cx="17.8" cy="13.8" r=".6"/></svg></span></div>
     <span>놀거리</span><div class="nav-dot"></div>
   </button>
-  <button class="nav-item" id="nav-mypage" onclick="showPage('mypage')">
+  <button class="nav-item" id="nav-mypage" onclick="showTab('mypage')">
     <div class="nav-icon-wrap"><span class="nav-icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg></span></div>
     <span>내정보</span><div class="nav-dot"></div>
   </button>
@@ -2360,7 +2361,7 @@
         <i class="ic hd" data-ic="tray"></i>
         <span style="font-family:'Jua',sans-serif;font-size:16px;color:var(--text)">오늘의 급식</span>
       </div>
-      <span id="fun-daily-meal-date" style="font-size:11px;color:var(--muted);background:var(--surface);padding:3px 10px;border-radius:20px;border:1px solid var(--border)"></span>
+      <span id="fun-daily-meal-date" style="font-size:11px;color:var(--muted);background:var(--surface);padding:3px 10px;border-radius:8px;border:1px solid var(--border)"></span>
     </div>
     <div id="fun-daily-meal-hint" style="font-size:12px;color:var(--muted);margin:-4px 0 10px"></div>
     <div id="fun-daily-meal-cards" style="display:flex;gap:8px"></div>
@@ -2373,7 +2374,7 @@
         <i class="ic hd" data-ic="chat"></i>
         <span style="font-family:'Jua',sans-serif;font-size:16px;color:var(--text)">오늘의 질문</span>
       </div>
-      <span id="fun-daily-q-date" style="font-size:11px;color:var(--muted);background:var(--surface);padding:3px 10px;border-radius:20px;border:1px solid var(--border)"></span>
+      <span id="fun-daily-q-date" style="font-size:11px;color:var(--muted);background:var(--surface);padding:3px 10px;border-radius:8px;border:1px solid var(--border)"></span>
     </div>
     <div id="fun-daily-q-card"></div>
   </div>
@@ -2385,7 +2386,7 @@
         <i class="ic hd" data-ic="swords"></i>
         <span style="font-family:'Jua',sans-serif;font-size:16px;color:var(--text)">이번 주 메뉴 배틀</span>
       </div>
-      <span id="tournament-week-label" style="font-size:11px;color:var(--muted);background:var(--surface);padding:3px 10px;border-radius:20px;border:1px solid var(--border)"></span>
+      <span id="tournament-week-label" style="font-size:11px;color:var(--muted);background:var(--surface);padding:3px 10px;border-radius:8px;border:1px solid var(--border)"></span>
     </div>
     <div style="display:flex;gap:6px;margin-bottom:12px" id="tournament-round-tabs">
       <button class="t-round-tab active" data-round="0" onclick="selectTournamentRound(0)">16강</button>
@@ -2505,7 +2506,7 @@
       <span class="row-l"><i class="ic" data-ic="pin"></i>현재 위치 사용</span><span style="font-size:11px;color:var(--orange)" id="location-label">허용 전</span>
     </div>
     <div class="my-setting-row" id="push-row" style="display:none" onclick="togglePush()">
-      <span class="row-l"><i class="ic" data-ic="bell"></i>점심·저녁 메뉴 알림 <small style="color:var(--muted);font-size:12px;margin-left:6px">11:30 · 17:30</small></span><span class="my-setting-arrow" id="push-state">끔</span>
+      <span class="row-l"><i class="ic" data-ic="bell"></i>점심·저녁 메뉴 알림 <small style="color:var(--muted);font-size:12px;margin-left:6px">11:30 · 17:30</small></span><span id="push-state" class="row-val">끔</span>
     </div>
     <div class="my-setting-row" id="pwa-setting-row" onclick="document.getElementById('pwa-install-btn').click()">
       <span class="row-l"><i class="ic" data-ic="send"></i>홈 화면에 앱 추가하기</span><span class="my-setting-arrow">›</span>
@@ -2594,14 +2595,20 @@
 
   <!-- 이번 주 먹은 것 -->
   <div class="my-section" id="my-week-wrap">
-    <div class="my-section-header"><span class="my-section-title"><i class="ic" data-ic="calendar"></i>이번 주 먹은 것</span></div>
-    <div id="my-week"></div>
+    <div class="my-section-header my-acc-header" onclick="toggleAcc(this)">
+      <span class="my-section-title"><i class="ic" data-ic="calendar"></i>이번 주 먹은 것</span>
+      <span style="display:flex;align-items:center;gap:6px"><span class="my-section-hint" id="week-count-label"></span><span class="my-acc-arrow">▾</span></span>
+    </div>
+    <div class="my-acc-body" style="display:none"><div id="my-week"></div></div>
   </div>
 
   <!-- 못 먹는 것 -->
   <div class="my-section">
-    <div class="my-section-header"><span class="my-section-title"><i class="ic" data-ic="ban"></i>못 먹는 것</span><span style="font-size:12px;color:var(--muted)">추천에서 늘 빼요</span></div>
-    <div id="my-avoid"></div>
+    <div class="my-section-header my-acc-header" onclick="toggleAcc(this)">
+      <span class="my-section-title"><i class="ic" data-ic="ban"></i>못 먹는 것</span>
+      <span style="display:flex;align-items:center;gap:6px"><span class="my-section-hint" id="avoid-count-label">추천에서 늘 빼요</span><span class="my-acc-arrow">▾</span></span>
+    </div>
+    <div class="my-acc-body" style="display:none"><div id="my-avoid"></div></div>
   </div>
 
   <!-- 입맛 분석 -->
@@ -5351,6 +5358,7 @@ function toggleAvoid(k) { avoidSet.has(k) ? avoidSet.delete(k) : avoidSet.add(k)
 function addAvoidTyped() { const i = document.getElementById('avoid-in'); const v = (i && i.value || '').trim().slice(0, 10); if (!v) return; avoidSet.add(v); try { localStorage.setItem('wmjAvoid', JSON.stringify([...avoidSet])); } catch (e) {} renderAvoid(); }
 function renderAvoid() {
   const el = document.getElementById('my-avoid'); if (!el) return;
+  const al = document.getElementById('avoid-count-label'); if (al) al.textContent = avoidSet.size ? [...avoidSet].slice(0, 3).join(', ') + (avoidSet.size > 3 ? ` 외 ${avoidSet.size - 3}` : '') : '추천에서 늘 빼요';
   const keys = [...Object.keys(AVOID_OPTS), ...[...avoidSet].filter(k => !AVOID_OPTS[k])];
   el.innerHTML = `<div class="fr-chips" style="margin:4px 0 8px">${keys.map(k => `<button class="fr-chip ${avoidSet.has(k) ? 'on avoid' : ''}" onclick="toggleAvoid('${k.replace(/'/g, "\\'")}')">${escHtml(k)}</button>`).join('')}</div>
     <div class="fr-add"><input id="avoid-in" placeholder="다른 재료 직접 쓰기 (예: 가지)" maxlength="10" onkeydown="if(event.key==='Enter')addAvoidTyped()"><button onclick="addAvoidTyped()">추가</button></div>
@@ -5361,6 +5369,7 @@ function renderMyWeek() {
   const el = document.getElementById('my-week'); if (!el) return;
   const now = new Date(), mon = new Date(now); mon.setHours(0, 0, 0, 0); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
   const week = ateLog().filter(a => a.ts >= mon.getTime());
+  const wl = document.getElementById('week-count-label'); if (wl) wl.textContent = week.length ? week.length + '끼' : '';
   if (!week.length) { el.innerHTML = `<div class="my-saved-empty">추천 카드에서 '이걸로 정했어'를 누르면 여기 쌓여요</div>`; return; }
   const how = { cook: '직접 요리', delivery: '배달', dine: '외식' }, cnt = {}, kinds = {};
   week.forEach(a => { cnt[a.how] = (cnt[a.how] || 0) + 1; (a.tags || []).filter(t => /한식|일식|중식|양식|분식|아시안|세계/.test(t)).forEach(t => { const k = t.replace(/^\S+\s/, ''); kinds[k] = (kinds[k] || 0) + 1; }); });
@@ -5384,27 +5393,42 @@ paintNet();
 const PUSH_READY = true;    // 서버 준비(SQL 08 + daily-push + 예약)가 끝나면 true로 바꿈 → 설정에 알림 줄이 보임
 const PUSH_VAPID = 'BF2eFGY_wl0JH8nReY4VyvQ5cEcntkOO4oi9n1n8lxMGezYBHkhUjfWqf4mFbkSbvnUjAkc0Lo-wOk94tQlNex4';
 const b64u = (s) => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); };
-async function pushReg() { return 'serviceWorker' in navigator ? navigator.serviceWorker.ready : null; }
+const withTimeout = (p, ms, msg) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(msg)), ms))]);
+async function pushReg() {
+  if (!('serviceWorker' in navigator)) return null;
+  let reg = await navigator.serviceWorker.getRegistration();
+  if (!reg) reg = await navigator.serviceWorker.register('/sw.js');
+  return withTimeout(navigator.serviceWorker.ready, 8000, 'sw');
+}
 async function paintPush() {
   const row = document.getElementById('push-row'), st = document.getElementById('push-state'); if (!row) return;
   if (!PUSH_READY || !PUSH_VAPID || !('PushManager' in window) || !('Notification' in window)) return;
   row.style.display = '';
-  try { const reg = await pushReg(); const sub = reg && await reg.pushManager.getSubscription(); st.textContent = sub ? '켬' : '끔'; st.style.color = sub ? 'var(--green)' : ''; } catch (e) {}
+  try { const reg = await pushReg(); const sub = reg && await reg.pushManager.getSubscription(); st.textContent = sub ? '켜짐' : '꺼짐'; st.style.color = sub ? 'var(--green)' : ''; } catch (e) {}
 }
+let pushBusy = false;
 async function togglePush() {
+  if (pushBusy) return; pushBusy = true;
+  const st = document.getElementById('push-state'); if (st) st.textContent = '확인 중…';
   try {
     if (/iPhone|iPad|iPod/i.test(navigator.userAgent) && !(window.matchMedia('(display-mode: standalone)').matches || navigator.standalone)) { showToast('아이폰은 홈 화면에 추가한 앱에서 알림을 켤 수 있어요'); return; }
-    const reg = await pushReg(); if (!reg) return;
+    if (/KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent)) { showToast('카카오톡·인스타 안의 창에서는 알림을 못 켜요 · 크롬이나 홈 화면 앱으로 열어 주세요'); return; }
+    if (Notification.permission === 'denied') { showToast('이 사이트 알림이 차단돼 있어요 · 크롬 주소창 왼쪽 자물쇠 → 알림 허용'); return; }
+    const reg = await pushReg(); if (!reg) { showToast('이 브라우저는 알림을 지원하지 않아요'); return; }
     const cur = await reg.pushManager.getSubscription();
-    if (cur) { await ownerRpc('delete_push_sub', { p_endpoint: cur.endpoint }).catch(() => {}); await cur.unsubscribe(); showToast('메뉴 알림을 껐어요'); paintPush(); return; }
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') { showToast('알림이 허용되지 않았어요 · 휴대폰 설정에서 바꿀 수 있어요'); return; }
-    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(PUSH_VAPID) });
+    if (cur) { await ownerRpc('delete_push_sub', { p_endpoint: cur.endpoint }).catch(() => {}); await cur.unsubscribe(); showToast('메뉴 알림을 껐어요'); return; }
+    const perm = await withTimeout(Notification.requestPermission(), 30000, 'perm');
+    if (perm !== 'granted') { showToast('알림이 허용되지 않았어요 · 다시 누르면 허용 창이 떠요'); return; }
+    const sub = await withTimeout(reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(PUSH_VAPID) }), 15000, 'sub');
     const j = sub.toJSON();
-    const ok = await ownerRpc('save_push_sub', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_slots: ['lunch', 'dinner'] }).catch(() => false);
-    if (!ok) { await sub.unsubscribe(); showToast('알림 기능은 아직 준비 중이에요'); paintPush(); return; }
-    showToast('점심 11시 반, 저녁 5시 반에 메뉴를 추천해 드릴게요'); paintPush();
-  } catch (e) { showToast('이 기기에서는 알림을 켤 수 없어요'); }
+    let ok = false, why = '';
+    try { ok = await ownerRpc('save_push_sub', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_slots: ['lunch', 'dinner'] }); } catch (e) { why = (e && (e.message || e.code)) || ''; }
+    if (!ok) { await sub.unsubscribe().catch(() => {}); showToast(why ? '알림 저장에 실패했어요 (' + String(why).slice(0, 40) + ')' : '알림 저장에 실패했어요 · 잠시 후 다시 눌러 주세요'); return; }
+    showToast('점심 11시 반, 저녁 5시 반에 메뉴를 추천해 드릴게요');
+  } catch (e) {
+    const m = e && e.message;
+    showToast(m === 'sw' ? '앱을 한 번 새로고침한 뒤 다시 눌러 주세요' : m === 'sub' ? '알림 서버 연결이 늦어요 · 잠시 후 다시 눌러 주세요' : '알림을 켜지 못했어요 (' + String(m || e).slice(0, 40) + ')');
+  } finally { pushBusy = false; paintPush(); }
 }
 setTimeout(paintPush, 1200);
 // 우승 메뉴 → '어떻게 먹을까?' 창 (사 먹기 먼저)
@@ -5931,7 +5955,22 @@ window.addEventListener('load', () => {
   setTimeout(() => { showPage('pocha'); if (h === '#dress' && window.Pocha) Pocha.openDress(); }, 80);
 });
 const TAB_TIPS = { community: '투표로 뭐 먹을지 물어보고, 먹은 걸 인증해 보세요', fun: '월드컵·메뉴 배틀로 오늘 메뉴를 정해 보세요', cart: '레시피에서 담은 재료가 여기 모여요' };
-function showPage(page) {
+let navStack = [];
+function visiblePageKey() {
+  const main = document.querySelector('main'); if (main && main.style.display !== 'none') return 'home';
+  const el = [...document.querySelectorAll('[id^="page-"]')].find(e => e.style.display !== 'none' && e.offsetParent !== null);
+  return el ? el.id.slice(5) : '';
+}
+function showTab(page) { showPage(page, { tab: true }); }
+function showPage(page, opt) {
+  // 탭을 누르면 맨 위, 하위 화면으로 들어가면 맨 위, 뒤로 돌아오면 있던 자리
+  let goY = 0;
+  try {
+    const from = visiblePageKey(), y = window.scrollY;
+    if (opt && opt.tab) navStack = [];
+    else { const i = navStack.findIndex(e => e.p === page); if (i >= 0) { goY = navStack[i].y; navStack = navStack.slice(0, i); } else if (from && from !== page) navStack.push({ p: from, y }); }
+  } catch (e) {}
+  setTimeout(() => window.scrollTo(0, goY), 30);
   try { watchStreetCount(page === 'home'); } catch (e) {}
   try { if (TAB_TIPS[page] && !localStorage.getItem('wmjTip_' + page)) { localStorage.setItem('wmjTip_' + page, '1'); setTimeout(() => showToast(TAB_TIPS[page]), 400); } } catch (e) {}
   if (page === 'settings') setTimeout(() => { const l = document.getElementById('tap-sound-label'); if (l && window.TapSound) l.textContent = TapSound.isOn() ? '켜짐' : '꺼짐'; }, 0);
@@ -6167,7 +6206,7 @@ function renderMyPage() {
     if (streak >= 3) {
       const fire = streak >= 30 ? '🔥🔥🔥' : streak >= 7 ? '🔥🔥' : '🔥';
       badge.style.display = 'inline-flex';
-      badge.innerHTML = `<span style="background:rgba(255,71,87,0.15);border:1px solid var(--orange);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--orange)">${fire} ${streak}일 연속 식단 기록 중!</span>`;
+      badge.innerHTML = `<span style="background:rgba(255,71,87,0.15);border:1px solid var(--orange);border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--orange)">${fire} ${streak}일 연속 식단 기록 중!</span>`;
     } else {
       badge.style.display = 'none';
     }
@@ -6504,7 +6543,7 @@ function renderHistoryPage() {
           <button onclick="deleteHistItem(${globalIdx})" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;line-height:1" title="삭제">×</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:5px">
-          ${h.menus.map(m => `<span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:12px">${m.emoji} ${m.name}</span>`).join('')}
+          ${h.menus.map(m => `<span style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:3px 10px;font-size:12px">${m.emoji} ${m.name}</span>`).join('')}
         </div>
       </div>`;
     }).join('') +
@@ -9221,7 +9260,7 @@ function openCommPostModal(postId) {
           style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;font-family:'Noto Sans KR',sans-serif"
           onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'"
           onkeydown="if(event.key==='Enter')submitModalComment('${p.id}')">
-        <button onclick="submitModalComment('${p.id}')" style="background:var(--orange);border:none;border-radius:20px;color:white;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;flex-shrink:0">등록</button>
+        <button onclick="submitModalComment('${p.id}')" style="background:var(--orange);border:none;border-radius:8px;color:white;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;flex-shrink:0">등록</button>
       </div>
     </div>`;
   document.getElementById('comm-post-modal').classList.add('open');
