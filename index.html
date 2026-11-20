@@ -10672,6 +10672,8 @@ if ('serviceWorker' in navigator) {
     regs.forEach(reg => reg.unregister());
   });
 }
+// 알림을 켠 기기에는 서비스 워커가 있음 → 열 때마다 새 버전 확인 (알림 아이콘 등 반영)
+if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => {}); });
 if ('serviceWorker' in navigator && (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:')) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
