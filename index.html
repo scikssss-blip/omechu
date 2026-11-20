@@ -10703,7 +10703,14 @@ window.addEventListener('beforeinstallprompt', e => {
 document.getElementById('pwa-install-btn').addEventListener('click', async () => {
   if (!deferredPrompt) {
     // iOS 안내
-    showToast('Safari 아래 공유 버튼 → "홈 화면에 추가"를 눌러 주세요');
+    // 자동 설치 창을 띄울 수 없는 경우: 기기·브라우저별 방법 안내
+    const ua = navigator.userAgent;
+    if (isStandalone()) showToast('이미 홈 화면 앱으로 열려 있어요');
+    else if (/iPhone|iPad|iPod/i.test(ua)) showToast('Safari 아래 공유 버튼 → "홈 화면에 추가"를 눌러 주세요');
+    else if (/SamsungBrowser/i.test(ua)) showToast('아래 ≡ 메뉴 → "현재 페이지 추가" → "홈 화면"을 눌러 주세요');
+    else if (/KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(ua)) showToast('카톡·앱 안의 창에서는 추가가 안 돼요 · 오른쪽 위 메뉴에서 "다른 브라우저로 열기"를 눌러 주세요');
+    else if (/Android/i.test(ua)) showToast('크롬 오른쪽 위 ⋮ 메뉴 → "홈 화면에 추가"(또는 "앱 설치")를 눌러 주세요');
+    else showToast('주소창 오른쪽의 설치 아이콘을 눌러 주세요');
     dismissPWA();
     return;
   }
