@@ -59,6 +59,9 @@
   }
   .logo { font-family:'Jua',sans-serif; font-size:26px; color:var(--orange); letter-spacing:0px; }
   .logo span { color:var(--text); }
+  .logo { display:inline-flex; align-items:flex-end; line-height:1; }
+  .logo-o { width:.98em; height:1em; margin-right:.02em; overflow:visible; }
+  .logo-ri { height:1.4em; width:1.26em; margin:0 0 -.32em .02em; transform:rotate(12deg); transform-origin:50% 100%; overflow:visible; }
   .header-badge { background:var(--orange); color:white; font-size:11px; font-weight:700; padding:4px 10px; border-radius:8px; }
 
   main { max-width:480px; margin:0 auto; padding:0 16px 200px; }
@@ -1114,7 +1117,7 @@
 <body>
 
 <header>
-  <div class="logo">오<span>메</span>추리</div>
+  <div class="logo" role="img" aria-label="오메추리"><svg class="logo-o" viewBox="0 0 48 50" aria-hidden="true"><circle cx="23" cy="15.5" r="11.2" fill="none" stroke="currentColor" stroke-width="3.9"/><path d="M23 4.5 q-1.5 -5 3.5 -5.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><circle cx="19.5" cy="14" r="1.9" fill="currentColor"/><circle cx="27.5" cy="14" r="1.9" fill="currentColor"/><path d="M32.5 12 L42.5 15.5 L32.5 19 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M23 26.5 V36" stroke="currentColor" stroke-width="3.9" stroke-linecap="round"/><path d="M5 40 H41" stroke="currentColor" stroke-width="3.9" stroke-linecap="round"/></svg><span>메</span>추<svg class="logo-ri" viewBox="0 0 36 40" aria-hidden="true"><rect x="16.1" y="24" width="3.8" height="14" rx="1" fill="#7a4c2a"/><rect x="2" y="2" width="32" height="24" rx="3.4" fill="currentColor" stroke="#c8102e" stroke-width="1.6"/><circle cx="5" cy="14" r="1.1" fill="#c8102e"/><circle cx="31" cy="14" r="1.1" fill="#c8102e"/><text x="18" y="20.5" text-anchor="middle" font-family="Jua, sans-serif" font-size="17.5" fill="#fff">리</text></svg></div>
   <div style="display:flex;align-items:center;gap:10px">
     <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="다크/라이트 모드" aria-label="다크/라이트 모드 전환">🌙</button>
   </div>
