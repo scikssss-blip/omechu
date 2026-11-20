@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>오메추 · 오늘 메뉴 추천</title>
+<title>오메추리 · 오늘 메뉴 추천</title>
 
 <!-- PWA -->
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -13,20 +13,20 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="오메추">
+<meta name="apple-mobile-web-app-title" content="오메추리">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
 <meta name="description" content="오늘 뭐 먹을지 조건만 고르면 메뉴 3개를 골라 줘요. 저메추, 점메추, 야식 추천까지.">
 
 <!-- 공유 미리보기 (카톡/인스타/SNS 링크 썸네일) -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="오메추">
-<meta property="og:title" content="오메추 · 오늘 뭐 먹지?">
+<meta property="og:site_name" content="오메추리">
+<meta property="og:title" content="오메추리 · 오늘 뭐 먹지?">
 <meta property="og:description" content="오늘 메뉴 고민 끝! 음식 월드컵·메뉴 배틀로 골라주는 메뉴 추천 앱. 지금 바로 뽑아 보세요 🍽️">
 <meta property="og:image" content="https://omechu-rouge.vercel.app/og-image.png">
 <meta property="og:url" content="https://omechu-rouge.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="오메추 · 오늘 뭐 먹지?">
+<meta name="twitter:title" content="오메추리 · 오늘 뭐 먹지?">
 <meta name="twitter:description" content="오늘 메뉴 고민 끝! 음식 월드컵·메뉴 배틀로 골라주는 메뉴 추천 앱 🍽️">
 <meta name="twitter:image" content="https://omechu-rouge.vercel.app/og-image.png">
 
@@ -652,7 +652,7 @@
   .comm-write-fab.show { display:flex; }
   .comm-write-fab:active { transform:scale(0.92); }
 
-  /* 오메추 투표 */
+  /* 오메추리 투표 */
   .comm-vote-wrap { display:flex; gap:8px; margin:8px 0; }
   .comm-vote-btn {
     flex:1; padding:10px 8px; border-radius:12px;
@@ -1120,7 +1120,7 @@
   <div id="menu-find-list" class="find-list"></div>
   <div class="pc-entry" onclick="showPage('pocha')">
     <span style="font-size:28px">🏮</span>
-    <div><div class="t">오메추 먹자골목</div><div class="s" id="pc-entry-home">포차·한식·일식·중식·양식, 들어가서 같이 골라요</div></div>
+    <div><div class="t">오메추리 먹자골목</div><div class="s" id="pc-entry-home">포차·한식·일식·중식·양식, 들어가서 같이 골라요</div></div>
     <span class="go">들어가기</span>
   </div>
 
@@ -1931,7 +1931,7 @@
   <!-- 탭 -->
   <div class="comm-tabs">
     <button class="comm-tab active" onclick="switchCommTab(this,'all')">전체</button>
-    <button class="comm-tab" onclick="switchCommTab(this,'pick')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.4M12 17h.01"/></svg>오메추</button>
+    <button class="comm-tab" onclick="switchCommTab(this,'pick')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.4M12 17h.01"/></svg>오메추리</button>
     <button class="comm-tab" onclick="switchCommTab(this,'menu')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z"/><path d="M8 20h8"/><path d="M9 3.5c-.8 1 .8 2-.1 3.2M12.5 3.5c-.8 1 .8 2-.1 3.2M16 3.5c-.8 1 .8 2-.1 3.2"/></svg>오늘의 메뉴</button>
     <button class="comm-tab" onclick="switchCommTab(this,'diet')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15z"/><path d="M5 19c3-4 6-7 10-10"/></svg>오늘 식단</button>
     <button class="comm-tab" onclick="switchCommTab(this,'cook')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="13" r="6.5"/><path d="M16.2 11.2 22 8.5"/><path d="M8 4.5c-.6.8.6 1.5-.1 2.4M11 4c-.6.8.6 1.5-.1 2.4"/></svg>오늘 요리</button>
@@ -2101,7 +2101,7 @@
     </div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:2px">유형 선택</div>
     <div class="comm-type-selector">
-      <button class="comm-type-btn selected" data-type="pick" onclick="selectCommType(this)">🤔 오메추</button>
+      <button class="comm-type-btn selected" data-type="pick" onclick="selectCommType(this)">🤔 골라줘</button>
       <button class="comm-type-btn" data-type="menu" onclick="selectCommType(this)">🍽️ 오늘의 메뉴</button>
       <button class="comm-type-btn" data-type="diet" onclick="selectCommType(this)">💪 오늘 식단</button>
       <button class="comm-type-btn" data-type="cook" onclick="selectCommType(this)">👨‍🍳 오늘 요리</button>
@@ -2173,7 +2173,7 @@
     <span id="comm-menutag-label" style="display:none"></span>
     <div id="comm-img-preview-wrap" class="comm-img-preview-wrap"></div>
 
-    <!-- 별점 (오메추 제외) -->
+    <!-- 별점 (오메추리 제외) -->
     <div id="comm-star-section" style="margin-top:12px">
       <div style="font-size:11px;color:var(--muted);margin-bottom:6px">별점 (선택)</div>
       <div id="comm-star-wrap" style="display:flex;gap:6px">
@@ -2256,7 +2256,7 @@
   </div>
 </div>
 
-<!-- 오메추 포차 -->
+<!-- 오메추리 포차 -->
 <div id="page-pocha"><div id="pocha-root"></div></div>
 <div id="pc-dress" onclick="if(event.target===this)Pocha.closeDress()"><div class="sheet">
   <div style="font-family:'Jua',sans-serif;font-size:18px;color:var(--text)">내 캐릭터 꾸미기</div>
@@ -2350,7 +2350,7 @@
   </div>
   <div class="pc-entry" onclick="showPage('pocha')">
     <span style="font-size:28px">🏮</span>
-    <div><div class="t">오메추 먹자골목</div><div class="s" id="pc-entry-fun">포차·한식·일식·중식·양식, 들어가서 같이 골라요</div></div>
+    <div><div class="t">오메추리 먹자골목</div><div class="s" id="pc-entry-fun">포차·한식·일식·중식·양식, 들어가서 같이 골라요</div></div>
     <span class="go">들어가기</span>
   </div>
 
@@ -2585,7 +2585,7 @@
       <div class="my-avatar" id="my-avatar" onclick="openAvatarPicker()" role="button" aria-label="프로필 사진 바꾸기" style="cursor:pointer;position:relative">😋</div>
       <div class="my-profile-info">
         <div class="my-nickname" id="my-profile-nick">로딩중...</div>
-        <div class="my-join">오메추 회원</div>
+        <div class="my-join">오메추리 회원</div>
         <div id="diet-streak-badge" style="display:none;margin-top:5px"></div>
       </div>
       <button class="my-edit-btn" onclick="openNicknameModal()">편집</button>
@@ -2714,13 +2714,13 @@
   <!-- 개발자에게 커피 (웹에서만, 링크를 넣었을 때만 보임) -->
   <a class="my-section donate-card" id="donate-card" href="#" target="_blank" rel="noopener" style="display:none" onclick="return openDonate(event)">
     <span class="donate-ic"><i class="ic" data-ic="coffee"></i></span>
-    <span style="flex:1;min-width:0"><b>개발자에게 커피 한 잔</b><small>오메추가 쓸 만했다면 응원해 주세요. 카카오페이로 보내져요.</small></span>
+    <span style="flex:1;min-width:0"><b>개발자에게 커피 한 잔</b><small>오메추리가 쓸 만했다면 응원해 주세요. 카카오페이로 보내져요.</small></span>
     <span class="my-setting-arrow">›</span>
   </a>
 
   <!-- 앱 정보 -->
   <div style="text-align:center;padding:20px 0 10px;color:var(--muted);font-size:11px">
-    오메추 v0.4<br>
+    오메추리 v0.4<br>
   </div>
 </div>
 <div class="recipe-modal-backdrop" id="recipe-modal" onclick="closeRecipe()">
@@ -5207,7 +5207,7 @@ function menuTiles(name, emoji) {
   const tile = (ic, tone, title, sub, attrs, id) => `<a class="more-tile" ${id ? `id="${id}"` : ''} ${attrs}><span class="mt-ic ${tone}">${moreIco(ic)}</span><span class="mt-tx"><b>${title}</b><small>${sub}</small></span></a>`;
   const ext = (u) => `href="${u}" target="_blank" rel="noopener"`, act = (f) => `href="#" onclick="${f};return false"`;
   const T = {
-    recipe: hasRecipe ? tile('recipe', 't-or', '오메추 레시피', '재료·순서 한 장에', act(`closeMenuMore();openRecipe('${js}','${m.emoji}')`)) : '',
+    recipe: hasRecipe ? tile('recipe', 't-or', '오메추리 레시피', '재료·순서 한 장에', act(`closeMenuMore();openRecipe('${js}','${m.emoji}')`)) : '',
     yt: tile('play', 't-red', '유튜브 레시피', '영상으로 따라 하기', ext(MENU_LINKS.ytRecipe(name))),
     man: tile('book', 't-grn', '만개의 레시피', '다른 레시피 모아 보기', act(`openMan10k('${js}')`)),
     ing: tile('basket', 't-yel', ingN ? `재료 ${ingN}가지 담기` : '재료 찾아보기', ingN ? '장보기에서 하나씩 사요' : '쿠팡에서 검색', act(`addAllIngredients('${js}')`), 'more-ing-btn'),
@@ -5321,7 +5321,7 @@ const MYDATA_KEY = (k) => /^(wmj|wmm|liked|omechu)/i.test(k);
 function exportMyData() {
   const data = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (MYDATA_KEY(k)) data[k] = localStorage.getItem(k); }
   const blob = new Blob([JSON.stringify({ app: 'omechu', v: 1, at: new Date().toISOString(), data })], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `오메추-내기록-${todayKey()}.json`; document.body.appendChild(a); a.click(); a.remove();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `오메추리-내기록-${todayKey()}.json`; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   showToast('기록 파일을 저장했어요. 새 폰에서 불러오기를 눌러 주세요');
 }
@@ -5333,7 +5333,7 @@ function importMyData(file) {
       const o = JSON.parse(rd.result); if (!o || o.app !== 'omechu' || !o.data) throw 0;
       Object.entries(o.data).forEach(([k, v]) => { if (MYDATA_KEY(k) && typeof v === 'string') localStorage.setItem(k, v); });
       showToast('기록을 불러왔어요. 다시 열게요'); setTimeout(() => location.reload(), 900);
-    } catch (e) { showToast('오메추 기록 파일이 아니에요'); }
+    } catch (e) { showToast('오메추리 기록 파일이 아니에요'); }
   };
   rd.readAsText(file);
 }
@@ -5468,9 +5468,9 @@ async function shareTodayMenu() {
   const ranks = ['🥇','🥈','🥉'];
   const menuLine = picks.map((m, i) => `${ranks[i] || '•'} ${m.name}`).join('   ');
   const url = location.origin + location.pathname;
-  const text = `🍽️ 오메추가 뽑아준 오늘의 메뉴!\n${menuLine}\n\n오늘 뭐 먹지? 고민은 오메추가 👇`;
+  const text = `🍽️ 오메추리가 뽑아준 오늘의 메뉴!\n${menuLine}\n\n오늘 뭐 먹지? 고민은 오메추리가 👇`;
   if (navigator.share) {
-    try { await navigator.share({ title: '오메추 - 오늘 뭐 먹지?', text, url }); return; }
+    try { await navigator.share({ title: '오메추리 - 오늘 뭐 먹지?', text, url }); return; }
     catch (e) { if (e && e.name === 'AbortError') return; }
   }
   try {
@@ -5503,7 +5503,7 @@ async function saveMenuImage() {
       if (!blob) { showToast('이미지 저장에 실패했어요'); return; }
       const file = new File([blob], 'omechu-menu.png', { type: 'image/png' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: '오메추 오늘의 메뉴' }); return; }
+        try { await navigator.share({ files: [file], title: '오메추리 오늘의 메뉴' }); return; }
         catch (e) { if (e && e.name === 'AbortError') return; }
       }
       const a = document.createElement('a');
@@ -5688,7 +5688,7 @@ function openRecipe(menuName, emoji, keepScroll) {
   const others = moreSec('더 해보기', [T.yt, T.man, T.muk, cat === 'dine' ? T.near : T.bae]);
   box.dataset.menu = menuName; box.dataset.emoji = emoji || m.emoji;
   if (!r || !(r.steps && r.steps.length)) {
-    box.innerHTML = `${top}<div class="rc-note">아직 오메추 레시피는 준비 중이에요. 영상이나 다른 레시피로 바로 볼 수 있어요.</div>
+    box.innerHTML = `${top}<div class="rc-note">아직 오메추리 레시피는 준비 중이에요. 영상이나 다른 레시피로 바로 볼 수 있어요.</div>
       ${moreSec('레시피 보기', [T.yt, T.man])}${moreSec('장보기', [T.ing, T.kit], cpNotice())}${moreSec('더 해보기', [T.muk, cat === 'dine' ? T.near : T.bae])}`;
     modal.classList.add('show'); return;
   }
@@ -5741,7 +5741,7 @@ function tickCook() {
     clearInterval(cookTimer); cookTimer = null;
     try { navigator.vibrate && navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) {}
     try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, 0.35, 0.7].forEach(d => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(0.25, a.currentTime + d); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + d + 0.3); o.start(a.currentTime + d); o.stop(a.currentTime + d + 0.32); }); } catch (e) {}
-    try { if (document.hidden && 'Notification' in window && Notification.permission === 'granted') new Notification('오메추 타이머', { body: cookLabel + ' 시간이 됐어요' }); } catch (e) {}
+    try { if (document.hidden && 'Notification' in window && Notification.permission === 'granted') new Notification('오메추리 타이머', { body: cookLabel + ' 시간이 됐어요' }); } catch (e) {}
   }
 }
 function renderCook() {
@@ -7448,7 +7448,7 @@ function openUserProfile(nick) {
   if (userPosts.length === 0) {
     list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:13px">아직 작성한 글이 없어요</div>`;
   } else {
-    const TYPE_LABEL = { menu:'🍽️ 오늘의 메뉴', diet:'💪 오늘 식단', cook:'👨‍🍳 오늘 요리', pick:'🤔 오메추' };
+    const TYPE_LABEL = { menu:'🍽️ 오늘의 메뉴', diet:'💪 오늘 식단', cook:'👨‍🍳 오늘 요리', pick:'🤔 골라줘' };
     list.innerHTML = userPosts.map(p => {
       const likeCount = (p.likes||0) + (likedPosts.has(p.id)?1:0);
       const imgHtml = p.imgs && p.imgs.length > 0
@@ -7691,7 +7691,7 @@ function revoteComm(postId) {
   showToast('🗳️ 새 투표가 시작됐어요!');
 }
 
-// ── 추천 결과 → 오메추 자동 생성 ──
+// ── 추천 결과 → 오메추리 자동 생성 ──
 function createVotePost() {
   const options = currentPicked.map(item => item.emoji + ' ' + item.name);
   if (options.length < 2) { showToast('추천 결과가 2개 이상이어야 해요!'); return; }
@@ -7734,7 +7734,7 @@ function openMenuReviewModal(menuName, emoji) {
   document.getElementById('review-modal-count').textContent = posts.length > 0 ? `총 ${posts.length}개` : '아직 후기가 없어요';
 
   const list = document.getElementById('menu-review-list');
-  const TYPE_LABEL = { menu:'🍽️ 오늘의 메뉴', diet:'💪 오늘 식단', cook:'👨‍🍳 오늘 요리', pick:'🤔 오메추' };
+  const TYPE_LABEL = { menu:'🍽️ 오늘의 메뉴', diet:'💪 오늘 식단', cook:'👨‍🍳 오늘 요리', pick:'🤔 골라줘' };
 
   if (posts.length === 0) {
     list.innerHTML = `
@@ -8289,7 +8289,7 @@ let hotSlideIdx = 0;
 
 const TAB_LABEL = {
   all: '오늘의 TOP 5',
-  pick: '🤔 오메추 TOP 5',
+  pick: '🤔 골라줘 TOP 5',
   menu: '🍽️ 오늘의 메뉴 TOP 5',
   diet: '💪 오늘 식단 TOP 5',
   cook: '👨‍🍳 오늘 요리 TOP 5',
@@ -8862,8 +8862,8 @@ let wcTheme = null;
 function weekTheme() { const d = new Date(), w = Math.floor((d - new Date(d.getFullYear(), 0, 1)) / 604800000); const th = WC_THEMES[w % WC_THEMES.length]; const n = menuDB.filter(m => (m.tags || []).includes(th.t)).length; return { ...th, size: n >= 16 ? 16 : 8 }; }
 function startThemeWorldcup() { const th = weekTheme(); startWorldcup(th.size, th); }
 function shareWorldcup(name) {
-  const text = `내 최애 음식은 '${name}'! 오메추 음식 월드컵 해 봐요`, url = location.origin + '/';
-  if (navigator.share) navigator.share({ title: '오메추 음식 월드컵', text, url }).catch(() => {});
+  const text = `내 최애 음식은 '${name}'! 오메추리 음식 월드컵 해 봐요`, url = location.origin + '/';
+  if (navigator.share) navigator.share({ title: '오메추리 음식 월드컵', text, url }).catch(() => {});
   else { try { navigator.clipboard.writeText(text + ' ' + url); showToast('공유 문구를 복사했어요'); } catch (e) {} }
 }
 function startWorldcup(size, theme) {
@@ -9214,7 +9214,7 @@ function hotSlideMove(dir) {
 function openCommPostModal(postId) {
   const p = commPosts.find(x => x.id === postId);
   if (!p) return;
-  const TYPE_LABEL = { menu:'🍽️ 오늘의 메뉴', diet:'💪 오늘 식단', cook:'👨‍🍳 오늘 요리', pick:'🤔 오메추' };
+  const TYPE_LABEL = { menu:'🍽️ 오늘의 메뉴', diet:'💪 오늘 식단', cook:'👨‍🍳 오늘 요리', pick:'🤔 골라줘' };
   const liked = likedPosts.has(p.id);
   const likeCount = (p.likes||0) + (liked?1:0);
   const imgHtml = p.imgs && p.imgs.length > 0 ? renderSlide(p.imgs, p.id+'-modal') : '';
@@ -10054,7 +10054,7 @@ const TYPE_INFO = {
   menu: { label:'🍽️ 오늘의 메뉴', cls:'comm-type-menu' },
   diet: { label:'💪 오늘 식단',   cls:'comm-type-diet' },
   cook: { label:'👨‍🍳 오늘 요리',  cls:'comm-type-cook' },
-  pick: { label:'🤔 오메추',      cls:'comm-type-pick' },
+  pick: { label:'🤔 골라줘',      cls:'comm-type-pick' },
 };
 
 const AVATARS = ['😋','🍜','🥩','🍱','👨‍🍳','🥗','🍣','🫕','🍛','🥘'];
@@ -10112,7 +10112,7 @@ function renderCommFeed(tab) {
     const liked = likedPosts.has(p.id);
     const likeCount = (p.likes || 0) + (liked && !p._liked ? 1 : 0);
 
-    // 오메추 투표 (가변 선택지)
+    // 오메추리 투표 (가변 선택지)
     let voteHtml = '';
     if (p.type === 'pick') {
       const options = p.voteOptions || (p.voteA ? [p.voteA, p.voteB] : []);
@@ -10384,7 +10384,7 @@ function openCommWrite() {
     </div>`
   ).join('');  const addBtn = document.getElementById('comm-vote-add-btn');
   if (addBtn) addBtn.style.display = 'block';
-  // 첫 유형 선택 상태로 (오메추 우선)
+  // 첫 유형 선택 상태로 (오메추리 우선)
   selectedCommType = 'pick';
   document.querySelectorAll('.comm-type-btn').forEach((b,i) => b.classList.toggle('selected', i===0));
   document.getElementById('comm-pick-options').style.display = 'block';
@@ -10392,7 +10392,7 @@ function openCommWrite() {
   // 올리기 버튼 초기화
   const submitBtn = document.getElementById('comm-submit-btn');
   if (submitBtn) { submitBtn.textContent = '올리기'; submitBtn.onclick = () => submitCommPost(); }
-  // 오메추 기본 선택 → 별점 + 사진 추가 숨김
+  // 오메추리 기본 선택 → 별점 + 사진 추가 숨김
   const starSection = document.getElementById('comm-star-section');
   if (starSection) starSection.style.display = 'none';
   const imgBtn = document.getElementById('comm-img-btn');
@@ -10418,7 +10418,7 @@ function selectCommType(btn) {
   // 카운터 업데이트
   const counter = document.getElementById('comm-char-count');
   if (counter) counter.textContent = ta.value.length + '/' + maxLen;
-  // 오메추는 별점 + 사진 추가 숨김
+  // 오메추리는 별점 + 사진 추가 숨김
   const starSection = document.getElementById('comm-star-section');
   if (starSection) starSection.style.display = isPick ? 'none' : 'block';
   const imgBtn = document.getElementById('comm-img-btn');
@@ -10719,7 +10719,7 @@ document.getElementById('pwa-install-btn').addEventListener('click', async () =>
   deferredPrompt.prompt();
   const { outcome } = await deferredPrompt.userChoice;
   if (outcome === 'accepted') {
-    showToast('🎉 오메추 앱이 설치됐어요!');
+    showToast('🎉 오메추리 앱이 설치됐어요!');
   }
   deferredPrompt = null;
   dismissPWA();

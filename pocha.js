@@ -1,5 +1,5 @@
 // ═════════════════════════════════════════════
-// 오메추 먹자골목: 걸어 다니다 가게에 들어가 같이 앉는 가상 공간
+// 오메추리 먹자골목: 걸어 다니다 가게에 들어가 같이 앉는 가상 공간
 // - 골목(street)에서 가게 문을 누르면 그 가게 방으로 들어간다
 // - 가게: 포차 · 한식집 · 일식집 · 중식집 · 양식집 (테이블 4개 × 4자리)
 // - Supabase Realtime(Presence + Broadcast) 사용, 대화는 서버에 저장하지 않음
@@ -23,36 +23,36 @@
   };
   // bg: Canva 크레파스 배경. 테이블의 s는 그림 속 의자 위치(테이블 중심 기준), ly는 이름표, by는 인원 배지 위치
   const ROOMS = {
-    street: { name: '오메추 먹자골목', w: 420, h: 832, ch: 'omechu-street-v1', spawn: [215, 790], bg: '/images/pocha/street.jpg', tables: [] },
-    pocha: { name: '오메추 포차', kind: '포장마차', w: 720, h: 900, ch: 'omechu-pocha-v1', spawn: [200, 770], exit: [180, 830], bg: '/images/pocha/pocha.jpg', lights: [[50, 115, 110], [650, 60, 100], [700, 170, 100], [15, 330, 100]],
+    street: { name: '오메추리 먹자골목', w: 420, h: 832, ch: 'omechu-street-v1', spawn: [215, 790], bg: '/images/pocha/street.jpg', tables: [] },
+    pocha: { name: '오메추리 포차', kind: '포장마차', w: 720, h: 900, ch: 'omechu-pocha-v1', spawn: [200, 770], exit: [180, 830], bg: '/images/pocha/pocha.jpg', lights: [[50, 115, 110], [650, 60, 100], [700, 170, 100], [15, 330, 100]],
       tags: ['🍺 술안주', '🌙 야식'], vote: '안주', door: [215, 172], front: { x: 120, y: 0, w: 190, h: 150 },
       tables: [
         { x: 200, y: 430, k: 'round', n: '1번 테이블', s: [[-70, -45], [92, 2], [-75, 68], [32, 92]], by: 125 },
         { x: 550, y: 415, k: 'round', n: '2번 테이블', s: [[-100, 18], [92, 18], [-50, 98], [45, 98]], by: 130 },
         { x: 410, y: 650, k: 'round', n: '3번 테이블', s: [[-110, 32], [105, 12], [-50, 122], [50, 122]], by: 150 },
         { x: 370, y: 200, k: 'bar', n: '이모네 바', s: [[-145, 60], [-50, 60], [40, 60], [145, 60]], by: 95 }] },
-    korean: { name: '오메추 밥상', kind: '한식집', w: 720, h: 900, ch: 'omechu-room-korean-v1', spawn: [360, 790], exit: [320, 850], bg: '/images/pocha/korean.jpg', lights: [[695, 130, 110], [360, 300, 220]],
+    korean: { name: '오메추리 밥상', kind: '한식집', w: 720, h: 900, ch: 'omechu-room-korean-v1', spawn: [360, 790], exit: [320, 850], bg: '/images/pocha/korean.jpg', lights: [[695, 130, 110], [360, 300, 220]],
       tags: ['🍱 한식'], vote: '메뉴', door: [160, 322], front: { x: 0, y: 190, w: 150, h: 230 },
       tables: [
         { x: 237, y: 335, k: 'low', n: '1번 상', s: [[3, -82], [-95, 12], [97, 12], [-2, 102]], by: 130 },
         { x: 505, y: 335, k: 'low', n: '2번 상', s: [[0, -82], [-93, 12], [93, 12], [3, 102]], by: 130 },
         { x: 222, y: 635, k: 'low', n: '3번 상', s: [[5, -95], [-105, 5], [110, 5], [0, 105]], by: 135 },
         { x: 515, y: 635, k: 'low', n: '4번 상', s: [[-8, -95], [-105, 5], [100, 5], [0, 105]], by: 135 }] },
-    japanese: { name: '오메추 스시야', kind: '일식집', w: 720, h: 900, ch: 'omechu-room-japanese-v1', spawn: [360, 790], exit: [360, 860], bg: '/images/pocha/japanese.jpg', lights: [[55, 75, 120], [668, 85, 120], [50, 815, 110], [668, 820, 110]],
+    japanese: { name: '오메추리 스시야', kind: '일식집', w: 720, h: 900, ch: 'omechu-room-japanese-v1', spawn: [360, 790], exit: [360, 860], bg: '/images/pocha/japanese.jpg', lights: [[55, 75, 120], [668, 85, 120], [50, 815, 110], [668, 820, 110]],
       tags: ['🍣 일식'], vote: '메뉴', door: [276, 332], front: { x: 290, y: 150, w: 130, h: 270 },
       tables: [
         { x: 365, y: 250, k: 'bar', n: '스시 카운터', s: [[-150, 50], [-50, 50], [50, 50], [155, 50]], by: 95 },
         { x: 165, y: 580, k: 'low', n: '1번 자리', s: [[-30, -72], [40, -72], [-35, 80], [35, 80]], by: 120 },
         { x: 360, y: 580, k: 'low', n: '2번 자리', s: [[-35, -72], [35, -72], [-35, 80], [35, 80]], by: 120 },
         { x: 555, y: 580, k: 'low', n: '3번 자리', s: [[-35, -72], [35, -72], [-35, 80], [35, 80]], by: 120 }] },
-    chinese: { name: '오메추 반점', kind: '중식집', w: 720, h: 900, ch: 'omechu-room-chinese-v1', spawn: [360, 800], exit: [360, 860], bg: '/images/pocha/chinese.jpg', lights: [[95, 90, 170], [610, 35, 140], [30, 540, 120], [700, 430, 110], [150, 810, 90]],
+    chinese: { name: '오메추리 반점', kind: '중식집', w: 720, h: 900, ch: 'omechu-room-chinese-v1', spawn: [360, 800], exit: [360, 860], bg: '/images/pocha/chinese.jpg', lights: [[95, 90, 170], [610, 35, 140], [30, 540, 120], [700, 430, 110], [150, 810, 90]],
       tags: ['🥢 중식'], vote: '메뉴', door: [152, 622], front: { x: 0, y: 470, w: 140, h: 280 },
       tables: [
         { x: 245, y: 325, k: 'round', n: '1번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 140 },
         { x: 535, y: 325, k: 'round', n: '2번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 140 },
         { x: 205, y: 650, k: 'round', n: '3번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 135 },
         { x: 525, y: 660, k: 'round', n: '4번 원탁', s: [[-115, -10], [115, -10], [-75, 92], [75, 92]], by: 125 }] },
-    western: { name: '오메추 비스트로', kind: '양식집', w: 720, h: 900, ch: 'omechu-room-western-v1', spawn: [360, 760], exit: [360, 845], bg: '/images/pocha/western.jpg', lights: [[240, 15, 80], [585, 15, 80], [20, 185, 80], [20, 780, 90], [630, 825, 90], [205, 300, 70], [560, 300, 70], [190, 600, 70], [565, 600, 70]],
+    western: { name: '오메추리 비스트로', kind: '양식집', w: 720, h: 900, ch: 'omechu-room-western-v1', spawn: [360, 760], exit: [360, 845], bg: '/images/pocha/western.jpg', lights: [[240, 15, 80], [585, 15, 80], [20, 185, 80], [20, 780, 90], [630, 825, 90], [205, 300, 70], [560, 300, 70], [190, 600, 70], [565, 600, 70]],
       tags: ['🍝 양식'], vote: '메뉴', door: [280, 622], front: { x: 295, y: 480, w: 125, h: 250 },
       tables: [
         { x: 200, y: 305, k: 'booth', n: '1번 부스', s: [[-112, -40], [-112, 45], [97, -40], [97, 45]], by: 100 },
@@ -448,7 +448,7 @@
     muted.add(sid); if (myTable !== null) logs[myTable] = (logs[myTable] || []).filter(m => m.sid !== sid); render(); showToast('🙈 이 손님의 말을 숨겼어요');
   }
 
-  // ── 메뉴 투표 (가게 음식 중에서 오메추 추천 엔진으로 후보 3개) ──
+  // ── 메뉴 투표 (가게 음식 중에서 오메추리 추천 엔진으로 후보 3개) ──
   function startVote() {
     if (myTable === null || !ch) return;
     const cur = votes[myTable]; if (cur && !cur.done) { showToast('이미 투표 중이에요'); return; }
@@ -648,20 +648,20 @@
       floor += tents;
     } else if (th === 'korean') {
       floor = `<rect width="${w}" height="${h}" fill="url(#pcWood)"/><rect width="${w}" height="90" fill="#efe3c8"/>${[0, 1, 2, 3, 4, 5].map(i => `<g transform="translate(${20 + i * 118} 10)"><rect width="104" height="70" fill="#f8f1df" stroke="#6b4a2b" stroke-width="4"/><path d="M34 0v70M70 0v70M0 23h104M0 47h104" stroke="#6b4a2b" stroke-width="2"/></g>`).join('')}`;
-      deco = `<rect x="250" y="96" width="220" height="34" rx="6" fill="#3a2a1c"/><text x="360" y="119" class="pc-sign2" style="font-size:16px;fill:#ffe9b0">오메추 밥상</text>
+      deco = `<rect x="250" y="96" width="220" height="34" rx="6" fill="#3a2a1c"/><text x="360" y="119" class="pc-sign2" style="font-size:16px;fill:#ffe9b0">오메추리 밥상</text>
         <g transform="translate(40 ${h - 120})"><rect width="50" height="70" rx="6" fill="#4b6b3a"/><circle cx="25" cy="-6" r="22" fill="#6c8f4e"/></g><g transform="translate(630 ${h - 120})"><rect width="50" height="70" rx="6" fill="#4b6b3a"/><circle cx="25" cy="-6" r="22" fill="#6c8f4e"/></g>`;
     } else if (th === 'japanese') {
       floor = `<rect width="${w}" height="${h}" fill="url(#pcTatami)"/><rect width="${w}" height="100" fill="#2a2420"/>${[0, 1, 2, 3, 4, 5, 6, 7].map(i => `<rect x="${i * 90 + 6}" y="70" width="80" height="58" rx="4" fill="${i % 2 ? '#22324a' : '#2b3f5c'}"/>`).join('')}`;
-      deco = `<text x="360" y="58" class="pc-sign2" style="font-size:18px;fill:#ffe9b0">오메추 스시야</text>
+      deco = `<text x="360" y="58" class="pc-sign2" style="font-size:18px;fill:#ffe9b0">오메추리 스시야</text>
         ${[110, 610].map(x => `<g transform="translate(${x} 150)"><rect x="-14" y="-4" width="28" height="6" fill="#222"/><ellipse cx="0" cy="22" rx="18" ry="24" fill="#e2564b"/><path d="M-18 14h36M-18 30h36" stroke="#a8321f" stroke-width="2"/><circle cx="0" cy="22" r="40" fill="url(#pcGlowG)"/></g>`).join('')}`;
     } else if (th === 'chinese') {
       floor = `<rect width="${w}" height="${h}" fill="url(#pcCnFloor)"/><rect width="${w}" height="92" fill="#8f0b20"/><path d="M0 88h${w}" stroke="#d8b25a" stroke-width="5"/><path d="M0 76h${w}" stroke="#d8b25a" stroke-width="2" stroke-dasharray="12 8"/>`;
-      deco = `<rect x="250" y="16" width="220" height="44" rx="6" fill="#d8b25a"/><text x="360" y="46" class="pc-sign2" style="font-size:18px;fill:#7a0a18">오메추 반점</text>
+      deco = `<rect x="250" y="16" width="220" height="44" rx="6" fill="#d8b25a"/><text x="360" y="46" class="pc-sign2" style="font-size:18px;fill:#7a0a18">오메추리 반점</text>
         ${[70, 360, 650].map(x => `<g transform="translate(${x} 120)"><path d="M0 -20v12" stroke="#d8b25a" stroke-width="2"/><ellipse cx="0" cy="12" rx="20" ry="22" fill="#e0301e"/><rect x="-10" y="-12" width="20" height="5" fill="#d8b25a"/><rect x="-10" y="31" width="20" height="5" fill="#d8b25a"/><path d="M0 36v14" stroke="#ffd36b" stroke-width="2"/><circle cx="0" cy="12" r="44" fill="url(#pcGlowG)"/></g>`).join('')}`;
     } else if (th === 'western') {
       floor = `<rect width="${w}" height="${h}" fill="url(#pcChecker)"/><rect width="${w}" height="96" fill="#2f4a3c"/><rect y="90" width="${w}" height="8" fill="#c9a45c"/>`;
       deco = `<g>${[40, 120, 200, 520, 600, 680].map((x, i) => `<rect x="${x - 6}" y="${22 + (i % 2) * 6}" width="12" height="40" rx="5" fill="${['#5b1a2a', '#2f5a3a', '#7a2a1a'][i % 3]}"/>`).join('')}</g>
-        <rect x="250" y="20" width="220" height="44" rx="22" fill="#f4efe2"/><text x="360" y="49" class="pc-sign2" style="font-size:17px;fill:#2f4a3c">오메추 비스트로</text>`;
+        <rect x="250" y="20" width="220" height="44" rx="22" fill="#f4efe2"/><text x="360" y="49" class="pc-sign2" style="font-size:17px;fill:#2f4a3c">오메추리 비스트로</text>`;
     }
     const labels = R.tables.map(tb => `<text x="${tb.x}" y="${tb.y - (tb.k === 'bar' ? 104 : tb.k === 'low' ? 92 : 112)}" class="pc-tname">${tb.n}</text>`).join('');
     return `<svg class="pc-map" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${DEFS}${floor}${deco}${R.tables.map(tb => furnitureSVG(tb, th)).join('')}${labels}${exitSVG()}</svg>`;
@@ -674,12 +674,12 @@
       const sign = (id) => { const r = shopRect(id), cx = r.x + r.w / 2, y = r.y + r.h / 2; const tw = ROOMS[id].name.length * 13 + 20;
         return `<g class="pc-shop"><rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" fill="transparent"/><rect x="${cx - tw / 2}" y="${y - 15}" width="${tw}" height="30" rx="15" fill="rgba(25,16,30,.72)" stroke="rgba(255,215,160,.55)"/><text x="${cx}" y="${y + 5}" class="pc-sign2" style="font-size:13px">${ROOMS[id].name}</text></g>`; };
       return `<svg class="pc-map" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><image href="${ROOMS.street.bg}" width="${w}" height="${h}" preserveAspectRatio="none"/>${SHOPS.map(sign).join('')}
-        <g transform="translate(215 ${h - 18})"><rect x="-78" y="-16" width="156" height="30" rx="10" fill="#c8102e"/><text x="0" y="5" class="pc-sign2">오메추 먹자골목</text></g></svg>`;
+        <g transform="translate(215 ${h - 18})"><rect x="-78" y="-16" width="156" height="30" rx="10" fill="#c8102e"/><text x="0" y="5" class="pc-sign2">오메추리 먹자골목</text></g></svg>`;
     }
     const front = (id) => {
       const r = shopRect(id), R2 = ROOMS[id], cx = r.x + r.w / 2;
       if (id === 'pocha') return `<g><rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="14" fill="#3a2a26"/><rect x="${r.x}" y="${r.y}" width="${r.w}" height="30" rx="12" fill="url(#pcAwnR)"/>
-        <rect x="${cx - 74}" y="${r.y + 42}" width="148" height="34" rx="10" fill="#c8102e"/><text x="${cx}" y="${r.y + 65}" class="pc-sign2" style="font-size:17px">오메추 포차</text>
+        <rect x="${cx - 74}" y="${r.y + 42}" width="148" height="34" rx="10" fill="#c8102e"/><text x="${cx}" y="${r.y + 65}" class="pc-sign2" style="font-size:17px">오메추리 포차</text>
         <rect x="${cx - 36}" y="${r.y + 88}" width="72" height="72" rx="6" fill="#ffb15c" opacity=".85"/><path d="M${cx} ${r.y + 88}v72" stroke="#c46a1a" stroke-width="2"/>
         ${[r.x + 22, r.x + 60, r.w + r.x - 60, r.w + r.x - 22].map(x => `<circle class="pc-bulb" cx="${x}" cy="${r.y + 100}" r="5" fill="#ffd36b"/>`).join('')}
         <circle cx="${cx}" cy="${r.y + 130}" r="80" fill="url(#pcGlowG)"/><text x="${cx}" y="${r.y + r.h + 18}" class="pc-tname" style="font-size:13px">${R2.kind}</text></g>`;
@@ -703,7 +703,7 @@
       <path d="M210 290v${h - 330}" stroke="#3a3249" stroke-width="3" stroke-dasharray="14 12"/>
       ${[330, 520, 640, 830].map((y, i) => `<circle class="pc-bulb" style="animation-delay:${(i % 3) * .8}s" cx="${i % 2 ? 252 : 168}" cy="${y}" r="5" fill="#ffd36b"/><circle cx="${i % 2 ? 252 : 168}" cy="${y}" r="56" fill="url(#pcGlowG)"/>`).join('')}
       ${SHOPS.map(front).join('')}
-      <g transform="translate(210 ${h - 22})"><rect x="-78" y="-18" width="156" height="32" rx="10" fill="#c8102e"/><text x="0" y="5" class="pc-sign2">오메추 먹자골목</text></g>
+      <g transform="translate(210 ${h - 22})"><rect x="-78" y="-18" width="156" height="32" rx="10" fill="#c8102e"/><text x="0" y="5" class="pc-sign2">오메추리 먹자골목</text></g>
     </svg>`;
   }
 
