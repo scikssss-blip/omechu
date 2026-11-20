@@ -770,6 +770,12 @@
   .ck-top span { color:var(--muted); font-weight:700; }
   .ck-bar { height:5px; border-radius:4px; background:var(--surface); margin:12px 0 18px; overflow:hidden; }
   .ck-bar i { display:block; height:100%; background:var(--orange); transition:width 0.3s; }
+  .ck-ings { margin:0; }
+  .ck-ings small, .ck-next small { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:700; }
+  .ck-ings div { display:flex; flex-wrap:wrap; gap:6px; }
+  .ck-ings span { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:14px; }
+  .ck-ings b { color:var(--orange); font-weight:700; }
+  .ck-next { border-top:1px dashed var(--border); padding:12px 0 4px; margin-bottom:12px; font-size:14px; color:var(--muted); line-height:1.5; word-break:keep-all; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
   .ck-step { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:18px; }
   .ck-k { width:44px; height:44px; border-radius:14px; background:rgba(255,71,87,0.14); color:var(--orange); font-size:20px; font-weight:800; display:flex; align-items:center; justify-content:center; }
   .ck-step p { font-size:24px; line-height:1.55; font-weight:700; margin:0; word-break:keep-all; }
@@ -5767,8 +5773,11 @@ function renderCook() {
   el.innerHTML = `<div class="ck-top"><b>${escHtml(name)}</b><span>${cookIdx + 1} / ${n}</span><button class="more-x" onclick="closeCookMode()" aria-label="닫기">✕</button></div>
     <div class="ck-bar"><i style="width:${((cookIdx + 1) / n) * 100}%"></i></div>
     <div class="ck-step"><span class="ck-k">${cookIdx + 1}</span><p>${escHtml(st)}</p>
-      ${mins ? `<button class="ck-start" onclick="startCookTimer(${mins}, '${cookIdx + 1}단계')">${ic('timer')}${fmtMin(mins)} 타이머 시작</button>` : ''}</div>
+      ${mins ? `<button class="ck-start" onclick="startCookTimer(${mins}, '${cookIdx + 1}단계')">${ic('timer')}${fmtMin(mins)} 타이머 시작</button>` : ''}
+    ${(() => { const f = recipeServ / 2, base = s => s.replace(/^(다진|송송 썬|불린|삶은|데친)\s*/, ''), used = recipeIngredients(name).filter(g => { const b = base(g.name); return b.length >= 1 && (st.includes(g.name) || st.includes(b)); });
+      return used.length ? `<div class="ck-ings"><small>이 단계 재료</small><div>${used.map(g => `<span>${escHtml(g.name)}${g.amount ? ` <b>${escHtml(scaleAmt(g.amount, f))}</b>` : ''}</span>`).join('')}</div></div>` : ''; })()}</div>
     <div id="cook-timer"></div>
+    ${cookIdx < n - 1 ? `<div class="ck-next"><small>다음</small>${escHtml(scaleStep(r.steps[cookIdx + 1], recipeServ / 2))}</div>` : ''}
     <div class="ck-nav"><button onclick="cookGo(-1)" ${cookIdx ? '' : 'disabled'}>이전</button><button class="next" onclick="${cookIdx < n - 1 ? 'cookGo(1)' : 'closeCookMode()'}">${cookIdx < n - 1 ? '다음 단계' : '다 만들었어요'}</button></div>`;
   if (cookTimer || cookEnd) tickCook();
 }
@@ -6097,7 +6106,8 @@ const CART_GROUPS = [
   ['밥·면·가루', /밥|쌀|찹쌀|면|소면|국수|스파게티|파스타|펜네|마카로니|우동|라면|떡|당면|만두피|또띠아|식빵|바게트|빵|가루|부침|전분|그래놀라|만두|사리/],
 ];
 const SAUCE_RE = /장$|소스|케첩|마요|식초|설탕|소금|기름|올리브유|후추|깨$|물엿|맛술|미림|액젓|젓$|스톡|페이스트|시럽|꿀|머스터드|머스타드|와인|가루|파우더|육수팩|다진마늘|쯔유|폰즈|카레|하이라이스|스리라차|케찹/;
-const cartGroupOf = (n) => SAUCE_RE.test(n) ? '양념·소스·기타' : (CART_GROUPS.find(([, re]) => re.test(n)) || ['양념·소스·기타'])[0];
+const SIDE_RE = /김치|깍두기|단무지|피클|어묵|맛살|게살|참치|통조림|콘$|스위트콘|반찬|^김$|^김가루$|조미김|명란|젓갈/;
+const cartGroupOf = (n) => SIDE_RE.test(n) && !/배추$|양배추|액$/.test(n) ? '반찬·가공식품' : SAUCE_RE.test(n) ? '양념·소스·기타' : (CART_GROUPS.find(([, re]) => re.test(n)) || ['양념·소스·기타'])[0];
 let cartHidePantry = false;
 try { cartHidePantry = localStorage.getItem('wmjCartPantry') === '1'; } catch (e) {}
 function sumAmts(list) {
@@ -6120,7 +6130,7 @@ function renderPageCartList() {
   const hidden = cartHidePantry ? rows.filter(r => r.pantry).length : 0;
   if (cartHidePantry) rows = rows.filter(r => !r.pantry);
   const left = rows.filter(r => !r.done).length;
-  countEl.textContent = rows.length ? `(${left}/${rows.length})` : '';
+  countEl.textContent = !rows.length ? '' : left ? `${left}개 남음` : '다 샀어요';
   clearBtn.style.display = cartItems.length > 0 ? 'block' : 'none';
   buyAllBtn.style.display = cartItems.length > 0 ? 'block' : 'none';
   if (cartItems.length === 0) {
@@ -6132,7 +6142,7 @@ function renderPageCartList() {
   }
   const groups = {};
   for (const r of rows) (groups[cartGroupOf(r.name)] = groups[cartGroupOf(r.name)] || []).push(r);
-  const order = [...CART_GROUPS.map(g => g[0]), '양념·소스·기타'];
+  const order = [...CART_GROUPS.map(g => g[0]), '반찬·가공식품', '양념·소스·기타'];
   listEl.innerHTML = `<button class="cart-pantry" onclick="cartTogglePantry()">${ic(cartHidePantry ? 'check' : 'ban')}${cartHidePantry ? `집에 있는 기본 양념 숨김 중${hidden ? ` (${hidden}개)` : ''} · 다시 보기` : '집에 있는 기본 양념(간장·소금·설탕 등) 숨기기'}</button>`
     + order.filter(g => groups[g]).map(g => `<div class="cart-g"><div class="cart-gh">${g}</div>${groups[g].sort((a, b) => a.done - b.done).map(r => { const js = r.name.replace(/'/g, "\\'");
       return `<div class="page-cart-item ${r.done ? 'done' : ''}">
