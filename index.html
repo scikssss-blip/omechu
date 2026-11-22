@@ -718,6 +718,36 @@
   .result-name { font-family:'Jua',sans-serif; font-size:17px; line-height:1.15; text-align:center; word-break:keep-all; }
   .result-actions { display:flex; flex-direction:column; gap:6px; margin-top:10px; }
   .result-actions .decide-btn { min-height:44px; font-size:13px; }
+  .result-left { position:relative; }
+  .result-btn.keep-btn { position:absolute; top:6px; right:6px; width:auto; min-height:0; padding:6px 9px; gap:3px; font-size:12px; font-weight:700; color:#fff; background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.35) !important; border-radius:8px; backdrop-filter:blur(4px); }
+  .result-btn.keep-btn .ic { margin-right:0; width:14px; height:14px; }
+  .result-btn.keep-btn.on { background:var(--orange); border-color:var(--orange) !important; color:#fff; }
+  .keep-box { margin-top:12px; padding:12px 14px; background:var(--card); border:1.5px dashed var(--orange); border-radius:12px; }
+  .keep-h { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; margin-bottom:8px; }
+  .keep-h b { color:var(--orange); }
+  .keep-clear { margin-left:auto; background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; font-family:inherit; }
+  .keep-chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .keep-chip { display:inline-flex; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .keep-chip button { background:none; border:none; color:var(--text); font-size:13px; padding:7px 4px 7px 10px; cursor:pointer; font-family:inherit; }
+  .keep-chip button.x { color:var(--muted); padding:7px 10px 7px 6px; font-size:11px; }
+  .keep-rand { width:100%; margin-top:10px; padding:12px; background:var(--orange); color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .keep-hint { margin-top:8px; font-size:12px; color:var(--muted); }
+  .rand-one-btn { width:100%; margin-top:8px; padding:12px; background:var(--card); border:1.5px solid var(--border); border-radius:12px; color:var(--text); font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .rand-ov { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:900; display:none; align-items:center; justify-content:center; padding:24px; }
+  .rand-ov.show { display:flex; }
+  .rand-box { width:100%; max-width:340px; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px 18px 14px; text-align:center; }
+  .rand-k { font-size:12px; color:var(--muted); margin-bottom:12px; }
+  .rand-roll { padding:18px 0 20px; }
+  .rand-emoji { display:block; font-size:54px; line-height:1.1; }
+  .rand-name { display:block; font-family:'Jua',sans-serif; font-size:26px; margin-top:8px; }
+  .rand-roll.done .rand-name { color:var(--orange); }
+  .rand-roll.done .rand-emoji { animation:randPop .35s ease; }
+  @keyframes randPop { 0%{transform:scale(.6)} 70%{transform:scale(1.15)} 100%{transform:scale(1)} }
+  .rand-main { width:100%; padding:14px; background:var(--green); color:#062; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .rand-sub { display:flex; gap:6px; margin-top:8px; }
+  .rand-sub button { flex:1; padding:11px 4px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .rand-close { margin-top:10px; background:none; border:none; color:var(--muted); font-size:13px; padding:6px 12px; cursor:pointer; font-family:inherit; }
+
   .result-actions .more-btn { min-height:40px; font-size:12px; color:var(--text); font-weight:700; }
   .result-mini { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
   .result-mini .result-btn { flex-direction:column; min-height:42px; padding:4px 2px; gap:1px; font-size:10.5px; background:transparent; }
@@ -2797,6 +2827,7 @@ const IC = {
   gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>',
   calendar:'<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   bookmark:'<path d="M6.5 4h11v16l-5.5-4-5.5 4z"/>',
+  dice:'<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/>',
   pencil:'<path d="M4 20l1-4.5L15.5 5a2 2 0 0 1 3 3L8 18.5z"/><path d="M13.5 7l3 3"/>',
   ballot:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/>',
   clipboard:'<rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5v-1h6v1M9 11h6M9 15h4"/>',
@@ -4057,6 +4088,69 @@ function getRecommendation() {
   logRecEvents(currentPicked);
 
   renderResults();
+}
+
+// ── 킵: 지금 고른 카테고리에서 추천받은 메뉴 중 마음에 드는 걸 잠깐 모아두기 (카테고리를 바꾸면 비워짐) ──
+let keepList = [], keepCat = '';
+function keepSync() { if (keepCat !== selectedCat) { keepList = []; keepCat = selectedCat; } }
+function isKept(name) { keepSync(); return keepList.some(m => m.name === name); }
+function paintKeepBtns() {
+  document.querySelectorAll('.keep-btn').forEach(b => { const on = isKept(b.dataset.n); b.classList.toggle('on', on); b.innerHTML = ic('bookmark') + (on ? '킵함' : '킵'); });
+  renderKeepTray();
+}
+function toggleKeep(name) {
+  keepSync();
+  const i = keepList.findIndex(m => m.name === name);
+  if (i >= 0) keepList.splice(i, 1);
+  else {
+    const m = (currentPicked || []).find(x => x.name === name) || menuDB.find(x => x.name === name); if (!m) return;
+    keepList.push({ name: m.name, emoji: m.emoji });
+    showToast(keepList.length === 1 ? `${m.name} 킵! 다시 뽑아도 아래에 남아 있어요` : `${m.name} 킵! (${keepList.length}개)`);
+  }
+  paintKeepBtns();
+}
+function clearKeep() { keepList = []; paintKeepBtns(); }
+function renderKeepTray() {
+  const el = document.getElementById('keep-tray'); if (!el) return; keepSync();
+  if (!keepList.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="keep-box"><div class="keep-h">${ic('bookmark')}킵한 메뉴 <b>${keepList.length}</b><button class="keep-clear" onclick="clearKeep()">비우기</button></div>
+    <div class="keep-chips">${keepList.map(m => `<span class="keep-chip"><button data-n="${escHtml(m.name)}" onclick="openMenuMore(this.dataset.n,'${m.emoji}')">${m.emoji} ${escHtml(m.name)}</button><button class="x" data-n="${escHtml(m.name)}" onclick="toggleKeep(this.dataset.n)" aria-label="킵 취소">✕</button></span>`).join('')}</div>
+    ${keepList.length >= 2 ? `<button class="keep-rand" onclick="randomPick('keep')">${ic('dice')}킵한 ${keepList.length}개 중에서 하나 골라줘</button>` : `<div class="keep-hint">2개 이상 킵하면 그중에서 하나 골라 드려요</div>`}</div>`;
+}
+// ── 랜덤 하나: 킵한 것 중에서, 또는 지금 조건에 맞는 전체 중에서 ──
+let randTimer = null;
+function closeRandPick() { clearInterval(randTimer); const el = document.getElementById('rand-pick'); if (el) el.classList.remove('show'); }
+function randomPick(src) {
+  const pool = src === 'keep' ? keepList.slice() : (currentCandidates || []).filter(m => !(rejectedNames || []).includes(m.name));
+  if (!pool.length) { showToast('고를 메뉴가 없어요'); return; }
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  let el = document.getElementById('rand-pick');
+  if (!el) { el = document.createElement('div'); el.id = 'rand-pick'; el.className = 'rand-ov'; el.onclick = (e) => { if (e.target === el) closeRandPick(); }; document.body.appendChild(el); }
+  const n = escHtml(pick.name), kept = isKept(pick.name);
+  el.innerHTML = `<div class="rand-box">
+    <div class="rand-k">${src === 'keep' ? `킵한 ${pool.length}개 중에서` : `조건에 맞는 ${pool.length}개 중에서`}</div>
+    <div class="rand-roll"><span class="rand-emoji">${pool[0].emoji}</span><b class="rand-name">${escHtml(pool[0].name)}</b></div>
+    <div class="rand-acts">
+      <button class="rand-main" data-n="${n}" onclick="closeRandPick();decideMenu(this.dataset.n,'${pick.emoji}',null)">${ic('check')}이걸로 정했어</button>
+      <div class="rand-sub">
+        <button data-n="${n}" onclick="closeRandPick();openMenuMore(this.dataset.n,'${pick.emoji}')">어떻게 먹을까</button>
+        ${src === 'keep' ? '' : `<button data-n="${n}" onclick="toggleKeep(this.dataset.n);this.textContent=isKept(this.dataset.n)?'킵함':'킵하기'">${kept ? '킵함' : '킵하기'}</button>`}
+        <button onclick="randomPick('${src}')">다시 고르기</button>
+      </div>
+      <button class="rand-close" onclick="closeRandPick()">닫기</button>
+    </div></div>`;
+  el.classList.add('show');
+  const roll = el.querySelector('.rand-roll'), acts = el.querySelector('.rand-acts');
+  acts.style.visibility = 'hidden';
+  clearInterval(randTimer);
+  let t = 0; const total = pool.length > 1 ? 14 : 0;
+  const done = () => { clearInterval(randTimer); roll.innerHTML = `<span class="rand-emoji">${pick.emoji}</span><b class="rand-name">${n}</b>`; roll.classList.add('done'); acts.style.visibility = ''; };
+  if (!total) return done();
+  randTimer = setInterval(() => {
+    const m = pool[Math.floor(Math.random() * pool.length)];
+    roll.innerHTML = `<span class="rand-emoji">${m.emoji}</span><b class="rand-name">${escHtml(m.name)}</b>`;
+    if (++t >= total) done();
+  }, 60 + t * 6);
 }
 
 // 안땡겨요: 해당 카드만 교체
@@ -5572,6 +5666,7 @@ function renderResults(rejectPattern, flipIndex) {
             ${cachedImg ? `<img src="${cachedImg}" onerror="this.parentElement.innerHTML='${item.emoji}'">` : item.emoji}
           </div>
           <div class="result-name">${item.name}</div>
+          <button class="result-btn keep-btn${isKept(item.name) ? ' on' : ''}" data-n="${escHtml(item.name)}" onclick="toggleKeep(this.dataset.n)" aria-label="킵하기">${ic('bookmark')}${isKept(item.name) ? '킵함' : '킵'}</button>
         </div>
         <div class="result-right">
           ${why}${kcalHtml}${review}
@@ -5625,12 +5720,14 @@ function renderResults(rejectPattern, flipIndex) {
       </div>`; }).join('')}
   </div>` : '';
 
-  document.getElementById('result-area').innerHTML = `<div class="result-grid">${cards}</div>${feedbackHtml}${rerollBtn}
+  document.getElementById('result-area').innerHTML = `<div class="result-grid">${cards}</div><div id="keep-tray"></div>${feedbackHtml}${rerollBtn}
+  ${currentCandidates && currentCandidates.length > 3 ? `<button class="rand-one-btn" onclick="randomPick('all')">${ic('dice')}고민되면 조건에 맞는 ${currentCandidates.length}개 중 하나 골라줘</button>` : ''}
   ${!isHate && currentPicked.length >= 2 ? `
   <button onclick="createVotePost()" style="width:100%;margin-top:8px;padding:11px;background:rgba(120,120,255,0.1);border:1.5px solid #7878ff;border-radius:12px;color:#7878ff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">
     ${ic('ballot')}커뮤니티에 투표 올리기
   </button>` : ''}${shareSection}${shopSection}`;
 
+  renderKeepTray();
   // 추천받기일 때만 카드로 스크롤
   if (flipIndex === undefined) {
     setTimeout(() => {
