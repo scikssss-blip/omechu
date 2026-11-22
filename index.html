@@ -718,10 +718,10 @@
   .result-name { font-family:'Jua',sans-serif; font-size:17px; line-height:1.15; text-align:center; word-break:keep-all; }
   .result-actions { display:flex; flex-direction:column; gap:6px; margin-top:10px; }
   .result-actions .decide-btn { min-height:44px; font-size:13px; }
-  .result-left { position:relative; }
-  .result-btn.keep-btn { position:absolute; top:6px; right:6px; width:auto; min-height:0; padding:6px 9px; gap:3px; font-size:12px; font-weight:700; color:#fff; background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.35) !important; border-radius:8px; backdrop-filter:blur(4px); }
-  .result-btn.keep-btn .ic { margin-right:0; width:14px; height:14px; }
-  .result-btn.keep-btn.on { background:var(--orange); border-color:var(--orange) !important; color:#fff; }
+  .result-mini.two { grid-template-columns:repeat(2,1fr); }
+  .result-mini.two .result-btn { flex-direction:row; gap:4px; min-height:38px; font-size:12px; }
+  .result-btn.keep-btn { color:var(--muted); }
+  .result-btn.keep-btn.on { color:var(--orange); border-color:var(--orange) !important; background:rgba(255,71,87,0.1); }
   .keep-box { margin-top:12px; padding:12px 14px; background:var(--card); border:1.5px dashed var(--orange); border-radius:12px; }
   .keep-h { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; margin-bottom:8px; }
   .keep-h b { color:var(--orange); }
@@ -4080,6 +4080,7 @@ function getRecommendation() {
   }
 
   currentCandidates = candidates;
+  keepCheckSet(candidates);
   pickReasons = {};
   // 오늘 이미 본 메뉴는 다시 추천에서 뺀다 (남는 게 3개보다 적으면 그냥 다 씀)
   const seen = seenToday(), fresh = candidates.filter(m => !seen.includes(m.name));
@@ -4090,12 +4091,14 @@ function getRecommendation() {
   renderResults();
 }
 
-// ── 킵: 지금 고른 카테고리에서 추천받은 메뉴 중 마음에 드는 걸 잠깐 모아두기 (카테고리를 바꾸면 비워짐) ──
-let keepList = [], keepCat = '';
+// ── 킵: 이번 선택(카테고리+조건)에서 추천받은 메뉴 중 마음에 드는 걸 잠깐 모아두기 ──
+let keepList = [], keepCat = '', keepSig = '';
+// 카테고리나 조건(필터)이 바뀌면 킵 목록도 새로 시작 — '이번 선택'에서만 유지
 function keepSync() { if (keepCat !== selectedCat) { keepList = []; keepCat = selectedCat; } }
+function keepCheckSet(cands) { const sig = selectedCat + '|' + cands.map(m => m.name).sort().join(','); if (sig !== keepSig) { keepSig = sig; keepList = []; } }
 function isKept(name) { keepSync(); return keepList.some(m => m.name === name); }
 function paintKeepBtns() {
-  document.querySelectorAll('.keep-btn').forEach(b => { const on = isKept(b.dataset.n); b.classList.toggle('on', on); b.innerHTML = ic('bookmark') + (on ? '킵함' : '킵'); });
+  document.querySelectorAll('.keep-btn').forEach(b => { const on = isKept(b.dataset.n); b.classList.toggle('on', on); b.innerHTML = ic('bookmark') + (on ? '킵함' : '킵하기'); });
   renderKeepTray();
 }
 function toggleKeep(name) {
@@ -5666,17 +5669,19 @@ function renderResults(rejectPattern, flipIndex) {
             ${cachedImg ? `<img src="${cachedImg}" onerror="this.parentElement.innerHTML='${item.emoji}'">` : item.emoji}
           </div>
           <div class="result-name">${item.name}</div>
-          <button class="result-btn keep-btn${isKept(item.name) ? ' on' : ''}" data-n="${escHtml(item.name)}" onclick="toggleKeep(this.dataset.n)" aria-label="킵하기">${ic('bookmark')}${isKept(item.name) ? '킵함' : '킵'}</button>
+          <div class="result-mini two left">
+            <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${ic('heart')}좋아요</button>
+            <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? ic('chat') + `후기 ${rc}` : ic('pencil') + '후기'; })()}</button>
+          </div>
         </div>
         <div class="result-right">
           ${why}${kcalHtml}${review}
           <div class="result-actions">
             <button class="result-btn decide-btn${ateToday(item.name) ? ' on' : ''}" onclick="decideMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}',this)">${ic('check')}${ateToday(item.name) ? '오늘 메뉴' : '이걸로 정했어'}</button>
-            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${selectedCat === 'cook' ? '레시피·재료 보기' : selectedCat === 'delivery' ? '배민·먹는 방법' : '근처 맛집·더보기'} ›</button>
-            <div class="result-mini">
-              <button class="result-btn like-btn${getLikedMenus().some(m=>m.name===item.name)?' active':''}" data-name="${item.name.replace(/'/g,"&apos;")}" onclick="likeMenu('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${ic('heart')}좋아요</button>
+            <button class="result-btn more-btn" onclick="openMenuMore('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${selectedCat === 'cook' ? '레시피 더보기' : selectedCat === 'delivery' ? '배달 더보기' : '근처 맛집 더보기'} ›</button>
+            <div class="result-mini two">
+              <button class="result-btn keep-btn${isKept(item.name) ? ' on' : ''}" data-n="${escHtml(item.name)}" onclick="toggleKeep(this.dataset.n)" >${ic('bookmark')}${isKept(item.name) ? '킵함' : '킵하기'}</button>
               <button class="result-btn reject-btn" onclick="rejectOne('${item.name.replace(/'/g,"\\'")}',${i})">${ic('ban')}안 땡겨</button>
-              <button class="result-btn" onclick="openMenuReviewModal('${item.name.replace(/'/g,"\\'")}','${item.emoji}')">${(() => { const rc = commPosts.filter(p => p.menuTag && p.menuTag.replace(/^[^\s]+ /,'').replace(/^✏️ /,'') === item.name).length; return rc > 0 ? ic('chat') + `후기 ${rc}` : ic('pencil') + '후기'; })()}</button>
             </div>
           </div>
           <div id="similar-btn-wrap-${i}">
