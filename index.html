@@ -823,6 +823,11 @@
   .rc-ing { display:flex; align-items:center; gap:8px; padding:9px 10px 9px 12px; border-top:1px solid var(--border); }
   .rc-ing:first-child { border-top:none; }
   .rc-n { font-size:13.5px; font-weight:700; } .rc-a { font-size:12px; color:var(--muted); flex:1; min-width:0; }
+  .lo-box { margin-top:18px; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; }
+  .lo-h { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:700; }
+  .lo-sub { font-size:12px; color:var(--muted); margin:2px 0 10px; }
+  .lo-box .fr-item { width:100%; margin-bottom:6px; }
+  .lo-more { width:100%; padding:11px; margin-top:4px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:6px; }
   .rc-none { font-size:11.5px; font-weight:700; border-radius:8px; padding:5px 8px; background:none; border:1px dashed var(--border); color:var(--muted); cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; line-height:1.2; }
   .rc-none.on { border-style:solid; border-color:var(--orange); color:var(--orange); }
   .rc-help { margin:0 10px 8px 12px; padding:9px 11px; border-radius:8px; background:var(--surface); font-size:12.5px; line-height:1.5; display:flex; flex-wrap:wrap; gap:2px 8px; align-items:baseline; }
@@ -5414,6 +5419,7 @@ function renderFridge() {
   el.innerHTML = `<div class="fr-box" role="dialog" aria-label="냉장고 재료로 찾기">
     <div class="fr-top"><b>냉장고에 뭐 있어요?</b><button class="more-x" onclick="closeFridge()" aria-label="닫기">✕</button></div>
     <div style="font-size:13px;color:var(--muted)">있는 재료를 누르면 만들 수 있는 메뉴를 보여 드려요</div>
+    ${(() => { const nb = recentBought().filter(n => !fridgeHave.has(n)); return nb.length ? `<button class="lo-more" style="margin-top:8px" onclick="importBoughtToFridge()">${ic('cart')}최근 장 본 재료 ${nb.length}개 한 번에 넣기</button>` : ''; })()}
     <div class="fr-chips">${common.map(chip).join('')}${extra.map(chip).join('')}</div>
     <div class="fr-add"><input id="fr-in" placeholder="목록에 없는 재료 직접 쓰기" maxlength="12" onkeydown="if(event.key==='Enter')addFridgeTyped()"><button onclick="addFridgeTyped()">추가</button>${fridgeHave.size ? `<button onclick="fridgeHave.clear();try{localStorage.removeItem('wmjFridge')}catch(e){};renderFridge()">비우기</button>` : ''}</div>
     ${res}
@@ -6286,7 +6292,37 @@ function sumAmts(list) {
   if (parsed.every(Boolean) && parsed.every(p => p.u === parsed[0].u)) return fmtNum(parsed.reduce((t, p) => t + p.n, 0), parsed[0].u) + parsed[0].u;
   return [...new Set(list.filter(Boolean))].join(' + ');
 }
-function cartToggleDone(name) { const on = !cartItems.filter(c => c.name === name).every(c => c.done); cartItems.forEach(c => { if (c.name === name) c.done = on; }); saveCart(); renderPageCartList(); }
+function cartToggleDone(name) { const on = !cartItems.filter(c => c.name === name).every(c => c.done); cartItems.forEach(c => { if (c.name === name) c.done = on; }); logBought(name, on); saveCart(); renderPageCartList(); }
+// ── 장 본 기록: '샀어요' 체크한 재료를 30일 동안 기억 → 남은 재료로 만들 메뉴 추천 ──
+const boughtLog = () => { try { return JSON.parse(localStorage.getItem('wmjBought') || '[]'); } catch (e) { return []; } };
+function logBought(name, on) {
+  const k = ingKey(name), now = Date.now();
+  let l = boughtLog().filter(b => b.name !== k && now - b.d < 30 * 864e5);
+  if (on) l.push({ name: k, d: now });
+  try { localStorage.setItem('wmjBought', JSON.stringify(l.slice(-200))); } catch (e) {}
+}
+const recentBought = (days = 14) => [...new Set(boughtLog().filter(b => Date.now() - b.d < days * 864e5).map(b => b.name))];
+function leftoverMenus(limit = 4) {
+  const have = recentBought(); if (!have.length) return [];
+  const used = new Set(cartItems.map(c => c.from).filter(Boolean)), eaten = new Set(ateLog().filter(a => Date.now() - (a.ts || 0) < 3 * 864e5).map(a => a.name));
+  const has = (n) => { const k = ingKey(n); return have.some(h => h === k || (h.length >= 2 && (k.includes(h) || h.includes(k)))); };
+  return cookMenusWithIngs().filter(({ m }) => !used.has(m.name) && !eaten.has(m.name))
+    .map(({ m, ings }) => { const got = ings.filter(has), need = ings.filter(n => !has(n)); return { m, got, need }; })
+    .filter(r => r.got.length >= 2 && r.got.length >= r.need.length)
+    .sort((a, b) => a.need.length - b.need.length || b.got.length - a.got.length).slice(0, limit);
+}
+function leftoverHtml() {
+  const rows = leftoverMenus(4); if (!rows.length) return '';
+  return `<div class="lo-box"><div class="lo-h">${ic('pot')}장 본 재료로 또 만들 수 있어요</div><div class="lo-sub">최근 2주 동안 '샀어요' 체크한 재료 기준이에요</div>
+    ${rows.map(r => { const js = r.m.name.replace(/'/g, "\\'"), img = getMenuImg(r.m.name); return `<button class="fr-item" onclick="openRecipe('${js}','${r.m.emoji}')">${img ? `<img src="${img}" alt="" loading="lazy">` : `<span class="em">${r.m.emoji}</span>`}<span style="min-width:0"><b>${escHtml(r.m.name)}</b>
+      <div class="fr-have">있는 재료 ${r.got.length}/${r.got.length + r.need.length} · ${escHtml(r.got.slice(0, 3).join(', '))}</div><div class="fr-need">${r.need.length ? '더 필요: ' + escHtml(r.need.slice(0, 3).join(', ')) + (r.need.length > 3 ? ' 외' : '') : '지금 바로 만들 수 있어요'}</div></span></button>`; }).join('')}
+    <button class="lo-more" onclick="importBoughtToFridge()">냉장고 찾기에서 더 보기</button></div>`;
+}
+function importBoughtToFridge() {
+  recentBought().forEach(n => fridgeHave.add(n));
+  try { localStorage.setItem('wmjFridge', JSON.stringify([...fridgeHave])); } catch (e) {}
+  openFridge();
+}
 function cartRemoveName(name) { cartItems = cartItems.filter(c => c.name !== name); saveCart(); renderPageCartList(); }
 function cartTogglePantry() { cartHidePantry = !cartHidePantry; try { localStorage.setItem('wmjCartPantry', cartHidePantry ? '1' : '0'); } catch (e) {} renderPageCartList(); }
 function renderPageCartList() {
@@ -6308,7 +6344,7 @@ function renderPageCartList() {
     listEl.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted)">
         <div class="ob-big" style="width:60px;height:60px;border-radius:18px;margin-bottom:12px">${ic('cart')}</div>
         <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">장보기 목록이 비어 있어요</div>
-        <div style="font-size:13px">레시피에서 '재료 담기'를 누르면 여기 모여요</div></div>`;
+        <div style="font-size:13px">레시피에서 '재료 담기'를 누르면 여기 모여요</div></div>` + leftoverHtml();
     return;
   }
   const groups = {};
@@ -6325,7 +6361,7 @@ function renderPageCartList() {
         <div class="page-cart-item-btns">
           <a class="page-cart-buy" href="${SHOP_AFFILIATE.coupang.url(r.name)}" target="_blank" rel="noopener">구매</a>
           <button class="page-cart-del" onclick="cartRemoveName('${js}')" aria-label="빼기">✕</button>
-        </div></div>`; }).join('')}</div>`).join('');
+        </div></div>`; }).join('')}</div>`).join('') + leftoverHtml();
 }
 
 // ── 마이페이지 렌더 ──
