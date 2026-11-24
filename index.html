@@ -823,7 +823,13 @@
   .rc-ing { display:flex; align-items:center; gap:8px; padding:9px 10px 9px 12px; border-top:1px solid var(--border); }
   .rc-ing:first-child { border-top:none; }
   .rc-n { font-size:13.5px; font-weight:700; } .rc-a { font-size:12px; color:var(--muted); flex:1; min-width:0; }
-  .rc-buy, .rc-add { font-size:11.5px; font-weight:700; border-radius:999px; padding:5px 10px; text-decoration:none; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; line-height:1.2; }
+  .rc-none { font-size:11.5px; font-weight:700; border-radius:8px; padding:5px 8px; background:none; border:1px dashed var(--border); color:var(--muted); cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; line-height:1.2; }
+  .rc-none.on { border-style:solid; border-color:var(--orange); color:var(--orange); }
+  .rc-help { margin:0 10px 8px 12px; padding:9px 11px; border-radius:8px; background:var(--surface); font-size:12.5px; line-height:1.5; display:flex; flex-wrap:wrap; gap:2px 8px; align-items:baseline; }
+  .rc-help b { font-size:12px; }
+  .rc-help.k-opt b { color:#3cc07a; } .rc-help.k-sub b, .rc-help.k-unk b { color:#ff8a3a; } .rc-help.k-core b { color:var(--red); }
+  .rc-help-sub { flex-basis:100%; } .rc-help-sub em { font-style:normal; font-weight:700; color:var(--text); }
+  .rc-buy, .rc-add { font-size:11.5px; font-weight:700; border-radius:8px; padding:5px 10px; text-decoration:none; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; line-height:1.2; }
   .rc-buy { color:#ff8a3a; background:rgba(255,122,26,.12); border:1px solid transparent; }
   .rc-add { color:var(--text); background:var(--card); border:1px solid var(--border); } .rc-add.added { color:#3cc07a; border-color:rgba(60,192,122,.5); }
   .rc-steps { display:flex; flex-direction:column; gap:6px; }
@@ -5803,6 +5809,68 @@ function recipeTime(r) {
 const fmtMin = (m) => m >= 60 ? `${Math.floor(m / 60)}시간${m % 60 ? ' ' + (m % 60) + '분' : ''}` : `${m}분`;
 function setServ(n) { recipeServ = n; try { localStorage.setItem('wmjServ', String(n)); } catch (e) {} const m = document.getElementById('recipe-modal-box'); if (m && m.dataset.menu) openRecipe(m.dataset.menu, m.dataset.emoji, true); }
 
+// ── 재료가 없을 때: 빼도 되는지 / 뭘로 바꾸는지 (AI 없이 먼저, 모르는 건 나중에 AI로) ──
+const ING_HELP = {
+  '대파':['opt','향이 조금 약해져요','쪽파, 양파 조금'], '쪽파':['opt','','대파'], '부추':['opt','','쪽파, 대파'],
+  '양파':['opt','단맛이 줄어들어요. 설탕 한 꼬집 넣으면 비슷해요','대파 흰 부분'],
+  '다진마늘':['opt','향이 약해져요','마늘가루 조금'], '마늘':['opt','향이 약해져요','다진마늘, 마늘가루'], '통마늘':['opt','','다진마늘'],
+  '생강':['opt','','생강가루 조금'], '참기름':['opt','고소한 향만 빠져요','들기름'], '들기름':['opt','','참기름'],
+  '깨':['opt','',''], '참깨':['opt','',''], '김가루':['opt','',''], '파슬리':['opt','',''], '후추':['opt','',''], '통후추':['opt','','후추'],
+  '깻잎':['opt','',''], '쑥갓':['opt','','미나리, 깻잎'], '어린잎채소':['opt','','양상추, 쌈채소'], '고수':['opt','',''], '바질':['opt','','파슬리'],
+  '청양고추':['opt','빼면 덜 매워요','고춧가루 조금'], '페페론치노':['opt','빼면 덜 매워요','청양고추, 고춧가루 조금'],
+  '당근':['opt','',''], '애호박':['opt','','호박, 양파'], '무':['opt','시원한 맛이 줄어요',''], '감자':['opt','','고구마'],
+  '양배추':['opt','','배추'], '파프리카':['opt','','피망, 당근'], '피망':['opt','','파프리카'], '양상추':['opt','','로메인, 양배추'],
+  '콩나물':['opt','','숙주'], '숙주':['opt','','콩나물'], '시금치':['opt','',''], '브로콜리':['opt','',''],
+  '양송이':['opt','','다른 버섯'], '표고버섯':['opt','','다른 버섯'], '팽이버섯':['opt','','다른 버섯'],
+  '두부':['opt','',''], '달걀':['opt','',''], '방울토마토':['opt','','토마토'], '레몬':['sub','','레몬즙, 식초 조금'], '라임':['sub','','레몬'],
+  '설탕':['sub','','올리고당, 꿀 (1.5배)'], '흑설탕':['sub','','설탕'], '올리고당':['sub','','설탕 (2/3만)'], '물엿':['sub','','올리고당, 설탕'], '꿀':['sub','','올리고당, 설탕'],
+  '고춧가루':['sub','빼면 안 매워요','고추장 조금 (덜 칼칼해요)'], '고추장':['sub','','고춧가루 + 간장 + 설탕 조금'],
+  '간장':['sub','','소금 조금 (색이 연해져요)'], '국간장':['sub','','간장 + 소금 조금'], '소금':['sub','','간장 조금'],
+  '된장':['sub','','미소된장'], '버터':['sub','','식용유, 올리브유'], '식용유':['sub','','올리브유'], '올리브유':['sub','','식용유'], '올리브오일':['sub','','식용유'],
+  '우유':['sub','','두유'], '식초':['sub','','레몬즙'], '케첩':['sub','','토마토소스'], '마요네즈':['sub','','플레인 요거트 (덜 고소해요)'],
+  '멸치육수팩':['sub','','물 + 국간장 조금, 다시다 조금'], '밀가루':['sub','','부침가루, 전분'], '감자전분':['sub','','옥수수전분, 밀가루'], '전분':['sub','','밀가루'],
+  '모짜렐라치즈':['sub','','슬라이스치즈, 체다치즈'], '슬라이스치즈':['sub','','모짜렐라치즈'], '체다치즈':['sub','','슬라이스치즈'],
+  '햄':['sub','','베이컨, 소시지, 스팸'], '베이컨':['sub','','햄, 소시지'], '소시지':['sub','','햄, 비엔나'],
+  '달걀노른자':['sub','소스의 핵심이라 빼면 맛이 많이 달라져요','달걀 1개'], '파마산치즈':['opt','고소함이 줄어요','슬라이스치즈 조금'], '파르메산치즈':['opt','고소함이 줄어요','슬라이스치즈 조금'],
+  '생크림':['sub','','우유 + 버터 조금'], '맛술':['sub','','소주 + 설탕 조금'], '미림':['sub','','맛술, 소주 + 설탕 조금'], '굴소스':['sub','','간장 + 설탕 조금'],
+  '오이':['opt','',''], '김치':['opt','',''], '묵은지':['sub','','김치'], '단무지':['opt','',''], '쌈무':['opt','',''], '아보카도':['opt','',''], '와사비':['opt','',''],
+  '토마토':['sub','','방울토마토, 토마토소스'], '토마토소스':['sub','','케첩 + 물 조금'], '토마토홀':['sub','','토마토소스'], '빵가루':['sub','덜 바삭해요','부침가루, 밀가루'],
+  '칠리파우더':['sub','','고춧가루 조금'], '파프리카가루':['opt','','고춧가루 조금'], '바지락':['opt','시원한 맛이 줄어요','모시조개, 홍합'], '배즙':['sub','','설탕 조금 + 간 양파'],
+  '새우젓':['sub','','소금, 국간장'], '카레가루':['sub','','고형 카레'], '플레인요거트':['sub','','그릭요거트, 우유 + 레몬즙'], '슬라이스햄':['sub','','햄'],
+  '로즈마리':['opt','',''], '우거지':['sub','','시래기, 배추'], '고사리':['opt','','시래기'], '참치캔':['sub','','햄'], '돈가스소스':['sub','','케첩 + 간장 + 설탕'],
+  '견과류':['opt','',''], '큐민':['opt','',''], '찹쌀가루':['sub','','밀가루, 전분'], '쌈채소':['sub','','상추, 깻잎'], '쌈장':['sub','','된장 + 고추장 조금'],
+  '발사믹식초':['sub','','식초 + 설탕 조금'], '옥수수콘':['opt','',''], '케이퍼':['opt','',''], '비빔고추장':['sub','','고추장 + 식초 + 설탕'], '두반장':['sub','','고추장 + 된장 조금'],
+  '고추기름':['sub','','식용유 + 고춧가루'], '크루통':['opt','','구운 식빵 조각'], '레몬즙':['sub','','식초'], '게맛살':['opt','',''], '고구마':['sub','','감자'],
+  '대추':['opt','',''], '땅콩':['opt','',''], '가지':['opt','',''], '어묵':['opt','',''], '알배추':['sub','','배추, 양배추'], '배추':['sub','','알배추, 양배추'],
+  '메이플시럽':['sub','','꿀, 올리고당'], '시나몬가루':['opt','',''], '월계수잎':['opt','',''], '미나리':['opt','','쑥갓'], '고추':['opt','',''], '건고추':['opt','','고춧가루 조금'],
+  '머스터드':['sub','','홀그레인머스터드'], '홀그레인머스터드':['sub','','머스터드'], '딜':['opt','',''], '굵은소금':['sub','','소금'], '초장':['sub','','고추장 + 식초 + 설탕'],
+  '튀김가루':['sub','','부침가루, 밀가루 + 전분'], '탄산수':['sub','덜 바삭해요','찬물'], '후리가케':['opt','',''], '꽃빵':['opt','',''], '그래놀라':['opt','',''], '바나나':['opt','',''], '블루베리':['opt','',''],
+  '닭다리살':['sub','','닭가슴살 (조금 퍽퍽해요)'], '닭가슴살':['sub','','닭다리살'], '새우':['opt','','오징어'], '오징어':['sub','','새우, 쭈꾸미'],
+};
+const BASE_RE = /^(밥|쌀|찹쌀|스파게티|스파게티면|소면|칼국수면|우동면|쌀국수|라면|펜네|마카로니|카펠리니|당면|식빵|또띠아|떡국떡|떡볶이떡|만두피)$/;
+const MEAT_SUBS = { '소고기 다짐육':'돼지 다짐육', '돼지 다짐육':'소고기 다짐육', '돼지고기':'소고기, 닭고기', '소고기':'돼지고기', '다진소고기':'다진돼지고기', '다진돼지고기':'다진소고기', '삼겹살':'목살, 앞다리살' };
+function ingHelp(menu, name) {
+  const base = name.replace(/^(다진|송송 썬|불린|삶은|데친)\s*/, '');
+  const inName = menu.includes(name) || (base.length >= 2 && menu.includes(base));
+  const h = ING_HELP[name] || ING_HELP[base];
+  const sub = (h && h[2]) || (SUBST[name] && !/빼도/.test(SUBST[name]) ? SUBST[name] : '') || MEAT_SUBS[name] || '';
+  if (inName || BASE_RE.test(name)) return { kind: 'core', msg: inName ? `${menu}의 주인공이라 꼭 있어야 해요` : '요리의 기본 재료라 꼭 있어야 해요', sub };
+  if (h && h[0] === 'opt') return { kind: 'opt', msg: h[1] || '', sub };
+  if (SUBST[name] && /빼도/.test(SUBST[name])) return { kind: 'opt', msg: '', sub: '' };
+  if (sub) return { kind: 'sub', msg: (h && h[1]) || '', sub };
+  const first = recipeIngredients(menu)[0];
+  if (first && first.name === name) return { kind: 'core', msg: '이 요리의 메인 재료라 꼭 있어야 해요', sub: '' };
+  return { kind: 'unk', msg: '빼면 맛이 조금 달라질 수 있어요', sub: '' };
+}
+function toggleIngHelp(btn) {
+  const row = btn.closest('.rc-ing'), next = row.nextElementSibling;
+  if (next && next.classList.contains('rc-help')) { next.remove(); btn.classList.remove('on'); return; }
+  const box = document.getElementById('recipe-modal-box'), menu = box.dataset.menu, name = btn.dataset.n;
+  const h = ingHelp(menu, name), tag = { core: '꼭 필요해요', opt: '빼도 돼요', sub: '바꿔 쓸 수 있어요', unk: '빼도 되긴 해요' }[h.kind];
+  const el = document.createElement('div'); el.className = 'rc-help k-' + h.kind;
+  el.innerHTML = `<b>${tag}</b>${h.msg ? `<span>${escHtml(h.msg)}</span>` : ''}${h.sub ? `<span class="rc-help-sub">대신 <em>${escHtml(h.sub)}</em></span>` : ''}`;
+  row.after(el); btn.classList.add('on');
+}
 function openRecipe(menuName, emoji, keepScroll) {
   closeMenuMore();
   const r = recipeDB[menuName], modal = document.getElementById('recipe-modal'), box = document.getElementById('recipe-modal-box');
@@ -5821,7 +5889,8 @@ function openRecipe(menuName, emoji, keepScroll) {
   const ings = recipeIngredients(menuName);
   const inCart = (n) => cartItems.some(c => c.name === n && c.from === menuName);
   const ingList = ings.map(g => { const amt = scaleAmt(g.amount, f), sub = SUBST[g.name];
-    return `<div class="rc-ing"><span class="rc-n">${escHtml(g.name)}${sub ? `<small class="rc-sub">없으면 ${escHtml(sub)}</small>` : ''}</span><span class="rc-a">${escHtml(amt)}</span>
+    return `<div class="rc-ing"><span class="rc-n">${escHtml(g.name)}</span><span class="rc-a">${escHtml(amt)}</span>
+      <button class="rc-none" data-n="${escHtml(g.name)}" onclick="toggleIngHelp(this)">없어요</button>
       <a class="rc-buy" href="${SHOP_AFFILIATE.coupang.url(g.query)}" target="_blank" rel="noopener">구매</a>
       <button class="rc-add cart-btn ${inCart(g.name) ? 'added' : ''}" id="cartbtn-${menuName}-${g.name}" onclick="addToCart('${g.name.replace(/'/g, "\\'")}','${amt.replace(/'/g, "\\'")}','${js}')">${inCart(g.name) ? '✓ 추가됨' : '+ 목록'}</button></div>`; }).join('');
   const steps = r.steps.map((st, k) => `<div class="rc-step"><span class="rc-k">${k + 1}</span><span>${scaleStep(st, f)}</span></div>`).join('');
