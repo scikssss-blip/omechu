@@ -836,6 +836,20 @@
   .talk-q { font-size:13px; color:var(--muted); margin-bottom:4px; }
   .talk-a { font-size:14px; line-height:1.55; } .talk-a b { color:var(--orange); } .talk-a s { color:var(--muted); }
   .talk-a small { font-size:12px; color:var(--muted); }
+  .fr-chip.on { border-color:var(--orange); color:var(--orange); background:rgba(255,71,87,0.1); }
+  .pl-opt { display:flex; gap:10px; align-items:flex-start; margin-bottom:8px; }
+  .pl-opt > span { flex:none; width:44px; font-size:12px; color:var(--muted); padding-top:9px; font-weight:700; }
+  .pl-opt > div { display:flex; flex-wrap:wrap; gap:6px; }
+  .pl-opt .fr-chip { padding:7px 10px; font-size:13px; }
+  .pl-sum { margin:16px 0 8px; padding:12px; border-radius:10px; background:var(--surface); display:flex; flex-direction:column; gap:3px; font-size:13px; line-height:1.5; }
+  .pl-sum b { font-size:15px; } .pl-sum em { font-style:normal; color:var(--orange); font-weight:700; } .pl-sum small { color:var(--muted); font-size:12px; }
+  .pl-day { border-top:1px solid var(--border); padding:8px 0; }
+  .pl-dh { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+  .pl-it { display:flex; align-items:center; gap:8px; padding:4px 0; }
+  .pl-slot { flex:none; font-size:11px; color:var(--muted); width:26px; }
+  .pl-name { flex:1; min-width:0; text-align:left; background:none; border:none; color:var(--text); font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; padding:4px 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pl-k { flex:none; font-size:11.5px; color:var(--muted); }
+  .pl-sw { flex:none; padding:5px 8px; border-radius:8px; border:1px solid var(--border); background:none; color:var(--muted); font-size:11.5px; cursor:pointer; font-family:inherit; }
   .lo-box { margin-top:18px; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; }
   .lo-h { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:700; }
   .lo-sub { font-size:12px; color:var(--muted); margin:2px 0 10px; }
@@ -2637,6 +2651,7 @@
     <h2 style="font-family:'Jua',sans-serif;font-size:22px;margin:0">장보기</h2>
     <p style="font-size:13px;color:var(--muted);margin:4px 0 0">레시피 재료를 한 번에 주문해요</p>
   </div>
+  <button class="lo-more" style="margin:0 0 12px" onclick="openPlan()"><i class="ic" data-ic="clipboard"></i>며칠 치 식단 짜고 재료 한 번에 담기</button>
 
   <!-- 쿠팡 로켓배송 배너 -->
   <div class="coupang-banner" onclick="window.open('https://link.coupang.com/a/eu5btk','_blank')">
@@ -2680,6 +2695,14 @@
       <button class="my-edit-btn" onclick="openNicknameModal()">편집</button>
     </div>
     <div class="my-profile-stats" id="my-profile-stats"></div>
+  </div>
+
+  <!-- 식단 짜기 -->
+  <div class="my-section">
+    <div class="my-section-header my-acc-header" onclick="openPlan()">
+      <span class="my-section-title"><i class="ic" data-ic="clipboard"></i>식단 짜기</span>
+      <span style="display:flex;align-items:center;gap:6px"><span class="my-section-hint">목적에 맞춰 며칠 치 집밥</span><span class="my-acc-arrow">›</span></span>
+    </div>
   </div>
 
   <!-- 이번 주 먹은 것 -->
@@ -4185,6 +4208,98 @@ function talkRecommend() {
   const box = document.createElement('div'); box.className = 'talk-res';
   box.innerHTML = `<div class="talk-q">"${escHtml(text)}"</div><div class="talk-a">${clue.length ? `추리 결과: ${clue.join(' · ')}` : '딱 맞는 단서를 못 찾아서 두루 골라 봤어요'}<br><small>${catName} 기준 · 조건에 맞는 ${pool.length}개 중에서 골랐어요${p.cat ? '' : ' · 위에서 다른 방식으로 바꿀 수 있어요'}</small></div>`;
   document.getElementById('result-area').prepend(box);
+}
+// ── 식단 짜기: 목적·기간·끼니에 맞춰 집밥 식단을 짜고, 영양 합계와 장보기까지 ──
+const PLAN_GOALS = { bal: '골고루', diet: '가볍게(저칼로리)', pro: '단백질 위주', easy: '간단하게(30분 안)', sugar: '당 줄이기' };
+let planOpt = (() => { try { return Object.assign({ goal: 'bal', days: 5, meals: 1, serv: 2, share: true }, JSON.parse(localStorage.getItem('wmjPlanOpt') || '{}')); } catch (e) { return { goal: 'bal', days: 5, meals: 1, serv: 2, share: true }; } })();
+let planData = (() => { try { return JSON.parse(localStorage.getItem('wmjPlan') || 'null'); } catch (e) { return null; } })();
+const planPool = () => avoidFilter(cookMenusWithIngs().map(x => x.m)).filter(m => { const r = recipeDB[m.name]; return r && r.calories; });
+function planFits(m, goal) {
+  const r = recipeDB[m.name], t = m.tags || [];
+  if (goal === 'diet') return (r.calories <= 450 || t.includes('🥗 다이어트식') || t.includes('🥑 저지방')) && !t.includes('🍟 기름진 음식') && !t.includes('🫕 튀김');
+  if (goal === 'pro') return r.protein >= 20 || t.includes('💪 고단백');
+  if (goal === 'easy') return t.includes('🕒 30분 이내') || t.includes('⚡ 10분 이내');
+  if (goal === 'sugar') return t.includes('📉 혈당 조절(저당)') || r.carbs <= 30;
+  return true;
+}
+function planPick(chosen, prevTags) {
+  let pool = planPool();
+  const ate = new Set(ateLog().filter(a => Date.now() - (a.ts || 0) < 5 * 864e5).map(a => a.name));
+  const used = new Set(chosen.map(c => c.name));
+  let fit = pool.filter(m => planFits(m, planOpt.goal) && !used.has(m.name) && !ate.has(m.name));
+  if (fit.length < 3) fit = pool.filter(m => planFits(m, planOpt.goal) && !used.has(m.name));
+  if (!fit.length) fit = pool.filter(m => !used.has(m.name));
+  const have = new Set(chosen.flatMap(c => recipeIngredients(c.name).map(g => ingKey(g.name)).filter(n => !PANTRY.includes(n))));
+  const mains = new Set(chosen.map(c => (recipeIngredients(c.name)[0] || {}).name));
+  const kind = (m) => (m.tags || []).find(x => /한식|중식|일식|양식|아시아/.test(x));
+  const scored = fit.map(m => {
+    const ings = recipeIngredients(m.name).map(g => ingKey(g.name)).filter(n => !PANTRY.includes(n));
+    let sc = Math.random() * 2;
+    if (planOpt.share && have.size) sc += Math.min(3, ings.filter(n => have.has(n)).length) * 0.6;
+    if (mains.has((recipeIngredients(m.name)[0] || {}).name)) sc -= 1.2;
+    if (prevTags && kind(m) && prevTags.includes(kind(m)) && kind(m) !== '🍱 한식') sc -= 0.6;
+    if (prevTags && ['🍳 볶음', '♨️ 찜/조림', '🍲 국물/찌개', '🔥 구이', '🫕 튀김'].some(x => prevTags.includes(x) && (m.tags || []).includes(x))) sc -= 0.9;
+    if (planOpt.goal === 'pro') sc += recipeDB[m.name].protein / 25;
+    if (planOpt.goal === 'diet') sc += (500 - recipeDB[m.name].calories) / 300;
+    return { m, sc };
+  }).sort((a, b) => b.sc - a.sc);
+  return scored[0] ? scored[0].m : null;
+}
+function makePlan() {
+  const items = [], slots = planOpt.meals === 2 ? ['점심', '저녁'] : ['저녁'];
+  for (let d = 0; d < planOpt.days; d++) for (const slot of slots) {
+    const prev = items[items.length - 1], m = planPick(items, prev ? (menuDB.find(x => x.name === prev.name) || {}).tags : null);
+    if (m) items.push({ d, slot, name: m.name, emoji: m.emoji });
+  }
+  planData = { opt: { ...planOpt }, items, start: new Date().toISOString().slice(0, 10) };
+  try { localStorage.setItem('wmjPlan', JSON.stringify(planData)); localStorage.setItem('wmjPlanOpt', JSON.stringify(planOpt)); } catch (e) {}
+  renderPlan();
+}
+function planSwap(i) {
+  const it = planData.items[i], others = planData.items.filter((_, k) => k !== i);
+  const m = planPick(others.concat([{ name: it.name }]), null); if (!m) return;
+  planData.items[i] = { ...it, name: m.name, emoji: m.emoji };
+  try { localStorage.setItem('wmjPlan', JSON.stringify(planData)); } catch (e) {}
+  renderPlan();
+}
+function planSet(k, v) { planOpt[k] = v; try { localStorage.setItem('wmjPlanOpt', JSON.stringify(planOpt)); } catch (e) {} renderPlan(); }
+function planToCart() {
+  if (!planData) return;
+  const f = (planData.opt.serv || 2) / 2; let n = 0;
+  for (const it of planData.items) for (const g of recipeIngredients(it.name)) {
+    if ((cartHidePantry && PANTRY.includes(g.name)) || cartItems.some(c => c.name === g.name && c.from === it.name)) continue;
+    cartItems.push({ name: g.name, amount: scaleAmt(g.amount, f), from: it.name }); n++;
+  }
+  saveCart(); closePlan(); showToast(n ? `식단 재료 ${n}개를 장보기에 담았어요` : '이미 다 담겨 있어요'); showTab('cart');
+}
+function openPlan() {
+  let el = document.getElementById('plan-modal');
+  if (!el) { el = document.createElement('div'); el.id = 'plan-modal'; el.className = 'fr-modal'; el.onclick = (e) => { if (e.target === el) closePlan(); }; document.body.appendChild(el); }
+  el.classList.add('open'); renderPlan();
+}
+function closePlan() { const el = document.getElementById('plan-modal'); if (el) el.classList.remove('open'); }
+function renderPlan() {
+  const el = document.getElementById('plan-modal'); if (!el) return;
+  const chip = (k, v, label) => `<button class="fr-chip ${planOpt[k] === v ? 'on' : ''}" onclick="planSet('${k}',${typeof v === 'string' ? `'${v}'` : v})">${label}</button>`;
+  const opts = `<div class="pl-opt"><span>목적</span><div>${Object.entries(PLAN_GOALS).map(([k, v]) => chip('goal', k, v)).join('')}</div></div>
+    <div class="pl-opt"><span>기간</span><div>${[3, 5, 7].map(n => chip('days', n, n + '일')).join('')}</div></div>
+    <div class="pl-opt"><span>끼니</span><div>${chip('meals', 1, '하루 1끼 (저녁)')}${chip('meals', 2, '하루 2끼 (점심·저녁)')}</div></div>
+    <div class="pl-opt"><span>인분</span><div>${[1, 2, 3, 4].map(n => chip('serv', n, n + '인분')).join('')}</div></div>
+    <div class="pl-opt"><span>장보기</span><div>${chip('share', true, '재료 겹치게 (남는 재료 줄이기)')}${chip('share', false, '상관없음')}</div></div>
+    <button class="keep-rand" onclick="makePlan()">${ic('calendar')}${planData ? '이 조건으로 다시 짜기' : '식단 짜기'}</button>`;
+  let res = '';
+  if (planData && planData.items.length) {
+    const days = ['일', '월', '화', '수', '목', '금', '토'], st = new Date(planData.start);
+    const nut = (n) => recipeDB[n] || {};
+    const byDay = {}; planData.items.forEach((it, i) => (byDay[it.d] = byDay[it.d] || []).push({ ...it, i }));
+    const tot = planData.items.reduce((a, it) => { const r = nut(it.name); a.k += r.calories || 0; a.p += r.protein || 0; a.c += r.carbs || 0; a.f += r.fat || 0; return a; }, { k: 0, p: 0, c: 0, f: 0 });
+    const nd = Object.keys(byDay).length, uniq = new Set(planData.items.flatMap(it => recipeIngredients(it.name).map(g => g.name).filter(n => !PANTRY.includes(n))));
+    res = `<div class="pl-sum"><b>${PLAN_GOALS[planData.opt.goal]} · ${nd}일</b><span>식단 1인분 기준 하루 평균 약 <em>${Math.round(tot.k / nd)}kcal</em> · 단백질 ${Math.round(tot.p / nd)}g · 탄수 ${Math.round(tot.c / nd)}g · 지방 ${Math.round(tot.f / nd)}g</span><small>레시피 기준 추정치예요 · 필요한 재료 ${uniq.size}가지 (기본 양념 제외)</small></div>
+      ${Object.entries(byDay).map(([d, list]) => { const dt = new Date(st.getTime() + d * 864e5); return `<div class="pl-day"><div class="pl-dh">${dt.getMonth() + 1}/${dt.getDate()} ${days[dt.getDay()]}</div>${list.map(it => { const r = nut(it.name), js = it.name.replace(/'/g, "\\'"); return `<div class="pl-it"><span class="pl-slot">${it.slot}</span><button class="pl-name" onclick="closePlan();openRecipe('${js}','${it.emoji}')">${it.emoji} ${escHtml(it.name)}</button><span class="pl-k">${r.calories || '-'}kcal · 단${Math.round(r.protein || 0)}g</span><button class="pl-sw" onclick="planSwap(${it.i})" aria-label="다른 메뉴로">바꾸기</button></div>`; }).join('')}</div>`; }).join('')}
+      <button class="keep-rand" style="background:var(--green);color:#062" onclick="planToCart()">${ic('cart')}재료 전부 장보기에 담기 (${planData.opt.serv}인분)</button>`;
+  }
+  el.innerHTML = `<div class="fr-box" role="dialog" aria-label="식단 짜기"><div class="fr-top"><b>식단 짜기</b><button class="more-x" onclick="closePlan()" aria-label="닫기">✕</button></div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px">레시피가 있는 집밥 메뉴로 짜요 · 최근 먹은 메뉴와 못 먹는 재료는 빼요</div>${opts}${res}</div>`;
 }
 // ── 킵: 이번 선택(카테고리+조건)에서 추천받은 메뉴 중 마음에 드는 걸 잠깐 모아두기 ──
 let keepList = [], keepCat = '', keepSig = '';
