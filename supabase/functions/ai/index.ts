@@ -11,15 +11,27 @@ const LIMIT = { yt_recipe: 10, owner: 40 }; // 사람당 하루 횟수
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'content-type, authorization, apikey, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 
+// 모델이 붐비면(503·429) 잠깐 쉬고 다시, 그래도 안 되면 다른 모델로
+const FALLBACK = [MODEL, 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest'];
 async function gemini(parts: unknown[], jsonOut: boolean, maxTokens = 2048) {
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
-    body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { temperature: jsonOut ? 0.2 : 0.8, maxOutputTokens: maxTokens, ...(jsonOut ? { responseMimeType: 'application/json' } : {}) } }),
-  });
-  if (!r.ok) throw new Error('gemini ' + r.status + ' ' + (await r.text()).slice(0, 300));
-  const d = await r.json();
-  return (d.candidates?.[0]?.content?.parts || []).map((p: { text?: string }) => p.text || '').join('');
+  const errs: string[] = [];
+  for (const model of [...new Set(FALLBACK)]) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
+        body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { temperature: jsonOut ? 0.2 : 0.8, maxOutputTokens: maxTokens, ...(jsonOut ? { responseMimeType: 'application/json' } : {}) } }),
+      });
+      if (r.ok) {
+        const d = await r.json();
+        return (d.candidates?.[0]?.content?.parts || []).map((p: { text?: string }) => p.text || '').join('');
+      }
+      errs.push(`${model} ${r.status} ` + (await r.text()).replace(/\s+/g, ' ').slice(0, 160));
+      if (r.status === 503 || r.status === 429 || r.status >= 500) { await new Promise((res) => setTimeout(res, 1200)); continue; }
+      break; // 404(모델 없음)·400 등은 다음 모델로
+    }
+  }
+  throw new Error('gemini ' + errs.join(' | '));
 }
 
 function ytId(u: string) {
@@ -82,7 +94,7 @@ ${hist ? '지난 대화:\n' + hist + '\n' : ''}손님: ${text}\n사장님:`;
       return json({ ok: true, reply: reply || '음… 뭐 드시고 싶어요? 🙂' });
     }
   } catch (e) {
-    return json({ ok: false, reason: '잠시 후 다시 시도해 주세요', detail: String(e).slice(0, 200) }, 500);
+    return json({ ok: false, reason: '잠시 후 다시 시도해 주세요', detail: String(e).slice(0, 900) }, 500);
   }
   return json({ ok: false }, 400);
 });
