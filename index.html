@@ -823,6 +823,19 @@
   .rc-ing { display:flex; align-items:center; gap:8px; padding:9px 10px 9px 12px; border-top:1px solid var(--border); }
   .rc-ing:first-child { border-top:none; }
   .rc-n { font-size:13.5px; font-weight:700; } .rc-a { font-size:12px; color:var(--muted); flex:1; min-width:0; }
+  .talk-box { margin:10px 0 14px; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; }
+  .talk-h { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .talk-h b { font-size:14px; } .talk-h span { font-size:12px; color:var(--muted); }
+  .talk-row { display:flex; gap:6px; }
+  .talk-row input { flex:1; min-width:0; padding:11px 12px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; font-family:inherit; }
+  .talk-row button { padding:0 14px; border:none; border-radius:10px; background:var(--orange); color:#fff; font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+  .talk-ex { display:flex; gap:6px; overflow-x:auto; margin-top:8px; scrollbar-width:none; }
+  .talk-ex::-webkit-scrollbar { display:none; }
+  .talk-ex button { flex:none; padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:none; color:var(--muted); font-size:12px; cursor:pointer; font-family:inherit; }
+  .talk-res { margin-bottom:12px; padding:12px 14px; border-radius:12px; background:rgba(255,71,87,0.08); border:1px solid rgba(255,71,87,0.35); }
+  .talk-q { font-size:13px; color:var(--muted); margin-bottom:4px; }
+  .talk-a { font-size:14px; line-height:1.55; } .talk-a b { color:var(--orange); } .talk-a s { color:var(--muted); }
+  .talk-a small { font-size:12px; color:var(--muted); }
   .lo-box { margin-top:18px; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; }
   .lo-h { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:700; }
   .lo-sub { font-size:12px; color:var(--muted); margin:2px 0 10px; }
@@ -1181,6 +1194,14 @@
     <button class="fridge-btn" onclick="openFridge()"><i class="ic" data-ic="fridge"></i>냉장고 재료로</button>
   </div>
   <div id="menu-find-list" class="find-list"></div>
+  <div class="talk-box">
+    <div class="talk-h"><b>추리에게 말로 물어보기</b><span>지금 상황을 편하게 적어 주세요</span></div>
+    <form class="talk-row" onsubmit="event.preventDefault();talkRecommend()">
+      <input id="talk-in" type="text" maxlength="60" autocomplete="off" placeholder="예) 비 오는데 따뜻하고 안 매운 거">
+      <button type="submit">추리해줘</button>
+    </form>
+    <div class="talk-ex"><button type="button" onclick="talkExample(this)">해장하고 싶어</button><button type="button" onclick="talkExample(this)">속 안 좋은데 가볍게</button><button type="button" onclick="talkExample(this)">친구랑 술 한잔</button><button type="button" onclick="talkExample(this)">혼자 간단히 빨리</button><button type="button" onclick="talkExample(this)">다이어트 중인데 배고파</button></div>
+  </div>
   <div class="pc-entry" onclick="showPage('pocha')">
     <span style="font-size:28px">🏮</span>
     <div><div class="t">오메추리 먹자골목</div><div class="s" id="pc-entry-home">포차·한식·일식·중식·양식, 들어가서 같이 골라요</div></div>
@@ -4102,6 +4123,69 @@ function getRecommendation() {
   renderResults();
 }
 
+// ── 말로 추천받기: 문장에서 상황·원하는 것·빼고 싶은 걸 찾아 조건으로 바꿈 (AI 없이 규칙으로, 나중에 AI로 보강) ──
+const TALK_RULES = [
+  [/비\s?(와|오|온|내)|비오|장마|눈\s?(와|오|온)/, ['🌨️ 눈/비오는 날'], '비 오는 날'],
+  [/추워|추운|춥|쌀쌀|으슬/, ['🥶 추운 날', '🍲 국물/찌개'], '추운 날'],
+  [/더워|더운|덥|시원한/, ['☀️ 더운 날'], '더운 날'],
+  [/해장|숙취|술\s?깨|전날\s?술/, ['🤢 해장', '🍲 국물/찌개'], '해장'],
+  [/속\s?(이)?\s?(안\s?좋|쓰려|불편|더부룩)|소화|체한/, ['💧 담백한맛'], '속 편한 것', ['🌶️ 매운/얼큰한맛', '🌶️ 매운 음식', '🍟 기름진 음식', '🧈 느끼한맛']],
+  [/따뜻|뜨끈|국물|찌개|탕/, ['🍲 국물/찌개'], '따뜻한 국물'],
+  [/매운|맵|얼큰|칼칼|스트레스/, ['🌶️ 매운/얼큰한맛', '🌶️ 매운 음식'], '매콤한 것'],
+  [/가볍|가벼운|다이어트|살\s?(빼|찌)|식단/, ['🥗 다이어트식', '🥑 저지방'], '가벼운 것', ['🍟 기름진 음식', '🫕 튀김']],
+  [/든든|배고|허기|많이\s?먹|푸짐/, ['🍚 밥', '🥩 고기'], '든든한 것'],
+  [/고기|삼겹|소고기|돼지/, ['🥩 고기'], '고기'],
+  [/해산물|해물|회\b|생선|새우|조개/, ['🦐 해산물', '🐟 생선'], '해산물'],
+  [/면|국수|라면|파스타/, ['🍜 면', '🍜 면 요리'], '면'],
+  [/밥\b|밥이|밥으로|덮밥|볶음밥/, ['🍚 밥'], '밥'],
+  [/한식/, ['🍱 한식'], '한식'], [/중식|중국/, ['🥢 중식'], '중식'], [/일식|일본/, ['🍣 일식'], '일식'], [/양식|서양/, ['🍝 양식'], '양식'],
+  [/술|안주|맥주|소주|와인|한잔|한 잔/, ['🍺 술안주'], '술안주'],
+  [/야식|밤에|늦게|새벽/, ['🌙 야식'], '야식'],
+  [/데이트|연인|애인/, ['🥂 데이트'], '데이트'], [/집들이|파티|손님/, ['🎉 홈파티/집들이'], '손님 상'],
+  [/달달|단\s?거|달콤|디저트/, ['🍯 달달한맛'], '달달한 것'], [/상큼|새콤|산뜻/, ['🍋 새콤/상큼한맛'], '상큼한 것'],
+  [/느끼|크리미|꾸덕/, ['🧈 느끼한맛'], '꾸덕한 것'], [/담백|슴슴|깔끔/, ['💧 담백한맛'], '담백한 것'],
+  [/간단|빨리|빠르게|귀찮|대충|금방|10분/, ['⚡ 10분 이내', '👶 초보도 가능', '🕒 30분 이내'], '간단한 것'],
+  [/단백질|운동|헬스|고단백/, ['💪 고단백'], '단백질'], [/바삭|튀김|치킨/, ['🫕 튀김'], '바삭한 것'],
+  [/채소|야채|샐러드|비건|채식/, ['🥗 채소'], '채소', ['🥩 고기']],
+];
+const TALK_NEG = /(빼고|말고|제외|싫|안\s?땡|못\s?먹|없는|없이|안\s?(돼|되)|별로|질려)/;
+function talkParse(text) {
+  const t = text.replace(/\s+/g, ' ').trim(), inc = new Set(), exc = new Set(), said = [], nope = [];
+  for (const [re, tags, label, alsoExc] of TALK_RULES) {
+    const m = t.match(re); if (!m) continue;
+    const after = t.slice(m.index, m.index + m[0].length + 8), before = t.slice(Math.max(0, m.index - 3), m.index);
+    const neg = TALK_NEG.test(after.slice(m[0].length)) || /(안|덜|못)\s?$/.test(before) || /^(안\s?매|안\s?맵|맵지\s?않|안\s?느끼|느끼하지\s?않)/.test(t.slice(m.index - 2 < 0 ? 0 : m.index - 2));
+    if (neg) { tags.forEach(x => exc.add(x)); nope.push(label); }
+    else { tags.forEach(x => inc.add(x)); (alsoExc || []).forEach(x => exc.add(x)); said.push(label); }
+  }
+  if (/안\s?매|맵지\s?않|안\s?맵|매운\s?거\s?(빼|말|싫|못)/.test(t)) { ['🌶️ 매운/얼큰한맛', '🌶️ 매운 음식'].forEach(x => { exc.add(x); inc.delete(x); }); if (!nope.includes('매콤한 것')) nope.push('매콤한 것'); const i = said.indexOf('매콤한 것'); if (i >= 0) said.splice(i, 1); }
+  const cat = /배달|시켜|주문/.test(t) ? 'delivery' : /해\s?먹|만들|요리|집밥|냉장고/.test(t) ? 'cook' : /나가|외식|식당|밖에서|가게/.test(t) ? 'dine' : '';
+  return { inc: [...inc], exc: [...exc], said, nope, cat };
+}
+function talkExample(b) { const i = document.getElementById('talk-in'); i.value = b.textContent; talkRecommend(); }
+function talkRecommend() {
+  const text = (document.getElementById('talk-in').value || '').trim();
+  if (!text) { showToast('먹고 싶은 느낌이나 상황을 적어 주세요'); return; }
+  const p = talkParse(text);
+  const cat = p.cat || selectedCat || 'delivery';
+  if (selectedCat !== cat) selectCat(cat);
+  let pool = avoidFilter(menuDB.filter(m => (m.cat || []).includes(cat) && !(m.tags || []).some(x => p.exc.includes(x))));
+  const hit = (m) => p.inc.filter(x => (m.tags || []).includes(x)).length;
+  if (p.inc.length) { const best = Math.max(0, ...pool.map(hit)); if (best > 0) pool = pool.filter(m => hit(m) >= Math.max(1, best - 1)); }
+  if (!pool.length) { showToast('조건에 맞는 메뉴가 없어요. 조금 다르게 말해 볼래요?'); return; }
+  saveHistorySnapshot(); rejectedNames = []; rejectCountMap = {};
+  currentCandidates = pool; keepCheckSet(pool); pickReasons = {};
+  const seen = seenToday(), fresh = pool.filter(m => !seen.includes(m.name));
+  currentPicked = pickWeighted(fresh.length >= 3 ? fresh : pool, Math.min(3, pool.length));
+  currentPicked.forEach(m => { const why = p.inc.filter(x => (m.tags || []).includes(x)).map(x => x.replace(/^\S+\s/, '')); if (why.length) pickReasons[m.name] = why.slice(0, 3); });
+  markSeen(currentPicked.map(m => m.name)); logRecEvents(currentPicked);
+  renderResults();
+  const catName = { cook: '집에서 해먹기', delivery: '배달', dine: '밖에서 먹기' }[cat];
+  const clue = [...p.said.map(x => `<b>${escHtml(x)}</b>`), ...p.nope.map(x => `<s>${escHtml(x)}</s> 빼고`)];
+  const box = document.createElement('div'); box.className = 'talk-res';
+  box.innerHTML = `<div class="talk-q">"${escHtml(text)}"</div><div class="talk-a">${clue.length ? `추리 결과: ${clue.join(' · ')}` : '딱 맞는 단서를 못 찾아서 두루 골라 봤어요'}<br><small>${catName} 기준 · 조건에 맞는 ${pool.length}개 중에서 골랐어요${p.cat ? '' : ' · 위에서 다른 방식으로 바꿀 수 있어요'}</small></div>`;
+  document.getElementById('result-area').prepend(box);
+}
 // ── 킵: 이번 선택(카테고리+조건)에서 추천받은 메뉴 중 마음에 드는 걸 잠깐 모아두기 ──
 let keepList = [], keepCat = '', keepSig = '';
 // 카테고리나 조건(필터)이 바뀌면 킵 목록도 새로 시작 — '이번 선택'에서만 유지
