@@ -834,7 +834,8 @@
   .talk-ex button { flex:none; padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:none; color:var(--muted); font-size:12px; cursor:pointer; font-family:inherit; }
   .talk-res { margin-bottom:12px; padding:12px 14px; border-radius:12px; background:rgba(255,71,87,0.08); border:1px solid rgba(255,71,87,0.35); }
   .talk-q { font-size:13px; color:var(--muted); margin-bottom:4px; }
-  .talk-a { font-size:14px; line-height:1.55; } .talk-a b { color:var(--orange); } .talk-a s { color:var(--muted); }
+  .talk-v { font-family:'Jua',sans-serif; font-size:17px; line-height:1.4; color:var(--text); margin:2px 0 6px; }
+  .talk-a { font-size:13px; line-height:1.55; } .talk-a b { color:var(--orange); } .talk-a s { color:var(--muted); }
   .talk-a small { font-size:12px; color:var(--muted); }
   .fr-chip.on { border-color:var(--orange); color:var(--orange); background:rgba(255,71,87,0.1); }
   .pl-opt { display:flex; gap:10px; align-items:flex-start; margin-bottom:8px; }
@@ -851,7 +852,11 @@
   .pl-k { flex:none; font-size:11.5px; color:var(--muted); }
   .pl-sw { flex:none; padding:5px 8px; border-radius:8px; border:1px solid var(--border); background:none; color:var(--muted); font-size:11.5px; cursor:pointer; font-family:inherit; }
   .yt-entry { width:100%; margin-top:8px; padding:10px; border-radius:10px; border:1px dashed var(--border); background:none; color:var(--text); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:6px; }
-  .yt-msg { font-size:13px; color:var(--muted); margin-top:8px; min-height:18px; display:flex; align-items:center; gap:8px; }
+  .yt-msg { font-size:13px; color:var(--muted); margin-top:8px; min-height:18px; }
+  .yt-prog { display:flex; gap:12px; align-items:flex-start; padding:10px; border-radius:10px; background:var(--surface); }
+  .yt-prog img { width:112px; aspect-ratio:16/9; object-fit:cover; border-radius:8px; flex:none; }
+  .yt-prog > div > div { display:flex; align-items:center; gap:6px; line-height:1.9; color:var(--muted); }
+  .yt-prog .now { color:var(--text); font-weight:700; } .yt-prog .done { color:#3cc07a; }
   .yt-spin { width:14px; height:14px; border-radius:50%; border:2px solid var(--border); border-top-color:var(--orange); animation:ytspin .8s linear infinite; flex:none; }
   @keyframes ytspin { to { transform:rotate(360deg); } }
   .rc-src { display:flex; gap:8px; align-items:flex-start; margin:0 0 10px; padding:10px 12px; border-radius:10px; background:var(--surface); color:var(--text); text-decoration:none; font-size:12.5px; line-height:1.5; }
@@ -4195,10 +4200,29 @@ function talkParse(text) {
   return { inc: [...inc], exc: [...exc], said, nope, cat };
 }
 function talkExample(b) { const i = document.getElementById('talk-in'); i.value = b.textContent; talkRecommend(); }
-function talkRecommend() {
+// AI로 먼저 해석(2~4초), 안 되면 규칙으로. 규칙으로도 못 알아들은 문장은 이름 없이 기록(추리 개선용)
+const TALK_TAGS = () => [...new Set(menuDB.flatMap(m => m.tags || []))];
+let talkBusy = false;
+async function talkRecommend() {
   const text = (document.getElementById('talk-in').value || '').trim();
   if (!text) { showToast('먹고 싶은 느낌이나 상황을 적어 주세요'); return; }
-  const p = talkParse(text);
+  if (talkBusy) return;
+  const rule = talkParse(text);
+  let p = rule, ai = null;
+  if (AI_READY) {
+    talkBusy = true;
+    const btn = document.querySelector('.talk-row button'); if (btn) { btn.disabled = true; btn.textContent = '추리 중…'; }
+    try {
+      ai = await Promise.race([aiCall('talk', { text, tags: TALK_TAGS() }), new Promise(r => setTimeout(() => r(null), 16000))]);
+    } catch (e) { ai = null; }
+    talkBusy = false; if (btn) { btn.disabled = false; btn.textContent = '추리해줘'; }
+    if (ai && ai.ok && (ai.inc.length || ai.exc.length)) p = { inc: ai.inc, exc: ai.exc, cat: ai.cat || rule.cat, said: ai.clues && ai.clues.length ? ai.clues : rule.said, nope: [], reason: ai.reason };
+    else if (ai && ai.ok && ai.reason) p = { ...rule, reason: ai.reason };
+  }
+  if (!p.inc.length && !p.exc.length) { try { sb && sb.rpc('log_talk_miss', { p_text: text }); } catch (e) {} }
+  talkApply(text, p);
+}
+function talkApply(text, p) {
   const cat = p.cat || selectedCat || 'delivery';
   if (selectedCat !== cat) selectCat(cat);
   let pool = avoidFilter(menuDB.filter(m => (m.cat || []).includes(cat) && !(m.tags || []).some(x => p.exc.includes(x))));
@@ -4215,7 +4239,8 @@ function talkRecommend() {
   const catName = { cook: '집에서 해먹기', delivery: '배달', dine: '밖에서 먹기' }[cat];
   const clue = [...p.said.map(x => `<b>${escHtml(x)}</b>`), ...p.nope.map(x => `<s>${escHtml(x)}</s> 빼고`)];
   const box = document.createElement('div'); box.className = 'talk-res';
-  box.innerHTML = `<div class="talk-q">"${escHtml(text)}"</div><div class="talk-a">${clue.length ? `추리 결과: ${clue.join(' · ')}` : '딱 맞는 단서를 못 찾아서 두루 골라 봤어요'}<br><small>${catName} 기준 · 조건에 맞는 ${pool.length}개 중에서 골랐어요${p.cat ? '' : ' · 위에서 다른 방식으로 바꿀 수 있어요'}</small></div>`;
+  const verdict = p.reason ? `<div class="talk-v">${escHtml(p.reason)}</div>` : '';
+  box.innerHTML = `<div class="talk-q">"${escHtml(text)}"</div>${verdict}<div class="talk-a">${clue.length ? `단서: ${clue.join(' · ')}` : '딱 맞는 단서를 못 찾아서 두루 골라 봤어요'}<br><small>${catName} 기준 · 조건에 맞는 ${pool.length}개 중에서 골랐어요${p.cat ? '' : ' · 위에서 다른 방식으로 바꿀 수 있어요'}</small></div>`;
   document.getElementById('result-area').prepend(box);
 }
 // ── 식단 짜기: 목적·기간·끼니에 맞춰 집밥 식단을 짜고, 영양 합계와 장보기까지 ──
@@ -4321,7 +4346,7 @@ const YT_KEY = 'wmjYtRecipes';
 const ytList = () => { try { return JSON.parse(localStorage.getItem(YT_KEY) || '[]'); } catch (e) { return []; } };
 function ytRegister(id, rc) {
   const name = `${rc.title} (유튜브)`;
-  recipeDB[name] = { ings: rc.ingredients.map(([n, a]) => [n, a, n]), steps: rc.steps, water: rc.water || '', baseServ: Math.max(1, Math.min(8, +rc.servings || 2)), src: id, guess: rc.guess || [] };
+  recipeDB[name] = { ings: rc.ingredients.map(([n, a]) => [n, a, n]), steps: rc.steps, water: rc.water || '', baseServ: Math.max(1, Math.min(8, +rc.servings || 2)), src: id, guess: rc.guess || [], channel: rc.channel || '' };
   return name;
 }
 setTimeout(() => { ytList().forEach(x => { try { ytRegister(x.id, x.rc); } catch (e) {} }); if (!AI_READY) document.querySelectorAll('.yt-entry').forEach(b => { b.style.display = 'none'; }); }, 0);
@@ -4345,16 +4370,23 @@ async function ytFetch() {
   const url = (document.getElementById('yt-in').value || '').trim(), msg = document.getElementById('yt-msg'), go = document.getElementById('yt-go');
   if (!/youtu\.?be/.test(url)) { msg.textContent = '유튜브 영상 주소를 붙여 넣어 주세요'; return; }
   if (!AI_READY) { msg.textContent = '곧 열려요! 조금만 기다려 주세요'; return; }
-  go.disabled = true; msg.innerHTML = '<span class="yt-spin"></span>추리가 영상을 보고 있어요… (20~40초)';
+  go.disabled = true;
+  const vid = (url.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/) || [])[1] || '';
+  const steps = [[0, '영상 정보 확인 중'], [3, '설명란에서 재료 찾는 중'], [8, '영상 보는 중 · 2초에 한 장씩'], [25, '재료랑 순서 정리하는 중'], [45, '거의 다 됐어요, 조금만요']];
+  const t0 = Date.now();
+  const paint = () => { const sec = (Date.now() - t0) / 1000, cur = steps.filter(x => sec >= x[0]).length - 1;
+    msg.innerHTML = `<div class="yt-prog">${vid ? `<img src="https://i.ytimg.com/vi/${vid}/mqdefault.jpg" alt="">` : ''}<div>${steps.map((x, i) => `<div class="${i < cur ? 'done' : i === cur ? 'now' : ''}">${i < cur ? '✓' : i === cur ? '<span class="yt-spin"></span>' : '·'} ${x[1]}</div>`).join('')}</div></div>`; };
+  paint(); const tick = setInterval(paint, 1000);
   try {
     const d = await aiCall('yt_recipe', { url });
+    clearInterval(tick);
     if (!d.ok) { msg.textContent = d.reason || '가져오지 못했어요'; return; }
     const l = ytList().filter(x => x.id !== d.video_id); l.push({ id: d.video_id, rc: d.recipe, at: Date.now() });
     try { localStorage.setItem(YT_KEY, JSON.stringify(l.slice(-30))); } catch (e) {}
     const name = ytRegister(d.video_id, d.recipe);
     closeYt(); openRecipe(name, d.recipe.emoji || '🍳');
   } catch (e) { msg.textContent = '연결이 불안정해요. 다시 시도해 주세요'; }
-  finally { if (go) go.disabled = false; }
+  finally { clearInterval(tick); if (go) go.disabled = false; }
 }
 // ── 킵: 이번 선택(카테고리+조건)에서 추천받은 메뉴 중 마음에 드는 걸 잠깐 모아두기 ──
 let keepList = [], keepCat = '', keepSig = '';
@@ -6159,7 +6191,7 @@ function openRecipe(menuName, emoji, keepScroll) {
   const meta = [t.cook ? `${ic('timer')}조리 약 ${fmtMin(t.cook)}` : '', t.prep ? `준비 ${fmtMin(t.prep)} 따로` : '', easy ? '초보도 가능' : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('');
   const serv = `<div class="rc-serv" role="group" aria-label="인분">${[1, 2, 3, 4].map(n => `<button class="${n === recipeServ ? 'on' : ''}" onclick="setServ(${n})">${n}인분</button>`).join('')}</div>`;
   box.innerHTML = `${top}
-    ${r.src ? `<a class="rc-src" href="https://www.youtube.com/watch?v=${r.src}" target="_blank" rel="noopener">${moreIco('play')}<span>유튜브 영상에서 정리한 레시피 · <b>원본 영상 보기</b>${r.guess && r.guess.length ? `<small>영상에서 양을 말하지 않아 추정한 재료: ${escHtml(r.guess.join(', '))}</small>` : ''}</span></a>` : ''}
+    ${r.src ? `<a class="rc-src" href="https://www.youtube.com/watch?v=${r.src}" target="_blank" rel="noopener">${moreIco('play')}<span>${r.channel ? escHtml(r.channel) + ' 영상' : '유튜브 영상'}에서 정리한 레시피 (${r.baseServ || 2}인분 기준) · <b>원본 영상 보기</b>${r.guess && r.guess.length ? `<small>영상에서 양을 말하지 않아 추정한 재료: ${escHtml(r.guess.join(', '))}</small>` : ''}</span></a>` : ''}
     ${meta ? `<div class="rc-meta">${meta}</div>` : ''}
     <button class="rc-cook" onclick="openCookMode()">${ic('pot')}요리 모드로 보기 <small>화면 꺼짐 방지 · 타이머</small></button>
     <div class="more-sec"><div class="more-h rc-h">재료${serv}</div>${cpNotice()}<div class="rc-ings">${r.water ? `<div class="rc-ing rc-water"><span class="rc-n">물</span><span class="rc-a">${escHtml(scaleAmt(r.water, f))}</span></div>` : ''}${ingList}</div><div class="rc-unit">1컵 = 200ml · 종이컵 가득 약 180ml${f !== 1 ? ` · 양은 ${r.baseServ || 2}인분 기준을 계산한 값이라 간은 보면서 맞춰 주세요` : ''}</div>

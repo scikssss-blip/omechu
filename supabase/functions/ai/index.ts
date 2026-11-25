@@ -7,26 +7,35 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-flash-latest';
-const LIMIT = { yt_recipe: 10, owner: 40 }; // 사람당 하루 횟수
+const LIMIT = { yt_recipe: 10, owner: 40, talk: 30 }; // 사람당 하루 횟수
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'content-type, authorization, apikey, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 
 // 모델이 붐비면(503·429) 잠깐 쉬고 다시, 그래도 안 되면 다른 모델로
 const FALLBACK = [MODEL, 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest'];
-async function gemini(parts: unknown[], jsonOut: boolean, maxTokens = 2048) {
+// quick=true: 생각(thinking) 없이 바로 답 → 짧은 답이 빠르고 잘리지 않음. 모델이 이 옵션을 거절하면 빼고 다시
+async function gemini(parts: unknown[], jsonOut: boolean, maxTokens = 2048, lowRes = false, quick = false) {
   const errs: string[] = [];
   for (const model of [...new Set(FALLBACK)]) {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    let think = quick;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      // 짧은 답은 한 모델이 12초 넘게 붙잡으면 다음 모델로
+      let r: Response;
+      try {
+        r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        signal: AbortSignal.timeout(quick ? 12000 : 120000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
-        body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { temperature: jsonOut ? 0.2 : 0.8, maxOutputTokens: maxTokens, ...(jsonOut ? { responseMimeType: 'application/json' } : {}) } }),
-      });
+        body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { temperature: jsonOut ? 0.2 : 0.8, maxOutputTokens: maxTokens, ...(jsonOut ? { responseMimeType: 'application/json' } : {}), ...(lowRes ? { mediaResolution: 'MEDIA_RESOLUTION_LOW' } : {}), ...(think ? { thinkingConfig: { thinkingBudget: 0 } } : {}) } }),
+        });
+      } catch (e) { errs.push(`${model} timeout ${String(e).slice(0, 60)}`); break; }
       if (r.ok) {
         const d = await r.json();
         return (d.candidates?.[0]?.content?.parts || []).map((p: { text?: string }) => p.text || '').join('');
       }
-      errs.push(`${model} ${r.status} ` + (await r.text()).replace(/\s+/g, ' ').slice(0, 160));
+      const et = (await r.text()).replace(/\s+/g, ' ');
+      errs.push(`${model} ${r.status} ` + et.slice(0, 160));
+      if (r.status === 400 && think && /thinking/i.test(et)) { think = false; continue; }
       if (r.status === 503 || r.status === 429 || r.status >= 500) { await new Promise((res) => setTimeout(res, 1200)); continue; }
       break; // 404(모델 없음)·400 등은 다음 모델로
     }
@@ -38,6 +47,18 @@ function ytId(u: string) {
   const m = String(u || '').match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return m ? m[1] : '';
 }
+
+// 영상 설명란 (YouTube Data API가 켜져 있을 때만. 키는 YT_API_KEY, 없으면 GEMINI_API_KEY로 시도)
+async function ytInfo(id: string): Promise<{ title: string; channel: string; desc: string } | null> {
+  const key = Deno.env.get('YT_API_KEY') || Deno.env.get('GEMINI_API_KEY');
+  try {
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${id}&key=${key}`);
+    if (!r.ok) return null;
+    const d = await r.json(); const sn = d.items?.[0]?.snippet; if (!sn) return null;
+    return { title: String(sn.title || ''), channel: String(sn.channelTitle || ''), desc: String(sn.description || '').slice(0, 5000) };
+  } catch { return null; }
+}
+const looksLikeRecipe = (t: string) => (t.match(/(큰술|작은술|컵|스푼|티스푼|\d+\s?(g|ml|개|장|쪽|줌|T|t)(?![A-Za-z])|재료)/g) || []).length >= 4;
 
 const RECIPE_PROMPT = `이 요리 영상을 보고 레시피를 정리해 줘. 한국어로, 아래 JSON 형식만 출력해.
 {"ok":true,"title":"요리 이름(짧게)","emoji":"요리에 맞는 이모지 1개","servings":영상 기준 인분 숫자,
@@ -53,7 +74,7 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ ok: false, reason: 'method' }, 405);
   const body = await req.json().catch(() => ({}));
   const { action, user_key, secret } = body || {};
-  if (!['yt_recipe', 'owner'].includes(action)) return json({ ok: false, reason: 'action' }, 400);
+  if (!['yt_recipe', 'owner', 'talk'].includes(action)) return json({ ok: false, reason: 'action' }, 400);
   if (!Deno.env.get('GEMINI_API_KEY')) return json({ ok: false, reason: '아직 준비 중이에요' }, 503);
 
   const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
@@ -68,14 +89,43 @@ Deno.serve(async (req) => {
       if (cached?.data) return json({ ok: true, cached: true, video_id: id, recipe: cached.data });
       const { data: allowed } = await sb.rpc('ai_take', { p_user_key: user_key, p_kind: 'yt_recipe', p_limit: LIMIT.yt_recipe });
       if (!allowed) return json({ ok: false, reason: `오늘은 ${LIMIT.yt_recipe}번까지 가져올 수 있어요. 내일 다시 해 주세요` }, 429);
-      const out = await gemini([{ file_data: { file_uri: `https://www.youtube.com/watch?v=${id}` } }, { text: RECIPE_PROMPT }], true, 4096);
+      // ① 설명란에 재료가 적혀 있으면 글만 읽고 끝 (몇 초) ② 없으면 영상을 2초에 1장, 저화질로 봄
+      const info = await ytInfo(id);
+      let out = '', via = 'video';
+      if (info && looksLikeRecipe(info.desc)) {
+        try {
+          out = await gemini([{ text: `영상 제목: ${info.title}\n채널: ${info.channel}\n영상 설명란:\n${info.desc}\n\n위 설명란만 보고 정리해. 설명란에 조리 순서가 없으면 재료만 채우고 steps는 빈 배열로 둬.\n` + RECIPE_PROMPT }], true, 4096);
+          const t = JSON.parse(out); if (t?.ok && t.ingredients?.length >= 3 && t.steps?.length >= 3) via = 'desc'; else out = '';
+        } catch { out = ''; }
+      }
+      if (!out) out = await gemini([{ file_data: { file_uri: `https://www.youtube.com/watch?v=${id}` }, video_metadata: { fps: 0.5 } }, { text: (info?.desc ? `참고용 영상 설명란(재료 양이 적혀 있으면 이걸 우선):\n${info.desc.slice(0, 2500)}\n\n` : '') + RECIPE_PROMPT }], true, 4096, true);
       let recipe; try { recipe = JSON.parse(out); } catch { return json({ ok: false, reason: '영상을 정리하지 못했어요. 다시 시도해 주세요' }, 502); }
       if (!recipe?.ok || !Array.isArray(recipe.ingredients) || !Array.isArray(recipe.steps) || !recipe.steps.length) return json({ ok: false, reason: recipe?.reason || '이 영상에서는 레시피를 찾지 못했어요' }, 422);
       recipe.ingredients = recipe.ingredients.filter((x: unknown) => Array.isArray(x) && x[0]).slice(0, 30).map((x: string[]) => [String(x[0]).slice(0, 20), String(x[1] || '').slice(0, 20)]);
       recipe.steps = recipe.steps.slice(0, 14).map((x: string) => String(x).slice(0, 160));
       recipe.title = String(recipe.title || '유튜브 레시피').slice(0, 24);
+      recipe.via = via; if (info?.channel) recipe.channel = info.channel.slice(0, 40);
       await sb.from('ai_recipes').upsert({ video_id: id, data: recipe });
       return json({ ok: true, video_id: id, recipe });
+    }
+
+    if (action === 'talk') {
+      const text = String(body.text || '').slice(0, 80).trim();
+      const tags = (Array.isArray(body.tags) ? body.tags : []).slice(0, 120).map((t: unknown) => String(t).slice(0, 24));
+      if (!text || !tags.length) return json({ ok: false, reason: 'empty' }, 400);
+      const { data: allowed } = await sb.rpc('ai_take', { p_user_key: user_key, p_kind: 'talk', p_limit: LIMIT.talk });
+      if (!allowed) return json({ ok: false, reason: 'limit' }, 429);
+      const prompt = `너는 '오메추리' 앱의 탐정 메추리 '추리'야. 손님이 한 말에서 단서를 찾아 오늘 먹을 메뉴의 방향을 추리해.
+손님 말: "${text}"
+태그 목록(이 중에서만, 글자 그대로 골라): ${tags.join(' | ')}
+JSON만 출력:
+{"inc":["손님이 원하거나 상황에 맞는 태그, 1~4개"],"exc":["빼야 할 태그 (매운 거 싫다, 속 안 좋다 등)"],"cat":"cook(집에서 해먹기)|delivery(배달)|dine(밖에서 먹기)|''(말 안 했으면 빈 문자열)","clues":["손님 말에서 찾은 단서, 2~6글자씩 최대 3개"],"reason":"탐정처럼 단서를 짚고 결론으로 끝맺는 한 문장, 45자 이내. 예: '어젯밤 술자리, 오늘 아침 쓰린 속… 범인은 뜨끈한 국물이다!'"}
+돌려 말한 것도 알아들어(예: 과음→해장, 입이 깔깔→상큼, 월급날→든든한 고기). 음식과 상관없는 말이면 inc를 비우고 reason은 가볍게 받아쳐.`;
+      let p; try { p = JSON.parse(await gemini([{ text: prompt }], true, 1024, false, true)); } catch { return json({ ok: false, reason: 'parse' }, 502); }
+      const ok = (a: unknown) => (Array.isArray(a) ? a : []).map((x) => String(x)).filter((x) => tags.includes(x));
+      const res = { inc: ok(p.inc).slice(0, 4), exc: ok(p.exc).slice(0, 6), cat: ['cook', 'delivery', 'dine'].includes(p.cat) ? p.cat : '', clues: (Array.isArray(p.clues) ? p.clues : []).slice(0, 3).map((x: unknown) => String(x).slice(0, 10)), reason: String(p.reason || '').slice(0, 60) };
+      await sb.from('talk_log').insert({ text, found: res.inc.length + res.exc.length > 0, src: 'ai' });
+      return json({ ok: true, ...res });
     }
 
     if (action === 'owner') {
@@ -90,7 +140,7 @@ Deno.serve(async (req) => {
 손님이 뭘 먹을지 고르도록 도와주는 게 일이야. 메뉴를 추천할 때는 이 가게 메뉴 중에서만 골라: ${menus || '(메뉴판 없음)'}.
 음식·식사 얘기가 아니면 가볍게 받아주고 메뉴 얘기로 돌아와. 욕설, 개인정보, 위험한 얘기에는 응하지 마. 건강·의학적 판단은 하지 마.
 ${hist ? '지난 대화:\n' + hist + '\n' : ''}손님: ${text}\n사장님:`;
-      const reply = (await gemini([{ text: prompt }], false, 200)).trim().slice(0, 200);
+      const reply = (await gemini([{ text: prompt }], false, 400, false, true)).trim().slice(0, 200);
       return json({ ok: true, reply: reply || '음… 뭐 드시고 싶어요? 🙂' });
     }
   } catch (e) {
