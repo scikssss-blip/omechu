@@ -65,14 +65,28 @@ function ytId(u: string) {
 }
 
 // 영상 설명란 (YouTube Data API가 켜져 있을 때만. 키는 YT_API_KEY, 없으면 GEMINI_API_KEY로 시도)
-async function ytInfo(id: string): Promise<{ title: string; channel: string; desc: string } | null> {
+async function ytInfo(id: string): Promise<{ title: string; channel: string; channelId: string; desc: string } | null> {
   const key = Deno.env.get('YT_API_KEY') || Deno.env.get('GEMINI_API_KEY');
   try {
     const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${id}&key=${key}`);
     if (!r.ok) return null;
     const d = await r.json(); const sn = d.items?.[0]?.snippet; if (!sn) return null;
-    return { title: String(sn.title || ''), channel: String(sn.channelTitle || ''), desc: String(sn.description || '').slice(0, 5000) };
+    return { title: String(sn.title || ''), channel: String(sn.channelTitle || ''), channelId: String(sn.channelId || ''), desc: String(sn.description || '').slice(0, 5000) };
   } catch { return null; }
+}
+// 댓글 맨 위(인기순) 몇 개 중 재료가 적힌 것. 채널 주인이 쓴 댓글(보통 고정 댓글)을 먼저. 댓글이 막혀 있으면 ''
+async function ytTopComment(id: string, channelId: string): Promise<string> {
+  const key = Deno.env.get('YT_API_KEY') || Deno.env.get('GEMINI_API_KEY');
+  try {
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${id}&order=relevance&maxResults=8&textFormat=plainText&key=${key}`, { signal: AbortSignal.timeout(6000) });
+    if (!r.ok) return '';
+    const d = await r.json();
+    const cs = (d.items || []).map((it: any) => it.snippet?.topLevelComment?.snippet).filter(Boolean)
+      .map((c: any) => ({ t: String(c.textOriginal || c.textDisplay || ''), own: !!channelId && c.authorChannelId?.value === channelId }))
+      .filter((c: { t: string }) => looksLikeRecipe(c.t));
+    cs.sort((a: { own: boolean }, b: { own: boolean }) => Number(b.own) - Number(a.own));
+    return cs[0]?.t.slice(0, 4000) || '';
+  } catch { return ''; }
 }
 const looksLikeRecipe = (t: string) => (t.match(/(큰술|작은술|컵|스푼|티스푼|\d+\s?(g|ml|개|장|쪽|줌|T|t)(?![A-Za-z])|재료)/g) || []).length >= 4;
 
@@ -107,14 +121,19 @@ Deno.serve(async (req) => {
       if (!allowed) return json({ ok: false, reason: `오늘은 ${LIMIT.yt_recipe}번까지 가져올 수 있어요. 내일 다시 해 주세요` }, 429);
       // ① 설명란에 재료가 적혀 있으면 글만 읽고 끝 (몇 초) ② 없으면 영상을 2초에 1장, 저화질로 봄
       const info = await ytInfo(id);
+      // 설명란에 재료가 없으면 댓글 맨 위(고정·인기 댓글)도 봄
+      const descOk = !!info && looksLikeRecipe(info.desc);
+      const cmt = info && !descOk ? await ytTopComment(id, info.channelId) : '';
+      const src = descOk ? `영상 설명란:\n${info!.desc}` : cmt ? `영상 설명란:\n${info!.desc.slice(0, 1500)}\n\n맨 위 댓글(재료가 적힌 고정·인기 댓글):\n${cmt}` : '';
       let out = '', via = 'video';
-      if (info && looksLikeRecipe(info.desc)) {
+      if (src) {
         try {
-          out = await gemini([{ text: `영상 제목: ${info.title}\n채널: ${info.channel}\n영상 설명란:\n${info.desc}\n\n위 설명란만 보고 정리해. 설명란에 조리 순서가 없으면 재료만 채우고 steps는 빈 배열로 둬.\n` + RECIPE_PROMPT }], true, 4096);
-          const t = JSON.parse(out); if (t?.ok && t.ingredients?.length >= 3 && t.steps?.length >= 3) via = 'desc'; else out = '';
+          out = await gemini([{ text: `영상 제목: ${info!.title}\n채널: ${info!.channel}\n${src}\n\n위 글만 보고 정리해. 조리 순서가 없으면 재료만 채우고 steps는 빈 배열로 둬.\n` + RECIPE_PROMPT }], true, 4096);
+          const t = JSON.parse(out); if (t?.ok && t.ingredients?.length >= 3 && t.steps?.length >= 3) via = descOk ? 'desc' : 'comment'; else out = '';
         } catch { out = ''; }
       }
-      if (!out) out = await gemini([{ file_data: { file_uri: `https://www.youtube.com/watch?v=${id}` }, video_metadata: { fps: 0.5 } }, { text: (info?.desc ? `참고용 영상 설명란(재료 양이 적혀 있으면 이걸 우선):\n${info.desc.slice(0, 2500)}\n\n` : '') + RECIPE_PROMPT }], true, 4096, true);
+      const hint = descOk ? info!.desc.slice(0, 2500) : cmt ? cmt.slice(0, 2500) : (info?.desc || '').slice(0, 2500);
+      if (!out) out = await gemini([{ file_data: { file_uri: `https://www.youtube.com/watch?v=${id}` }, video_metadata: { fps: 0.5 } }, { text: (hint ? `참고용 글(설명란 또는 맨 위 댓글, 재료 양이 적혀 있으면 이걸 우선):\n${hint}\n\n` : '') + RECIPE_PROMPT }], true, 4096, true);
       let recipe; try { recipe = JSON.parse(out); } catch { return json({ ok: false, reason: '영상을 정리하지 못했어요. 다시 시도해 주세요' }, 502); }
       if (!recipe?.ok || !Array.isArray(recipe.ingredients) || !Array.isArray(recipe.steps) || !recipe.steps.length) return json({ ok: false, reason: recipe?.reason || '이 영상에서는 레시피를 찾지 못했어요' }, 422);
       recipe.ingredients = recipe.ingredients.filter((x: unknown) => Array.isArray(x) && x[0]).slice(0, 30).map((x: string[]) => [String(x[0]).slice(0, 20), String(x[1] || '').slice(0, 20)]);
