@@ -4377,6 +4377,21 @@ function ytRegister(id, rc) {
   return name;
 }
 setTimeout(() => { ytList().forEach(x => { try { ytRegister(x.id, x.rc); } catch (e) {} }); if (!AI_READY) document.querySelectorAll('.yt-entry').forEach(b => { b.style.display = 'none'; }); }, 0);
+// 이 폰에 저장한 유튜브 레시피도 30일마다 영상 정보를 새로 받음 (레시피는 그대로, 원본이 지워졌으면 목록에서 뺌). 한 번에 3개씩 조용히
+setTimeout(async () => {
+  if (!AI_READY || typeof MY_USER_KEY === 'undefined' || !MY_USER_KEY) return;
+  const old = ytList().filter(x => !x.at || Date.now() - x.at > 28 * 864e5).slice(0, 3);
+  for (const x of old) {
+    try {
+      const d = await aiCall('yt_recipe', { url: 'https://www.youtube.com/watch?v=' + x.id });
+      const l = ytList();
+      if (d.ok && d.recipe) { const i = l.findIndex(y => y.id === x.id); if (i >= 0) { l[i] = { id: x.id, rc: d.recipe, at: Date.now() }; ytRegister(x.id, d.recipe); } }
+      else if (d.gone) { const i = l.findIndex(y => y.id === x.id); if (i >= 0) l.splice(i, 1); }
+      else continue;
+      localStorage.setItem(YT_KEY, JSON.stringify(l));
+    } catch (e) {}
+  }
+}, 8000);
 function openYt() {
   let el = document.getElementById('yt-modal');
   if (!el) { el = document.createElement('div'); el.id = 'yt-modal'; el.className = 'fr-modal'; el.onclick = (e) => { if (e.target === el) closeYt(); }; document.body.appendChild(el); }

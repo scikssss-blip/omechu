@@ -65,12 +65,12 @@ function ytId(u: string) {
 }
 
 // 영상 설명란 (YouTube Data API가 켜져 있을 때만. 키는 YT_API_KEY, 없으면 GEMINI_API_KEY로 시도)
-async function ytInfo(id: string): Promise<{ title: string; channel: string; channelId: string; desc: string; secs: number } | null> {
+async function ytInfo(id: string): Promise<{ title: string; channel: string; channelId: string; desc: string; secs: number; gone?: boolean } | null> {
   const key = Deno.env.get('YT_API_KEY') || Deno.env.get('GEMINI_API_KEY');
   try {
     const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${id}&key=${key}`);
     if (!r.ok) return null;
-    const d = await r.json(); const sn = d.items?.[0]?.snippet; if (!sn) return null;
+    const d = await r.json(); const sn = d.items?.[0]?.snippet; if (!sn) return Array.isArray(d.items) ? { gone: true } as any : null;
     return { title: String(sn.title || ''), channel: String(sn.channelTitle || ''), channelId: String(sn.channelId || ''), desc: String(sn.description || '').slice(0, 5000), secs: isoSecs(d.items[0].contentDetails?.duration) };
   } catch { return null; }
 }
@@ -101,15 +101,37 @@ const RECIPE_PROMPT = `이 요리 영상을 보고 레시피를 정리해 줘. �
 규칙: 재료 이름은 마트에서 찾는 이름으로(예: '다진마늘','대파'). 1큰술=15ml, 1작은술=5ml, 1컵=200ml 기준. 단계는 12개 이하.
 요리 영상이 아니거나 레시피를 알 수 없으면 {"ok":false,"reason":"이유"} 만 출력.`;
 
+// 저장본 갱신: 영상이 그대로면 채널명 새로 받아 날짜 갱신(레시피 유지), 없어졌으면 삭제. 유튜브 응답 실패면 null
+async function refreshRow(sb: any, id: string, data: any): Promise<any | 'gone' | null> {
+  const info = await ytInfo(id);
+  if (!info) return null;
+  if (info.gone) { await sb.from('ai_recipes').delete().eq('video_id', id); return 'gone'; }
+  const nd = { ...data, channel: info.channel.slice(0, 40) };
+  await sb.from('ai_recipes').update({ data: nd, created_at: new Date().toISOString() }).eq('video_id', id);
+  return nd;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ ok: false, reason: 'method' }, 405);
   const body = await req.json().catch(() => ({}));
   const { action, user_key, secret } = body || {};
-  if (!['yt_recipe', 'owner', 'talk'].includes(action)) return json({ ok: false, reason: 'action' }, 400);
+  if (!['yt_recipe', 'owner', 'talk', 'yt_refresh'].includes(action)) return json({ ok: false, reason: 'action' }, 400);
   if (!Deno.env.get('GEMINI_API_KEY')) return json({ ok: false, reason: '아직 준비 중이에요' }, 503);
 
   const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  // 하루 한 번(예약 작업): 25일 넘은 저장본의 영상 정보를 새로 받아 갱신 → 레시피는 계속 유지. 영상이 지워졌거나 비공개면 저장본 삭제
+  if (action === 'yt_refresh') {
+    const cs = Deno.env.get('CRON_SECRET');
+    if (!cs || req.headers.get('x-cron-secret') !== cs) return json({ ok: false }, 401);
+    const { data: old } = await sb.from('ai_recipes').select('video_id,data').lt('created_at', new Date(Date.now() - 25 * 864e5).toISOString()).order('created_at').limit(60);
+    let fresh = 0, gone = 0;
+    for (const row of old || []) {
+      const r = await refreshRow(sb, row.video_id, row.data);
+      if (r === 'gone') gone++; else if (r) fresh++;
+    }
+    return json({ ok: true, checked: (old || []).length, fresh, gone });
+  }
   const { data: okUser } = await sb.rpc('_owner_ok', { p_user_key: user_key, p_secret: secret });
   if (!okUser) return json({ ok: false, reason: '사용자 확인이 안 돼요' }, 401);
 
@@ -117,13 +139,20 @@ Deno.serve(async (req) => {
     if (action === 'yt_recipe') {
       const id = ytId(body.url);
       if (!id) return json({ ok: false, reason: '유튜브 영상 주소가 아니에요' }, 400);
-      // 유튜브 정책: 영상 정보는 30일 안에 새로 받아야 함 → 30일 지난 저장본은 안 씀 (하루 한 번 지워짐)
-      const { data: cached } = await sb.from('ai_recipes').select('data').eq('video_id', id).gt('created_at', new Date(Date.now() - 30 * 864e5).toISOString()).maybeSingle();
-      if (cached?.data) return json({ ok: true, cached: true, video_id: id, recipe: cached.data });
+      // 유튜브 정책: 영상 정보(제목·채널명 등)는 30일 안에 새로 받아야 함 → 오래된 저장본은 정보만 새로 받아 갱신하고 그대로 씀
+      const { data: cached } = await sb.from('ai_recipes').select('data,created_at').eq('video_id', id).maybeSingle();
+      if (cached?.data) {
+        if (Date.now() - new Date(cached.created_at).getTime() < 25 * 864e5) return json({ ok: true, cached: true, video_id: id, recipe: cached.data });
+        const r = await refreshRow(sb, id, cached.data);
+        if (r === 'gone') return json({ ok: false, gone: true, reason: '원본 영상이 지워졌거나 비공개로 바뀌었어요' }, 404);
+        if (r) return json({ ok: true, cached: true, video_id: id, recipe: r });
+        return json({ ok: true, cached: true, video_id: id, recipe: cached.data }); // 유튜브 응답이 잠깐 실패하면 이번엔 그대로 (다음에 갱신)
+      }
       const { data: allowed } = await sb.rpc('ai_take', { p_user_key: user_key, p_kind: 'yt_recipe', p_limit: LIMIT.yt_recipe });
       if (!allowed) return json({ ok: false, reason: `오늘은 ${LIMIT.yt_recipe}번까지 가져올 수 있어요. 내일 다시 해 주세요` }, 429);
       // ① 설명란에 재료가 적혀 있으면 글만 읽고 끝 (몇 초) ② 없으면 영상을 2초에 1장, 저화질로 봄
       const info = await ytInfo(id);
+      if (info?.gone) return json({ ok: false, gone: true, reason: '지워졌거나 비공개인 영상이에요' }, 404);
       // 긴 영상은 설명란만. 쇼츠(주소가 shorts이거나 3분 이하)는 설명란에 없으면 고정·인기 댓글도 봄
       const descOk = !!info && looksLikeRecipe(info.desc);
       const isShort = /\/shorts\//.test(String(body.url)) || (!!info && info.secs > 0 && info.secs <= 180);
