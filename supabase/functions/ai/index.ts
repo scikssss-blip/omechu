@@ -14,10 +14,11 @@ const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { sta
 // 모델이 붐비면(503·429) 잠깐 쉬고 다시, 그래도 안 되면 다른 모델로
 const FALLBACK = [MODEL, 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest'];
 // quick=true: 생각(thinking) 없이 바로 답 → 짧은 답이 빠르고 잘리지 않음. 모델이 이 옵션을 거절하면 빼고 다시
-async function gemini(parts: unknown[], jsonOut: boolean, maxTokens = 2048, lowRes = false, quick = false) {
+async function gemini(parts: unknown[], jsonOut: boolean, maxTokens = 2048, lowRes = false, quick = false, budget = 0) {
   const errs: string[] = [];
   // 짧은 답은 전체 24초 안에 끝냄 (앱은 26초 뒤 규칙 추천으로 넘어감). 한 모델이 12초 넘게 붙잡으면 다음 모델로
-  const until = Date.now() + (quick ? 24000 : 140000);
+  // 서버 한 번 실행은 150초에서 끊김 → 긴 작업도 budget(기본 100초) 안에서 끝냄
+  const until = Date.now() + (budget || (quick ? 24000 : 100000));
   for (const model of [...new Set(FALLBACK)]) {
     if (Date.now() > until - 1500) break;
     let think = quick;
@@ -25,7 +26,7 @@ async function gemini(parts: unknown[], jsonOut: boolean, maxTokens = 2048, lowR
       let r: Response;
       try {
         r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-        signal: AbortSignal.timeout(Math.max(1000, Math.min(until - Date.now(), quick ? 12000 : 120000))),
+        signal: AbortSignal.timeout(Math.max(1000, Math.min(until - Date.now(), quick ? 12000 : 90000))),
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
         body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { temperature: jsonOut ? 0.2 : 0.8, maxOutputTokens: maxTokens, ...(jsonOut ? { responseMimeType: 'application/json' } : {}), ...(lowRes ? { mediaResolution: 'MEDIA_RESOLUTION_LOW' } : {}), ...(think ? { thinkingConfig: { thinkingBudget: 0 } } : {}) } }),
@@ -157,16 +158,19 @@ Deno.serve(async (req) => {
       const descOk = !!info && looksLikeRecipe(info.desc);
       const isShort = /\/shorts\//.test(String(body.url)) || (!!info && info.secs > 0 && info.secs <= 180);
       const cmt = info && !descOk && isShort ? await ytTopComment(id, info.channelId) : '';
+      const t0 = Date.now();
+      console.log('yt', id, JSON.stringify({ info: !!info, secs: info?.secs, descOk, isShort, cmtLen: cmt.length }));
       const src = descOk ? `영상 설명란:\n${info!.desc}` : cmt ? `영상 설명란:\n${info!.desc.slice(0, 1500)}\n\n맨 위 댓글(재료가 적힌 고정·인기 댓글):\n${cmt}` : '';
       let out = '', via = 'video';
       if (src) {
         try {
-          out = await gemini([{ text: `영상 제목: ${info!.title}\n채널: ${info!.channel}\n${src}\n\n위 글만 보고 정리해. 조리 순서가 없으면 재료만 채우고 steps는 빈 배열로 둬.\n` + RECIPE_PROMPT }], true, 4096);
+          out = await gemini([{ text: `영상 제목: ${info!.title}\n채널: ${info!.channel}\n${src}\n\n위 글만 보고 정리해. 조리 순서가 없으면 재료만 채우고 steps는 빈 배열로 둬.\n` + RECIPE_PROMPT }], true, 4096, false, false, 35000);
           const t = JSON.parse(out); if (t?.ok && t.ingredients?.length >= 3 && t.steps?.length >= 3) via = descOk ? 'desc' : 'comment'; else out = '';
         } catch { out = ''; }
       }
       const hint = descOk ? info!.desc.slice(0, 2500) : cmt ? cmt.slice(0, 2500) : (info?.desc || '').slice(0, 2500);
-      if (!out) out = await gemini([{ file_data: { file_uri: `https://www.youtube.com/watch?v=${id}` }, video_metadata: { fps: 0.5 } }, { text: (hint ? `참고용 글(설명란 또는 맨 위 댓글, 재료 양이 적혀 있으면 이걸 우선):\n${hint}\n\n` : '') + RECIPE_PROMPT }], true, 4096, true);
+      if (!out) console.log('yt video path', id, 'after', Date.now() - t0);
+      if (!out) out = await gemini([{ file_data: { file_uri: `https://www.youtube.com/watch?v=${id}` }, video_metadata: { fps: 0.5 } }, { text: (hint ? `참고용 글(설명란 또는 맨 위 댓글, 재료 양이 적혀 있으면 이걸 우선):\n${hint}\n\n` : '') + RECIPE_PROMPT }], true, 4096, true, false, Math.max(20000, 125000 - (Date.now() - t0)));
       let recipe; try { recipe = JSON.parse(out); } catch { return json({ ok: false, reason: '영상을 정리하지 못했어요. 다시 시도해 주세요' }, 502); }
       if (!recipe?.ok || !Array.isArray(recipe.ingredients) || !Array.isArray(recipe.steps) || !recipe.steps.length) return json({ ok: false, reason: recipe?.reason || '이 영상에서는 레시피를 찾지 못했어요' }, 422);
       recipe.ingredients = recipe.ingredients.filter((x: unknown) => Array.isArray(x) && x[0]).slice(0, 30).map((x: string[]) => [String(x[0]).slice(0, 20), String(x[1] || '').slice(0, 20)]);
