@@ -65,15 +65,17 @@ function ytId(u: string) {
 }
 
 // 영상 설명란 (YouTube Data API가 켜져 있을 때만. 키는 YT_API_KEY, 없으면 GEMINI_API_KEY로 시도)
-async function ytInfo(id: string): Promise<{ title: string; channel: string; channelId: string; desc: string } | null> {
+async function ytInfo(id: string): Promise<{ title: string; channel: string; channelId: string; desc: string; secs: number } | null> {
   const key = Deno.env.get('YT_API_KEY') || Deno.env.get('GEMINI_API_KEY');
   try {
-    const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${id}&key=${key}`);
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${id}&key=${key}`);
     if (!r.ok) return null;
     const d = await r.json(); const sn = d.items?.[0]?.snippet; if (!sn) return null;
-    return { title: String(sn.title || ''), channel: String(sn.channelTitle || ''), channelId: String(sn.channelId || ''), desc: String(sn.description || '').slice(0, 5000) };
+    return { title: String(sn.title || ''), channel: String(sn.channelTitle || ''), channelId: String(sn.channelId || ''), desc: String(sn.description || '').slice(0, 5000), secs: isoSecs(d.items[0].contentDetails?.duration) };
   } catch { return null; }
 }
+// PT1M30S → 90
+const isoSecs = (t: string) => { const m = String(t || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : 0; };
 // 댓글 맨 위(인기순) 몇 개 중 재료가 적힌 것. 채널 주인이 쓴 댓글(보통 고정 댓글)을 먼저. 댓글이 막혀 있으면 ''
 async function ytTopComment(id: string, channelId: string): Promise<string> {
   const key = Deno.env.get('YT_API_KEY') || Deno.env.get('GEMINI_API_KEY');
@@ -115,15 +117,17 @@ Deno.serve(async (req) => {
     if (action === 'yt_recipe') {
       const id = ytId(body.url);
       if (!id) return json({ ok: false, reason: '유튜브 영상 주소가 아니에요' }, 400);
-      const { data: cached } = await sb.from('ai_recipes').select('data').eq('video_id', id).maybeSingle();
+      // 유튜브 정책: 영상 정보는 30일 안에 새로 받아야 함 → 30일 지난 저장본은 안 씀 (하루 한 번 지워짐)
+      const { data: cached } = await sb.from('ai_recipes').select('data').eq('video_id', id).gt('created_at', new Date(Date.now() - 30 * 864e5).toISOString()).maybeSingle();
       if (cached?.data) return json({ ok: true, cached: true, video_id: id, recipe: cached.data });
       const { data: allowed } = await sb.rpc('ai_take', { p_user_key: user_key, p_kind: 'yt_recipe', p_limit: LIMIT.yt_recipe });
       if (!allowed) return json({ ok: false, reason: `오늘은 ${LIMIT.yt_recipe}번까지 가져올 수 있어요. 내일 다시 해 주세요` }, 429);
       // ① 설명란에 재료가 적혀 있으면 글만 읽고 끝 (몇 초) ② 없으면 영상을 2초에 1장, 저화질로 봄
       const info = await ytInfo(id);
-      // 설명란에 재료가 없으면 댓글 맨 위(고정·인기 댓글)도 봄
+      // 긴 영상은 설명란만. 쇼츠(주소가 shorts이거나 3분 이하)는 설명란에 없으면 고정·인기 댓글도 봄
       const descOk = !!info && looksLikeRecipe(info.desc);
-      const cmt = info && !descOk ? await ytTopComment(id, info.channelId) : '';
+      const isShort = /\/shorts\//.test(String(body.url)) || (!!info && info.secs > 0 && info.secs <= 180);
+      const cmt = info && !descOk && isShort ? await ytTopComment(id, info.channelId) : '';
       const src = descOk ? `영상 설명란:\n${info!.desc}` : cmt ? `영상 설명란:\n${info!.desc.slice(0, 1500)}\n\n맨 위 댓글(재료가 적힌 고정·인기 댓글):\n${cmt}` : '';
       let out = '', via = 'video';
       if (src) {
@@ -140,7 +144,7 @@ Deno.serve(async (req) => {
       recipe.steps = recipe.steps.slice(0, 14).map((x: string) => String(x).slice(0, 160));
       recipe.title = String(recipe.title || '유튜브 레시피').slice(0, 24);
       recipe.via = via; if (info?.channel) recipe.channel = info.channel.slice(0, 40);
-      await sb.from('ai_recipes').upsert({ video_id: id, data: recipe });
+      await sb.from('ai_recipes').upsert({ video_id: id, data: recipe, created_at: new Date().toISOString() });
       return json({ ok: true, video_id: id, recipe });
     }
 
