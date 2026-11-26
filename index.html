@@ -4235,7 +4235,7 @@ async function talkRecommend() {
     const btn = document.querySelector('.talk-row button'); if (btn) { btn.disabled = true; btn.textContent = '추리 중…'; }
     talkThinking(true);
     try {
-      ai = await Promise.race([aiCall('talk', { text, tags: TALK_TAGS() }), new Promise(r => setTimeout(() => r(null), 16000))]);
+      ai = await Promise.race([aiCall('talk', { text, tags: TALK_TAGS() }), new Promise(r => setTimeout(() => r(null), 26000))]);
     } catch (e) { ai = null; }
     talkBusy = false; if (btn) { btn.disabled = false; btn.textContent = '추리해줘'; }
     talkThinking(false);

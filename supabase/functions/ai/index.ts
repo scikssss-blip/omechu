@@ -16,14 +16,16 @@ const FALLBACK = [MODEL, 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-l
 // quick=true: 생각(thinking) 없이 바로 답 → 짧은 답이 빠르고 잘리지 않음. 모델이 이 옵션을 거절하면 빼고 다시
 async function gemini(parts: unknown[], jsonOut: boolean, maxTokens = 2048, lowRes = false, quick = false) {
   const errs: string[] = [];
+  // 짧은 답은 전체 24초 안에 끝냄 (앱은 26초 뒤 규칙 추천으로 넘어감). 한 모델이 12초 넘게 붙잡으면 다음 모델로
+  const until = Date.now() + (quick ? 24000 : 140000);
   for (const model of [...new Set(FALLBACK)]) {
+    if (Date.now() > until - 1500) break;
     let think = quick;
     for (let attempt = 0; attempt < 3; attempt++) {
-      // 짧은 답은 한 모델이 12초 넘게 붙잡으면 다음 모델로
       let r: Response;
       try {
         r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-        signal: AbortSignal.timeout(quick ? 12000 : 120000),
+        signal: AbortSignal.timeout(Math.max(1000, Math.min(until - Date.now(), quick ? 12000 : 120000))),
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
         body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { temperature: jsonOut ? 0.2 : 0.8, maxOutputTokens: maxTokens, ...(jsonOut ? { responseMimeType: 'application/json' } : {}), ...(lowRes ? { mediaResolution: 'MEDIA_RESOLUTION_LOW' } : {}), ...(think ? { thinkingConfig: { thinkingBudget: 0 } } : {}) } }),
@@ -41,6 +43,20 @@ async function gemini(parts: unknown[], jsonOut: boolean, maxTokens = 2048, lowR
     }
   }
   throw new Error('gemini ' + errs.join(' | '));
+}
+
+// 문장 뜻을 숫자 768개로 (비슷한 문장 찾기용). 실패하면 null
+async function embed(text: string): Promise<number[] | null> {
+  try {
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent', {
+      method: 'POST', signal: AbortSignal.timeout(6000),
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
+      body: JSON.stringify({ content: { parts: [{ text }] }, taskType: 'SEMANTIC_SIMILARITY', outputDimensionality: 768 }),
+    });
+    if (!r.ok) return null;
+    const d = await r.json(); const v = d.embedding?.values;
+    return Array.isArray(v) && v.length === 768 ? v : null;
+  } catch { return null; }
 }
 
 function ytId(u: string) {
@@ -117,15 +133,23 @@ Deno.serve(async (req) => {
       const norm = text.toLowerCase().replace(/(먹고\s?싶[어다네음]?|뭐\s?먹[지을까]*|추천\s?해?\s?줘?|해\s?줘|좀|요(?=$|[.!?\s]))/g, '').replace(/[^\p{L}\p{N}]+/gu, '');
       const negSig = (t: string) => [/안(?![주심전녕방경])/, /빼/, /말고/, /싫/, /못/, /없/, /덜/].map((re) => (re.test(t) ? 1 : 0)).join('');
       const fit = (r: any) => ({ inc: (r.inc || []).filter((x: string) => tags.includes(x)), exc: (r.exc || []).filter((x: string) => tags.includes(x)), cat: r.cat || '', clues: r.clues || [], reason: r.reason || '' });
+      let emb: number[] | null = null;
       if (norm.length >= 2) {
-        const { data: hit } = await sb.rpc('talk_cache_find', { p_norm: norm });
-        const h = hit?.[0];
-        if (h && (h.norm === norm || (h.sim >= 0.5 && negSig(h.norm) === negSig(norm)))) {
-          const r = fit(h.result);
-          if (r.inc.length || r.exc.length) {
-            sb.from('talk_cache').update({ hits: 1 }).eq('norm', h.norm).then(() => {}, () => {});
-            return json({ ok: true, cached: true, ...r });
+        // 똑같은 문장 → 바로. 아니면 뜻이 아주 비슷하고(0.9 이상) 부정어 구성이 같은 문장 → 바로
+        const { data: same } = await sb.from('talk_cache').select('norm,result').eq('norm', norm).maybeSingle();
+        let h: { norm: string; result: any } | null = same || null;
+        if (same) { const { data: e0 } = await sb.from('talk_cache').select('norm').eq('norm', norm).is('emb', null).maybeSingle(); if (e0) { const v = await embed(text); if (v) await sb.from('talk_cache').update({ emb: JSON.stringify(v) }).eq('norm', norm); } }
+        if (!h) {
+          emb = await embed(text);
+          if (emb) {
+            const { data: near } = await sb.rpc('talk_cache_near', { p_emb: JSON.stringify(emb) });
+            const n = near?.[0];
+            if (n && n.sim >= 0.9 && negSig(n.norm) === negSig(norm)) h = n;
           }
+        }
+        if (h) {
+          const r = fit(h.result);
+          if (r.inc.length || r.exc.length) return json({ ok: true, cached: true, ...r });
         }
       }
       const { data: allowed } = await sb.rpc('ai_take', { p_user_key: user_key, p_kind: 'talk', p_limit: LIMIT.talk });
@@ -136,11 +160,13 @@ Deno.serve(async (req) => {
 JSON만 출력:
 {"inc":["손님이 원하거나 상황에 맞는 태그, 1~4개"],"exc":["빼야 할 태그 (매운 거 싫다, 속 안 좋다 등)"],"cat":"cook(집에서 해먹기)|delivery(배달)|dine(밖에서 먹기)|''(말 안 했으면 빈 문자열)","clues":["손님 말에서 찾은 단서, 2~6글자씩 최대 3개"],"reason":"탐정처럼 단서를 짚고 결론으로 끝맺는 한 문장, 45자 이내. 예: '어젯밤 술자리, 오늘 아침 쓰린 속… 범인은 뜨끈한 국물이다!'"}
 돌려 말한 것도 알아들어(예: 과음→해장, 입이 깔깔→상큼, 월급날→든든한 고기). 음식과 상관없는 말이면 inc를 비우고 reason은 가볍게 받아쳐.`;
-      let p; try { p = JSON.parse(await gemini([{ text: prompt }], true, 1024, false, true)); } catch { return json({ ok: false, reason: 'parse' }, 502); }
+      let raw = '';
+      try { raw = await gemini([{ text: prompt }], true, 1024, false, true); } catch (e) { return json({ ok: false, reason: 'busy', detail: String(e).slice(0, 600) }, 503); }
+      let p; try { p = JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, '')); } catch { return json({ ok: false, reason: 'parse', detail: raw.slice(0, 300) }, 502); }
       const ok = (a: unknown) => (Array.isArray(a) ? a : []).map((x) => String(x)).filter((x) => tags.includes(x));
       const res = { inc: ok(p.inc).slice(0, 4), exc: ok(p.exc).slice(0, 6), cat: ['cook', 'delivery', 'dine'].includes(p.cat) ? p.cat : '', clues: (Array.isArray(p.clues) ? p.clues : []).slice(0, 3).map((x: unknown) => String(x).slice(0, 10)), reason: String(p.reason || '').slice(0, 60) };
       await sb.from('talk_log').insert({ text, found: res.inc.length + res.exc.length > 0, src: 'ai' });
-      if (norm.length >= 2 && (res.inc.length || res.exc.length)) await sb.from('talk_cache').upsert({ norm, result: res });
+      if (norm.length >= 2 && (res.inc.length || res.exc.length)) { if (!emb) emb = await embed(text); await sb.from('talk_cache').upsert({ norm, result: res, ...(emb ? { emb: JSON.stringify(emb) } : {}) }); }
       return json({ ok: true, ...res });
     }
 
