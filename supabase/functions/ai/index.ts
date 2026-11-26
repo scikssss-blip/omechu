@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
       let out = '', via = 'video';
       if (src) {
         try {
-          out = await gemini([{ text: `영상 제목: ${info!.title}\n채널: ${info!.channel}\n${src}\n\n위 글만 보고 정리해. 조리 순서가 없으면 재료만 채우고 steps는 빈 배열로 둬.\n` + RECIPE_PROMPT }], true, 4096, false, false, 35000);
+          out = await gemini([{ text: `영상 제목: ${info!.title}\n채널: ${info!.channel}\n${src}\n\n위 글만 보고 정리해. 조리 순서가 없으면 재료만 채우고 steps는 빈 배열로 둬.\n` + RECIPE_PROMPT }], true, 4096, false, true, 35000); // 글 정리는 생각 없이 바로 (빠름)
           const t = JSON.parse(out); if (t?.ok && t.ingredients?.length >= 3 && t.steps?.length >= 3) via = descOk ? 'desc' : 'comment'; else out = '';
         } catch { out = ''; }
       }
