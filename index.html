@@ -834,6 +834,13 @@
   .talk-ex button { flex:none; padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:none; color:var(--muted); font-size:12px; cursor:pointer; font-family:inherit; }
   .talk-res { margin-bottom:12px; padding:12px 14px; border-radius:12px; background:rgba(255,71,87,0.08); border:1px solid rgba(255,71,87,0.35); }
   .talk-q { font-size:13px; color:var(--muted); margin-bottom:4px; }
+  .talk-think { display:flex; flex-direction:column; align-items:center; gap:6px; margin:4px 0 14px; padding:14px; border-radius:12px; background:var(--card); border:1px dashed var(--border); }
+  .tk-det { width:110px; height:100px; overflow:visible; }
+  .tk-glass { animation:tkScan 1.6s ease-in-out infinite; transform-origin:96px 92px; }
+  .tk-hat { animation:tkHat 1.6s ease-in-out infinite; transform-origin:58px 48px; }
+  @keyframes tkScan { 0%,100% { transform:translate(0,0) rotate(0deg); } 30% { transform:translate(-30px,-6px) rotate(-8deg); } 60% { transform:translate(-14px,4px) rotate(4deg); } }
+  @keyframes tkHat { 0%,100% { transform:rotate(0deg); } 50% { transform:rotate(-4deg); } }
+  .tk-line { font-family:'Jua',sans-serif; font-size:15px; color:var(--text); }
   .talk-v { font-family:'Jua',sans-serif; font-size:17px; line-height:1.4; color:var(--text); margin:2px 0 6px; }
   .talk-a { font-size:13px; line-height:1.55; } .talk-a b { color:var(--orange); } .talk-a s { color:var(--muted); }
   .talk-a small { font-size:12px; color:var(--muted); }
@@ -4202,20 +4209,37 @@ function talkParse(text) {
 function talkExample(b) { const i = document.getElementById('talk-in'); i.value = b.textContent; talkRecommend(); }
 // AI로 먼저 해석(2~4초), 안 되면 규칙으로. 규칙으로도 못 알아들은 문장은 이름 없이 기록(추리 개선용)
 const TALK_TAGS = () => [...new Set(menuDB.flatMap(m => m.tags || []))];
-let talkBusy = false;
+let talkBusy = false, talkThinkT = null;
+const TALK_LINES = ['단서를 모으는 중…', '수상한 냄새가 나는데…', '돋보기로 자세히 보는 중…', '범인이 거의 보여요…', '조금만 더… 거의 다 왔어요!'];
+function talkThinking(on) {
+  let el = document.getElementById('talk-think');
+  clearInterval(talkThinkT);
+  if (!on) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement('div'); el.id = 'talk-think'; el.className = 'talk-think'; document.querySelector('.talk-box').after(el); }
+  let i = 0;
+  el.innerHTML = `<svg class="tk-det" viewBox="0 0 120 110" aria-hidden="true">  <ellipse cx="58" cy="100" rx="34" ry="5" fill="rgba(0,0,0,.18)"/>  <ellipse cx="58" cy="72" rx="38" ry="28" fill="#f3e2c4" stroke="#7a4c2a" stroke-width="2"/>  <g fill="#c99a6a"><circle cx="44" cy="78" r="2"/><circle cx="58" cy="86" r="2"/><circle cx="72" cy="78" r="2"/><circle cx="50" cy="66" r="1.6"/><circle cx="68" cy="66" r="1.6"/></g>  <ellipse cx="40" cy="74" rx="5" ry="3" fill="#f2a08a" opacity=".8"/><ellipse cx="76" cy="74" rx="5" ry="3" fill="#f2a08a" opacity=".8"/>  <circle cx="48" cy="64" r="3" fill="#2b1d14"/><circle cx="68" cy="64" r="3" fill="#2b1d14"/>  <path d="M55 70 L61 70 L58 74 Z" fill="#e8a33c"/>  <g class="tk-hat"><path d="M24 48 Q58 30 92 48 Q58 56 24 48 Z" fill="#8a6a4a" stroke="#5a3e26" stroke-width="2"/><path d="M36 47 Q38 26 58 24 Q78 26 80 47 Q58 52 36 47 Z" fill="#a47f58" stroke="#5a3e26" stroke-width="2"/><path d="M38 42 Q58 47 78 42" fill="none" stroke="#c8102e" stroke-width="3"/><path d="M58 24 Q56 16 63 14" fill="none" stroke="#5a3e26" stroke-width="2.4" stroke-linecap="round"/></g>  <g class="tk-glass"><line x1="96" y1="92" x2="84" y2="78" stroke="#5a3e26" stroke-width="5" stroke-linecap="round"/><circle cx="78" cy="70" r="11" fill="rgba(200,230,255,.35)" stroke="#5a3e26" stroke-width="3.5"/><path d="M72 66 Q75 62 80 63" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/></g></svg><div class="tk-line">${TALK_LINES[0]}</div>`;
+  talkThinkT = setInterval(() => { i = Math.min(i + 1, TALK_LINES.length - 1); const l = el.querySelector('.tk-line'); if (l) l.textContent = TALK_LINES[i]; }, 2600);
+}
 async function talkRecommend() {
   const text = (document.getElementById('talk-in').value || '').trim();
   if (!text) { showToast('먹고 싶은 느낌이나 상황을 적어 주세요'); return; }
   if (talkBusy) return;
   const rule = talkParse(text);
   let p = rule, ai = null;
+  // 이 폰에서 같은 문장을 또 쓰면 바로 (서버도 비슷한 문장은 바로 돌려줌)
+  const tkKey = text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  const tkMem = (() => { try { return JSON.parse(localStorage.getItem('wmjTalkMem') || '{}'); } catch (e) { return {}; } })();
+  if (tkMem[tkKey]) { const m = tkMem[tkKey]; talkApply(text, { inc: m.inc, exc: m.exc, cat: m.cat || rule.cat, said: m.clues && m.clues.length ? m.clues : rule.said, nope: [], reason: m.reason }); return; }
   if (AI_READY) {
     talkBusy = true;
     const btn = document.querySelector('.talk-row button'); if (btn) { btn.disabled = true; btn.textContent = '추리 중…'; }
+    talkThinking(true);
     try {
       ai = await Promise.race([aiCall('talk', { text, tags: TALK_TAGS() }), new Promise(r => setTimeout(() => r(null), 16000))]);
     } catch (e) { ai = null; }
     talkBusy = false; if (btn) { btn.disabled = false; btn.textContent = '추리해줘'; }
+    talkThinking(false);
+    if (ai && ai.ok && (ai.inc.length || ai.exc.length)) { try { tkMem[tkKey] = { inc: ai.inc, exc: ai.exc, cat: ai.cat, clues: ai.clues, reason: ai.reason }; const ks = Object.keys(tkMem); if (ks.length > 40) delete tkMem[ks[0]]; localStorage.setItem('wmjTalkMem', JSON.stringify(tkMem)); } catch (e) {} }
     if (ai && ai.ok && (ai.inc.length || ai.exc.length)) p = { inc: ai.inc, exc: ai.exc, cat: ai.cat || rule.cat, said: ai.clues && ai.clues.length ? ai.clues : rule.said, nope: [], reason: ai.reason };
     else if (ai && ai.ok && ai.reason) p = { ...rule, reason: ai.reason };
   }

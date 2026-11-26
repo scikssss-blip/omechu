@@ -113,6 +113,21 @@ Deno.serve(async (req) => {
       const text = String(body.text || '').slice(0, 80).trim();
       const tags = (Array.isArray(body.tags) ? body.tags : []).slice(0, 120).map((t: unknown) => String(t).slice(0, 24));
       if (!text || !tags.length) return json({ ok: false, reason: 'empty' }, 400);
+      // ① 저장된 답: 같은 문장이거나 아주 비슷하고 '안·빼고·말고' 같은 부정어 구성이 같으면 AI 없이 바로
+      const norm = text.toLowerCase().replace(/(먹고\s?싶[어다네음]?|뭐\s?먹[지을까]*|추천\s?해?\s?줘?|해\s?줘|좀|요(?=$|[.!?\s]))/g, '').replace(/[^\p{L}\p{N}]+/gu, '');
+      const negSig = (t: string) => [/안(?![주심전녕방경])/, /빼/, /말고/, /싫/, /못/, /없/, /덜/].map((re) => (re.test(t) ? 1 : 0)).join('');
+      const fit = (r: any) => ({ inc: (r.inc || []).filter((x: string) => tags.includes(x)), exc: (r.exc || []).filter((x: string) => tags.includes(x)), cat: r.cat || '', clues: r.clues || [], reason: r.reason || '' });
+      if (norm.length >= 2) {
+        const { data: hit } = await sb.rpc('talk_cache_find', { p_norm: norm });
+        const h = hit?.[0];
+        if (h && (h.norm === norm || (h.sim >= 0.5 && negSig(h.norm) === negSig(norm)))) {
+          const r = fit(h.result);
+          if (r.inc.length || r.exc.length) {
+            sb.from('talk_cache').update({ hits: 1 }).eq('norm', h.norm).then(() => {}, () => {});
+            return json({ ok: true, cached: true, ...r });
+          }
+        }
+      }
       const { data: allowed } = await sb.rpc('ai_take', { p_user_key: user_key, p_kind: 'talk', p_limit: LIMIT.talk });
       if (!allowed) return json({ ok: false, reason: 'limit' }, 429);
       const prompt = `너는 '오메추리' 앱의 탐정 메추리 '추리'야. 손님이 한 말에서 단서를 찾아 오늘 먹을 메뉴의 방향을 추리해.
@@ -125,6 +140,7 @@ JSON만 출력:
       const ok = (a: unknown) => (Array.isArray(a) ? a : []).map((x) => String(x)).filter((x) => tags.includes(x));
       const res = { inc: ok(p.inc).slice(0, 4), exc: ok(p.exc).slice(0, 6), cat: ['cook', 'delivery', 'dine'].includes(p.cat) ? p.cat : '', clues: (Array.isArray(p.clues) ? p.clues : []).slice(0, 3).map((x: unknown) => String(x).slice(0, 10)), reason: String(p.reason || '').slice(0, 60) };
       await sb.from('talk_log').insert({ text, found: res.inc.length + res.exc.length > 0, src: 'ai' });
+      if (norm.length >= 2 && (res.inc.length || res.exc.length)) await sb.from('talk_cache').upsert({ norm, result: res });
       return json({ ok: true, ...res });
     }
 
