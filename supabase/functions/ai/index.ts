@@ -91,6 +91,8 @@ async function ytTopComment(id: string, channelId: string): Promise<string> {
     return cs[0]?.t.slice(0, 4000) || '';
   } catch { return ''; }
 }
+// 조리 순서도 적혀 있는지 (재료만 있으면 글 정리는 건너뛰고 바로 영상 보기 → 20초쯤 절약)
+const hasSteps = (t: string) => (String(t || '').match(/(넣|볶|끓|썰|섞|부어|부으|익혀|졸여|데쳐|무쳐|구워|굽)/g) || []).length >= 3;
 const looksLikeRecipe = (t: string) => (t.match(/(큰술|작은술|컵|스푼|티스푼|\d+\s?(g|ml|개|장|쪽|줌|T|t)(?![A-Za-z])|재료)/g) || []).length >= 4;
 
 const RECIPE_PROMPT = `이 요리 영상을 보고 레시피를 정리해 줘. 한국어로, 아래 JSON 형식만 출력해.
@@ -159,8 +161,9 @@ Deno.serve(async (req) => {
       const isShort = /\/shorts\//.test(String(body.url)) || (!!info && info.secs > 0 && info.secs <= 180);
       const cmt = info && !descOk && isShort ? await ytTopComment(id, info.channelId) : '';
       const t0 = Date.now();
-      console.log('yt', id, JSON.stringify({ info: !!info, secs: info?.secs, descOk, isShort, cmtLen: cmt.length }));
-      const src = descOk ? `영상 설명란:\n${info!.desc}` : cmt ? `영상 설명란:\n${info!.desc.slice(0, 1500)}\n\n맨 위 댓글(재료가 적힌 고정·인기 댓글):\n${cmt}` : '';
+      console.log('yt', id, JSON.stringify({ info: !!info, secs: info?.secs, descOk, isShort, cmtLen: cmt.length, steps: hasSteps(descOk ? info!.desc : cmt) }));
+      const textSrc = descOk ? info!.desc : cmt;
+      const src = !hasSteps(textSrc) ? '' : descOk ? `영상 설명란:\n${info!.desc}` : cmt ? `영상 설명란:\n${info!.desc.slice(0, 1500)}\n\n맨 위 댓글(재료가 적힌 고정·인기 댓글):\n${cmt}` : '';
       let out = '', via = 'video';
       if (src) {
         try {
