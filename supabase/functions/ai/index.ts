@@ -77,20 +77,6 @@ async function ytInfo(id: string): Promise<{ title: string; channel: string; cha
 }
 // PT1M30S → 90
 const isoSecs = (t: string) => { const m = String(t || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : 0; };
-// 댓글 맨 위(인기순) 몇 개 중 재료가 적힌 것. 채널 주인이 쓴 댓글(보통 고정 댓글)을 먼저. 댓글이 막혀 있으면 ''
-async function ytTopComment(id: string, channelId: string): Promise<string> {
-  const key = Deno.env.get('YT_API_KEY') || Deno.env.get('GEMINI_API_KEY');
-  try {
-    const r = await fetch(`https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${id}&order=relevance&maxResults=8&textFormat=plainText&key=${key}`, { signal: AbortSignal.timeout(6000) });
-    if (!r.ok) return '';
-    const d = await r.json();
-    const cs = (d.items || []).map((it: any) => it.snippet?.topLevelComment?.snippet).filter(Boolean)
-      .map((c: any) => ({ t: String(c.textOriginal || c.textDisplay || ''), own: !!channelId && c.authorChannelId?.value === channelId }))
-      .filter((c: { t: string }) => looksLikeRecipe(c.t));
-    cs.sort((a: { own: boolean }, b: { own: boolean }) => Number(b.own) - Number(a.own));
-    return cs[0]?.t.slice(0, 4000) || '';
-  } catch { return ''; }
-}
 // 조리 순서도 적혀 있는지 (재료만 있으면 글 정리는 건너뛰고 바로 영상 보기 → 20초쯤 절약)
 const hasSteps = (t: string) => (String(t || '').match(/(넣|볶|끓|썰|섞|부어|부으|익혀|졸여|데쳐|무쳐|구워|굽)/g) || []).length >= 3;
 const looksLikeRecipe = (t: string) => (t.match(/(큰술|작은술|컵|스푼|티스푼|\d+\s?(g|ml|개|장|쪽|줌|T|t)(?![A-Za-z])|재료)/g) || []).length >= 4;
@@ -156,24 +142,21 @@ Deno.serve(async (req) => {
       // ① 설명란에 재료가 적혀 있으면 글만 읽고 끝 (몇 초) ② 없으면 영상을 2초에 1장, 저화질로 봄
       const info = await ytInfo(id);
       if (info?.gone) return json({ ok: false, gone: true, reason: '지워졌거나 비공개인 영상이에요' }, 404);
-      // 긴 영상은 설명란만. 쇼츠(주소가 shorts이거나 3분 이하)는 설명란에 없으면 고정·인기 댓글도 봄
+      // 긴 영상·쇼츠 모두 설명란만 봄. 설명란에 재료와 조리 순서가 다 있으면 글만 정리, 아니면 영상을 보고 정리(설명란 재료 양은 참고)
       const descOk = !!info && looksLikeRecipe(info.desc);
-      const isShort = /\/shorts\//.test(String(body.url)) || (!!info && info.secs > 0 && info.secs <= 180);
-      const cmt = info && !descOk && isShort ? await ytTopComment(id, info.channelId) : '';
       const t0 = Date.now();
-      console.log('yt', id, JSON.stringify({ info: !!info, secs: info?.secs, descOk, isShort, cmtLen: cmt.length, steps: hasSteps(descOk ? info!.desc : cmt) }));
-      const textSrc = descOk ? info!.desc : cmt;
-      const src = !hasSteps(textSrc) ? '' : descOk ? `영상 설명란:\n${info!.desc}` : cmt ? `영상 설명란:\n${info!.desc.slice(0, 1500)}\n\n맨 위 댓글(재료가 적힌 고정·인기 댓글):\n${cmt}` : '';
+      console.log('yt', id, JSON.stringify({ info: !!info, secs: info?.secs, descOk, steps: descOk && hasSteps(info!.desc) }));
+      const src = descOk && hasSteps(info!.desc) ? `영상 설명란:\n${info!.desc}` : '';
       let out = '', via = 'video';
       if (src) {
         try {
           out = await gemini([{ text: `영상 제목: ${info!.title}\n채널: ${info!.channel}\n${src}\n\n위 글만 보고 정리해. 조리 순서가 없으면 재료만 채우고 steps는 빈 배열로 둬.\n` + RECIPE_PROMPT }], true, 4096, false, true, 35000); // 글 정리는 생각 없이 바로 (빠름)
-          const t = JSON.parse(out); if (t?.ok && t.ingredients?.length >= 3 && t.steps?.length >= 3) via = descOk ? 'desc' : 'comment'; else out = '';
+          const t = JSON.parse(out); if (t?.ok && t.ingredients?.length >= 3 && t.steps?.length >= 3) via = 'desc'; else out = '';
         } catch { out = ''; }
       }
-      const hint = descOk ? info!.desc.slice(0, 2500) : cmt ? cmt.slice(0, 2500) : (info?.desc || '').slice(0, 2500);
+      const hint = (info?.desc || '').slice(0, 2500);
       if (!out) console.log('yt video path', id, 'after', Date.now() - t0);
-      if (!out) out = await gemini([{ file_data: { file_uri: `https://www.youtube.com/watch?v=${id}` }, video_metadata: { fps: 0.5 } }, { text: (hint ? `참고용 글(설명란 또는 맨 위 댓글, 재료 양이 적혀 있으면 이걸 우선):\n${hint}\n\n` : '') + RECIPE_PROMPT }], true, 4096, true, false, Math.max(20000, 125000 - (Date.now() - t0)));
+      if (!out) out = await gemini([{ file_data: { file_uri: `https://www.youtube.com/watch?v=${id}` }, video_metadata: { fps: 0.5 } }, { text: (hint ? `참고용 영상 설명란(재료 양이 적혀 있으면 이걸 우선):\n${hint}\n\n` : '') + RECIPE_PROMPT }], true, 4096, true, false, Math.max(20000, 125000 - (Date.now() - t0)));
       let recipe; try { recipe = JSON.parse(out); } catch { return json({ ok: false, reason: '영상을 정리하지 못했어요. 다시 시도해 주세요' }, 502); }
       if (!recipe?.ok || !Array.isArray(recipe.ingredients) || !Array.isArray(recipe.steps) || !recipe.steps.length) return json({ ok: false, reason: recipe?.reason || '이 영상에서는 레시피를 찾지 못했어요' }, 422);
       recipe.ingredients = recipe.ingredients.filter((x: unknown) => Array.isArray(x) && x[0]).slice(0, 30).map((x: string[]) => [String(x[0]).slice(0, 20), String(x[1] || '').slice(0, 20)]);
